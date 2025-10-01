@@ -1,0 +1,106 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Lock, User } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+
+interface LoginProps {
+  onSuccess?: () => void;
+}
+
+const Login = ({ onSuccess }: LoginProps) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    setTimeout(() => {
+      const success = login(username, password);
+      if (success) {
+        onSuccess?.();
+      } else {
+        setError("Invalid email address or password");
+      }
+      setIsLoading(false);
+    }, 1000); // Simulate network delay
+  };
+
+  return (
+    <div className="min-h-screen bg-deep-purple flex items-center justify-center p-4">
+      <Card className="w-full max-w-md bg-black/40 backdrop-blur-sm border-white/10">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl text-white flex items-center justify-center gap-2">
+            <Lock className="h-6 w-6 text-electric-blue" />
+            Admin Login
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-white">
+                Email Address
+              </Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
+                <Input
+                  id="username"
+                  type="email"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  placeholder="Enter email address"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-white">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  placeholder="Enter password"
+                  required
+                />
+              </div>
+            </div>
+
+            {error && (
+              <Alert className="bg-red-500/20 border-red-500/50">
+                <AlertDescription className="text-red-200">
+                  {error}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold"
+            >
+              {isLoading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default Login;
