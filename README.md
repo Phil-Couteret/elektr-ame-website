@@ -1,73 +1,122 @@
-# Welcome to your Lovable project
+# 🎵 Elektr-Âme Website
 
-## Project info
+A modern, multilingual website for Barcelona's vibrant electronic music community.
 
-**URL**: https://lovable.dev/projects/6f837210-4ef6-4a9c-b25f-0561a698e493
+## 🌟 Features
 
-## How can I edit this code?
+- **Multilingual Support** - English, Spanish, and Catalan
+- **Responsive Design** - Works on all devices
+- **Artist Showcase** - Featured artists with bios and social links
+- **Events Management** - Upcoming electronic music events
+- **Join Us Form** - Community registration with PHP backend
+- **Admin Panel** - Content management system
+- **Modern UI** - Built with React, TypeScript, and Tailwind CSS
 
-There are several ways of editing your application.
+## 🚀 Tech Stack
 
-**Use Lovable**
+### Frontend
+- **React 18** with TypeScript
+- **Vite** for fast development and building
+- **Tailwind CSS** for styling
+- **Radix UI** for accessible components
+- **React Router** for navigation
+- **React Hook Form** with Zod validation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/6f837210-4ef6-4a9c-b25f-0561a698e493) and start prompting.
+### Backend
+- **PHP 8.4** for API endpoints
+- **MySQL** for data storage
+- **PDO** for database operations
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📦 Installation
 
-**Use your preferred IDE**
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/yourusername/elektr-ame-website.git
+   cd elektr-ame-website
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+3. **Start development server:**
+   ```bash
+   npm run dev
+   ```
 
-Follow these steps:
+4. **Set up PHP backend (optional):**
+   ```bash
+   php setup-database.php
+   php -S localhost:8000
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🌐 Deployment
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Quick Deploy (Frontend Only)
+- **Vercel**: Connect your GitHub repo to Vercel
+- **Netlify**: Connect your GitHub repo to Netlify
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Full Stack Deploy
+- Upload `dist/` contents to your web host
+- Upload `api/` folder to your PHP-enabled host
+- Set up MySQL database using `database/schema.sql`
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+## 📁 Project Structure
+
+```
+elektr-ame-website/
+├── src/
+│   ├── components/     # React components
+│   ├── pages/         # Page components
+│   ├── contexts/      # React contexts
+│   ├── hooks/         # Custom hooks
+│   ├── locales/       # Translation files
+│   └── types/         # TypeScript types
+├── api/               # PHP backend
+├── database/          # Database schema
+├── public/            # Static assets
+└── dist/              # Built files
 ```
 
-**Edit a file directly in GitHub**
+## 🎨 Design Features
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Dark Theme** with electric blue accents
+- **Gradient Backgrounds** for visual appeal
+- **Smooth Animations** and transitions
+- **Mobile-First** responsive design
+- **Accessibility** compliant components
 
-**Use GitHub Codespaces**
+## 🔧 Development
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Available Scripts
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
 
-## What technologies are used for this project?
+### Adding New Languages
+1. Create new locale file in `src/locales/`
+2. Add language option to `LanguageContext.tsx`
+3. Update `LanguageSelector.tsx`
 
-This project is built with:
+## 📝 License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+This project is created for Elektr-Âme, a musical association based in Barcelona.
 
-## How can I deploy this project?
+## 🤝 Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/6f837210-4ef6-4a9c-b25f-0561a698e493) and click on Share -> Publish.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
 
-## Can I connect a custom domain to my Lovable project?
+## 📞 Contact
 
-Yes, you can!
+For questions about this project, contact the Elektr-Âme team.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+**Built with ❤️ for the Barcelona electronic music community**
