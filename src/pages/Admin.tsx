@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Calendar, Users, Home, Image, UserCog } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContextNew";
 import { Link } from "react-router-dom";
 import EventsManager from "@/components/admin/EventsManager";
 import ArtistsManager from "@/components/admin/ArtistsManager";
