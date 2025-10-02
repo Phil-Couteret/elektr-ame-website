@@ -27,10 +27,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Database configuration
-$host = 'localhost';
-$dbname = 'elektr_ame';
-$username = 'root';
-$password = '';
+$host = 'elektry2025.mysql.db';
+$dbname = 'elektry2025';
+$username = 'elektry2025';
+$password = '92Alcolea2025';
 
 try {
     // Create PDO connection

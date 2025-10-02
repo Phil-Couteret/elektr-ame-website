@@ -32,10 +32,10 @@ if ($_SESSION['admin_role'] !== 'superadmin') {
 }
 
 // Database configuration
-$host = 'localhost';
-$dbname = 'elektr_ame';
-$username = 'root';
-$password = '';
+$host = 'elektry2025.mysql.db';
+$dbname = 'elektry2025';
+$username = 'elektry2025';
+$password = '92Alcolea2025';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
