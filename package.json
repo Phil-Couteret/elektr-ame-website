@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && cp -r dist/* . && cp -r api . && cp -r database . && cp ovh-deployment/.htaccess .htaccess",
+    "build": "vite build",
+    "build:ovh": "vite build && cp -r dist/* . && cp -r api . && cp -r database . && cp ovh-deployment/.htaccess .htaccess",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
