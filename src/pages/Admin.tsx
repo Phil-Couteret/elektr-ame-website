@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
 import EventsManager from "@/components/admin/EventsManager";
 import ArtistsManager from "@/components/admin/ArtistsManager";
 import GalleryManager from "@/components/admin/GalleryManager";
+import UsersManager from "@/components/admin/UsersManager";
 
 const Admin = () => {
-  const { logout, user } = useAuth();
+  const { logout, user, isSuperAdmin } = useAuth();
   const [activeTab, setActiveTab] = useState("events");
 
   const handleLogout = () => {
@@ -35,7 +36,7 @@ const Admin = () => {
               <h1 className="text-xl font-bold text-white">Admin Panel</h1>
               {user && (
                 <span className="text-electric-blue text-sm">
-                  Welcome, {user}
+                  Welcome, {user.name} {isSuperAdmin && '(Superadmin)'}
                 </span>
               )}
             </div>
@@ -63,7 +64,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-black/40 border-white/10">
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-4' : 'grid-cols-3'} bg-black/40 border-white/10`}>
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -85,6 +86,15 @@ const Admin = () => {
               <Image className="h-4 w-4 mr-2" />
               Gallery
             </TabsTrigger>
+            {isSuperAdmin && (
+              <TabsTrigger 
+                value="users"
+                className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+              >
+                <UserCog className="h-4 w-4 mr-2" />
+                Users
+              </TabsTrigger>
+            )}
           </TabsList>
           
           <TabsContent value="events" className="mt-6">
@@ -98,6 +108,12 @@ const Admin = () => {
           <TabsContent value="gallery" className="mt-6">
             <GalleryManager />
           </TabsContent>
+
+          {isSuperAdmin && (
+            <TabsContent value="users" className="mt-6">
+              <UsersManager />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

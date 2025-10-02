@@ -51,3 +51,4 @@ jobs:
         password: ${{ secrets.OVH_FTP_PASSWORD }}
         local-dir: ./database/
         server-dir: ./www/database/
+

@@ -87,3 +87,4 @@ SELECT
     COUNT(CASE WHEN created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) THEN 1 END) as new_members_last_30_days
 FROM members;
 
+

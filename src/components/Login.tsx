@@ -18,20 +18,23 @@ const Login = ({ onSuccess }: LoginProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    setTimeout(() => {
-      const success = login(username, password);
-      if (success) {
+    try {
+      const result = await login(username, password);
+      if (result.success) {
         onSuccess?.();
       } else {
-        setError("Invalid email address or password");
+        setError(result.message || "Invalid email address or password");
       }
+    } catch (error) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 1000); // Simulate network delay
+    }
   };
 
   return (

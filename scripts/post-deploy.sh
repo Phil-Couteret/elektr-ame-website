@@ -15,3 +15,4 @@ cp ovh-deployment/.htaccess dist/
 
 echo "✅ Post-deployment setup complete!"
 echo "🌐 Your website is ready!"
+

@@ -27,3 +27,4 @@ cp ovh-deployment/.htaccess .htaccess
 
 echo "✅ Deployment complete!"
 echo "🌐 Files are now in the web root"
+
