@@ -1,4 +1,7 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
@@ -29,28 +32,29 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     
     // Get JSON input
-    $input = json_decode(file_get_contents('php://input'), true);
+    $rawInput = file_get_contents('php://input');
+    $input = json_decode($rawInput, true);
     
     if (!$input) {
-        throw new Exception('Invalid JSON input');
+        throw new Exception('Invalid JSON input. Raw: ' . substr($rawInput, 0, 100));
     }
     
     // Validate required fields
     $requiredFields = ['firstName', 'lastName', 'email', 'phone', 'city', 'country'];
     foreach ($requiredFields as $field) {
         if (empty($input[$field])) {
-            throw new Exception("Field '$field' is required");
+            throw new Exception("Field '$field' is required. Received: " . json_encode($input));
         }
     }
     
     // Validate email format
     if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Invalid email format');
+        throw new Exception('Invalid email format: ' . $input['email']);
     }
     
     // Validate phone format (international format)
     if (!preg_match('/^\+\d{1,3}\d{4,14}$/', $input['phone'])) {
-        throw new Exception('Invalid phone format. Use international format (e.g., +1234567890)');
+        throw new Exception('Invalid phone format. Use international format (e.g., +1234567890). Received: ' . $input['phone']);
     }
     
     // Prepare SQL statement
@@ -83,11 +87,14 @@ try {
     // Bind parameters
     $stmt->bindParam(':firstName', $input['firstName']);
     $stmt->bindParam(':lastName', $input['lastName']);
-    $stmt->bindParam(':secondName', $input['secondName'] ?? null);
+    $secondName = $input['secondName'] ?? null;
+    $stmt->bindParam(':secondName', $secondName);
     $stmt->bindParam(':email', $input['email']);
     $stmt->bindParam(':phone', $input['phone']);
-    $stmt->bindParam(':street', $input['street'] ?? null);
-    $stmt->bindParam(':zipCode', $input['zipCode'] ?? null);
+    $street = $input['street'] ?? null;
+    $stmt->bindParam(':street', $street);
+    $zipCode = $input['zipCode'] ?? null;
+    $stmt->bindParam(':zipCode', $zipCode);
     $stmt->bindParam(':city', $input['city']);
     $stmt->bindParam(':country', $input['country']);
     
@@ -98,7 +105,11 @@ try {
     echo json_encode([
         'success' => true,
         'message' => 'Member registration successful',
-        'member_id' => $pdo->lastInsertId()
+        'member_id' => $pdo->lastInsertId(),
+        'debug' => [
+            'received_data' => $input,
+            'php_version' => phpversion()
+        ]
     ]);
     
 } catch (PDOException $e) {
@@ -107,14 +118,18 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Database error occurred'
+        'message' => 'Database error occurred',
+        'error' => $e->getMessage(),
+        'code' => $e->getCode(),
+        'trace' => $e->getTraceAsString()
     ]);
 } catch (Exception $e) {
     // Validation or other error
     http_response_code(400);
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'trace' => $e->getTraceAsString()
     ]);
 }
 ?>
