@@ -1,0 +1,28 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Allow API requests to pass through without redirection
+RewriteCond %{REQUEST_URI} ^/api/ [NC]
+RewriteRule ^ - [L]
+
+# Allow existing files and directories
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect all other requests to index.html for React Router
+RewriteRule ^ /index.html [L]
+
+# Set proper MIME types
+<IfModule mod_mime.c>
+    AddType application/javascript js
+    AddType text/css css
+</IfModule>
+
+# Enable CORS for API
+<IfModule mod_headers.c>
+    SetEnvIf Origin "^http(s)?://(.+\.)?(elektr-ame\.com)$" AccessControlAllowOrigin=$0
+    Header set Access-Control-Allow-Origin "%{AccessControlAllowOrigin}e" env=AccessControlAllowOrigin
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS, PUT, DELETE"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
+
