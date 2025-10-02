@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Define user type
+// Define user type  
+// Backend authentication with secure PHP sessions
 type User = {
   email: string;
   name: string;
