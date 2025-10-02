@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Home } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
+import { Link } from "react-router-dom";
 
 interface LoginProps {
   onSuccess?: () => void;
@@ -39,13 +40,24 @@ const Login = ({ onSuccess }: LoginProps) => {
 
   return (
     <div className="min-h-screen bg-deep-purple flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-black/40 backdrop-blur-sm border-white/10">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl text-white flex items-center justify-center gap-2">
-            <Lock className="h-6 w-6 text-electric-blue" />
-            Admin Login
-          </CardTitle>
-        </CardHeader>
+      <div className="w-full max-w-md space-y-4">
+        <Link to="/" className="block">
+          <Button 
+            variant="outline" 
+            className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue/20"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        </Link>
+        
+        <Card className="w-full bg-black/40 backdrop-blur-sm border-white/10">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl text-white flex items-center justify-center gap-2">
+              <Lock className="h-6 w-6 text-electric-blue" />
+              Admin Login
+            </CardTitle>
+          </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -102,6 +114,7 @@ const Login = ({ onSuccess }: LoginProps) => {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
