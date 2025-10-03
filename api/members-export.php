@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
+header('Access-Control-Allow-Credentials: true');
+
 // Check if user is authenticated
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);

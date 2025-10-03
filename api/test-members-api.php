@@ -2,6 +2,8 @@
 session_start();
 
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
+header('Access-Control-Allow-Credentials: true');
 
 $response = [
     'test' => 'Members API test',
