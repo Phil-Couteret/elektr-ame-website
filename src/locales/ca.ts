@@ -114,5 +114,112 @@ export default {
   'joinUs.submit': 'Uneix-te a Elektr-Âme',
   'joinUs.submitting': 'Enviant...',
   'joinUs.success': 'Gràcies! La teva sol·licitud ha estat enviada exitosament.',
-  'joinUs.error': 'Ha ocorregut un error. Si us plau, torna-ho a intentar.'
+  'joinUs.error': 'Ha ocorregut un error. Si us plau, torna-ho a intentar.',
+  
+  // Admin - Login
+  'admin.login.title': 'Inici de Sessió Admin',
+  'admin.login.email': 'Correu Electrònic',
+  'admin.login.emailPlaceholder': 'Introdueix el teu correu electrònic',
+  'admin.login.password': 'Contrasenya',
+  'admin.login.passwordPlaceholder': 'Introdueix la teva contrasenya',
+  'admin.login.submit': 'Iniciar Sessió',
+  'admin.login.submitting': 'Iniciant sessió...',
+  'admin.login.backToHome': 'Tornar a l\'Inici',
+  
+  // Admin - Header
+  'admin.header.title': 'Panell d\'Administració',
+  'admin.header.welcome': 'Benvingut/da',
+  'admin.header.superadmin': 'Superadministrador',
+  'admin.header.home': 'Inici',
+  'admin.header.logout': 'Tancar Sessió',
+  
+  // Admin - Tabs
+  'admin.tabs.events': 'Esdeveniments',
+  'admin.tabs.artists': 'Artistes',
+  'admin.tabs.gallery': 'Galeria',
+  'admin.tabs.members': 'Membres',
+  'admin.tabs.users': 'Usuaris',
+  
+  // Admin - Members Management
+  'admin.members.title': 'Gestió de Membresies',
+  'admin.members.subtitle': 'Gestiona registres, pagaments i renovacions de membres',
+  'admin.members.exportCSV': 'Exportar CSV',
+  'admin.members.exporting': 'Exportant...',
+  'admin.members.noMembers': 'No hi ha membres registrats encara',
+  'admin.members.showing': 'Mostrant',
+  'admin.members.of': 'de',
+  'admin.members.members': 'membres',
+  
+  // Admin - Members Table
+  'admin.members.table.name': 'Nom',
+  'admin.members.table.email': 'Correu',
+  'admin.members.table.status': 'Estat',
+  'admin.members.table.membership': 'Membresia',
+  'admin.members.table.expires': 'Caduca',
+  'admin.members.table.payment': 'Pagament',
+  'admin.members.table.amount': 'Import',
+  'admin.members.table.actions': 'Accions',
+  
+  // Admin - Member Status
+  'admin.status.pending': 'Pendent',
+  'admin.status.approved': 'Aprovat',
+  'admin.status.rejected': 'Rebutjat',
+  'admin.status.approve': 'Aprovar',
+  'admin.status.reject': 'Rebutjar',
+  'admin.status.manage': 'Gestionar',
+  
+  // Admin - Membership Types
+  'admin.membership.freeTrial': 'Prova Gratuïta',
+  'admin.membership.monthly': 'Mensual',
+  'admin.membership.yearly': 'Anual',
+  'admin.membership.lifetime': 'Vitalícia',
+  
+  // Admin - Payment Status
+  'admin.payment.unpaid': 'No Pagat',
+  'admin.payment.paid': 'Pagat',
+  'admin.payment.overdue': 'Vençut',
+  
+  // Admin - Filters
+  'admin.filter.all': 'Tots els Membres',
+  'admin.filter.pending': 'Pendents',
+  'admin.filter.approved': 'Aprovats',
+  'admin.filter.rejected': 'Rebutjats',
+  'admin.filter.expiringSoon': 'Per Vèncer',
+  'admin.filter.expired': 'Vençuts',
+  
+  // Admin - Expiration Warnings
+  'admin.expiry.expired': 'Vençut',
+  'admin.expiry.daysLeft': 'dies restants',
+  'admin.expiry.expiresIn': 'Caduca en',
+  'admin.expiry.expiringSoon': 'membresia per vèncer',
+  'admin.expiry.expiredCount': 'membresia vençuda',
+  
+  // Admin - Membership Dialog
+  'admin.dialog.title': 'Gestionar Membresia',
+  'admin.dialog.membershipType': 'Tipus de Membresia',
+  'admin.dialog.paymentStatus': 'Estat del Pagament',
+  'admin.dialog.quickRenewal': 'Renovació Ràpida',
+  'admin.dialog.startDate': 'Data d\'Inici',
+  'admin.dialog.endDate': 'Data de Fi',
+  'admin.dialog.lastPayment': 'Data Últim Pagament',
+  'admin.dialog.amount': 'Import del Pagament',
+  'admin.dialog.notes': 'Notes Internes',
+  'admin.dialog.notesPlaceholder': 'Afegeix notes internes sobre aquest membre...',
+  'admin.dialog.cancel': 'Cancel·lar',
+  'admin.dialog.save': 'Guardar Canvis',
+  'admin.dialog.saving': 'Guardant...',
+  'admin.dialog.month1': '+1 Mes',
+  'admin.dialog.month3': '+3 Mesos',
+  'admin.dialog.month6': '+6 Mesos',
+  'admin.dialog.year1': '+1 Any',
+  
+  // Admin - Messages
+  'admin.message.success': 'Èxit',
+  'admin.message.error': 'Error',
+  'admin.message.statusUpdated': 'Membre {status} exitosament',
+  'admin.message.membershipUpdated': 'Membresia actualitzada exitosament',
+  'admin.message.exportSuccess': 'Llista de membres exportada exitosament',
+  'admin.message.exportError': 'Error en exportar membres',
+  'admin.message.loadError': 'Error en carregar membres',
+  'admin.message.updateError': 'Error en actualitzar membre'
 };

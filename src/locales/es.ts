@@ -114,5 +114,112 @@ export default {
   'joinUs.submit': 'Únete a Elektr-Âme',
   'joinUs.submitting': 'Enviando...',
   'joinUs.success': '¡Gracias! Tu solicitud ha sido enviada exitosamente.',
-  'joinUs.error': 'Ocurrió un error. Por favor intenta de nuevo.'
+  'joinUs.error': 'Ocurrió un error. Por favor intenta de nuevo.',
+  
+  // Admin - Login
+  'admin.login.title': 'Inicio de Sesión Admin',
+  'admin.login.email': 'Correo Electrónico',
+  'admin.login.emailPlaceholder': 'Ingresa tu correo electrónico',
+  'admin.login.password': 'Contraseña',
+  'admin.login.passwordPlaceholder': 'Ingresa tu contraseña',
+  'admin.login.submit': 'Iniciar Sesión',
+  'admin.login.submitting': 'Iniciando sesión...',
+  'admin.login.backToHome': 'Volver al Inicio',
+  
+  // Admin - Header
+  'admin.header.title': 'Panel de Administración',
+  'admin.header.welcome': 'Bienvenido/a',
+  'admin.header.superadmin': 'Superadministrador',
+  'admin.header.home': 'Inicio',
+  'admin.header.logout': 'Cerrar Sesión',
+  
+  // Admin - Tabs
+  'admin.tabs.events': 'Eventos',
+  'admin.tabs.artists': 'Artistas',
+  'admin.tabs.gallery': 'Galería',
+  'admin.tabs.members': 'Miembros',
+  'admin.tabs.users': 'Usuarios',
+  
+  // Admin - Members Management
+  'admin.members.title': 'Gestión de Membresías',
+  'admin.members.subtitle': 'Gestiona registros, pagos y renovaciones de miembros',
+  'admin.members.exportCSV': 'Exportar CSV',
+  'admin.members.exporting': 'Exportando...',
+  'admin.members.noMembers': 'No hay miembros registrados aún',
+  'admin.members.showing': 'Mostrando',
+  'admin.members.of': 'de',
+  'admin.members.members': 'miembros',
+  
+  // Admin - Members Table
+  'admin.members.table.name': 'Nombre',
+  'admin.members.table.email': 'Correo',
+  'admin.members.table.status': 'Estado',
+  'admin.members.table.membership': 'Membresía',
+  'admin.members.table.expires': 'Vence',
+  'admin.members.table.payment': 'Pago',
+  'admin.members.table.amount': 'Monto',
+  'admin.members.table.actions': 'Acciones',
+  
+  // Admin - Member Status
+  'admin.status.pending': 'Pendiente',
+  'admin.status.approved': 'Aprobado',
+  'admin.status.rejected': 'Rechazado',
+  'admin.status.approve': 'Aprobar',
+  'admin.status.reject': 'Rechazar',
+  'admin.status.manage': 'Gestionar',
+  
+  // Admin - Membership Types
+  'admin.membership.freeTrial': 'Prueba Gratis',
+  'admin.membership.monthly': 'Mensual',
+  'admin.membership.yearly': 'Anual',
+  'admin.membership.lifetime': 'Vitalicia',
+  
+  // Admin - Payment Status
+  'admin.payment.unpaid': 'No Pagado',
+  'admin.payment.paid': 'Pagado',
+  'admin.payment.overdue': 'Vencido',
+  
+  // Admin - Filters
+  'admin.filter.all': 'Todos los Miembros',
+  'admin.filter.pending': 'Pendientes',
+  'admin.filter.approved': 'Aprobados',
+  'admin.filter.rejected': 'Rechazados',
+  'admin.filter.expiringSoon': 'Por Vencer',
+  'admin.filter.expired': 'Vencidos',
+  
+  // Admin - Expiration Warnings
+  'admin.expiry.expired': 'Vencido',
+  'admin.expiry.daysLeft': 'días restantes',
+  'admin.expiry.expiresIn': 'Vence en',
+  'admin.expiry.expiringSoon': 'membresía por vencer',
+  'admin.expiry.expiredCount': 'membresía vencida',
+  
+  // Admin - Membership Dialog
+  'admin.dialog.title': 'Gestionar Membresía',
+  'admin.dialog.membershipType': 'Tipo de Membresía',
+  'admin.dialog.paymentStatus': 'Estado de Pago',
+  'admin.dialog.quickRenewal': 'Renovación Rápida',
+  'admin.dialog.startDate': 'Fecha de Inicio',
+  'admin.dialog.endDate': 'Fecha de Fin',
+  'admin.dialog.lastPayment': 'Fecha Último Pago',
+  'admin.dialog.amount': 'Monto del Pago',
+  'admin.dialog.notes': 'Notas Internas',
+  'admin.dialog.notesPlaceholder': 'Añade notas internas sobre este miembro...',
+  'admin.dialog.cancel': 'Cancelar',
+  'admin.dialog.save': 'Guardar Cambios',
+  'admin.dialog.saving': 'Guardando...',
+  'admin.dialog.month1': '+1 Mes',
+  'admin.dialog.month3': '+3 Meses',
+  'admin.dialog.month6': '+6 Meses',
+  'admin.dialog.year1': '+1 Año',
+  
+  // Admin - Messages
+  'admin.message.success': 'Éxito',
+  'admin.message.error': 'Error',
+  'admin.message.statusUpdated': 'Miembro {status} exitosamente',
+  'admin.message.membershipUpdated': 'Membresía actualizada exitosamente',
+  'admin.message.exportSuccess': 'Lista de miembros exportada exitosamente',
+  'admin.message.exportError': 'Error al exportar miembros',
+  'admin.message.loadError': 'Error al cargar miembros',
+  'admin.message.updateError': 'Error al actualizar miembro'
 };

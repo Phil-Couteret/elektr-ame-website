@@ -117,5 +117,112 @@ export default {
   'joinUs.submit': 'Join Elektr-Âme',
   'joinUs.submitting': 'Submitting...',
   'joinUs.success': 'Thank you! Your application has been submitted successfully.',
-  'joinUs.error': 'An error occurred. Please try again.'
+  'joinUs.error': 'An error occurred. Please try again.',
+  
+  // Admin - Login
+  'admin.login.title': 'Admin Login',
+  'admin.login.email': 'Email Address',
+  'admin.login.emailPlaceholder': 'Enter email address',
+  'admin.login.password': 'Password',
+  'admin.login.passwordPlaceholder': 'Enter password',
+  'admin.login.submit': 'Sign In',
+  'admin.login.submitting': 'Signing in...',
+  'admin.login.backToHome': 'Back to Home',
+  
+  // Admin - Header
+  'admin.header.title': 'Admin Panel',
+  'admin.header.welcome': 'Welcome',
+  'admin.header.superadmin': 'Superadmin',
+  'admin.header.home': 'Home',
+  'admin.header.logout': 'Logout',
+  
+  // Admin - Tabs
+  'admin.tabs.events': 'Events',
+  'admin.tabs.artists': 'Artists',
+  'admin.tabs.gallery': 'Gallery',
+  'admin.tabs.members': 'Members',
+  'admin.tabs.users': 'Users',
+  
+  // Admin - Members Management
+  'admin.members.title': 'Membership Management',
+  'admin.members.subtitle': 'Manage member registrations, payments, and membership renewals',
+  'admin.members.exportCSV': 'Export CSV',
+  'admin.members.exporting': 'Exporting...',
+  'admin.members.noMembers': 'No members registered yet',
+  'admin.members.showing': 'Showing',
+  'admin.members.of': 'of',
+  'admin.members.members': 'members',
+  
+  // Admin - Members Table
+  'admin.members.table.name': 'Name',
+  'admin.members.table.email': 'Email',
+  'admin.members.table.status': 'Status',
+  'admin.members.table.membership': 'Membership',
+  'admin.members.table.expires': 'Expires',
+  'admin.members.table.payment': 'Payment',
+  'admin.members.table.amount': 'Amount',
+  'admin.members.table.actions': 'Actions',
+  
+  // Admin - Member Status
+  'admin.status.pending': 'Pending',
+  'admin.status.approved': 'Approved',
+  'admin.status.rejected': 'Rejected',
+  'admin.status.approve': 'Approve',
+  'admin.status.reject': 'Reject',
+  'admin.status.manage': 'Manage',
+  
+  // Admin - Membership Types
+  'admin.membership.freeTrial': 'Free Trial',
+  'admin.membership.monthly': 'Monthly',
+  'admin.membership.yearly': 'Yearly',
+  'admin.membership.lifetime': 'Lifetime',
+  
+  // Admin - Payment Status
+  'admin.payment.unpaid': 'Unpaid',
+  'admin.payment.paid': 'Paid',
+  'admin.payment.overdue': 'Overdue',
+  
+  // Admin - Filters
+  'admin.filter.all': 'All Members',
+  'admin.filter.pending': 'Pending',
+  'admin.filter.approved': 'Approved',
+  'admin.filter.rejected': 'Rejected',
+  'admin.filter.expiringSoon': 'Expiring Soon',
+  'admin.filter.expired': 'Expired',
+  
+  // Admin - Expiration Warnings
+  'admin.expiry.expired': 'Expired',
+  'admin.expiry.daysLeft': 'days left',
+  'admin.expiry.expiresIn': 'Expires in',
+  'admin.expiry.expiringSoon': 'membership expiring soon',
+  'admin.expiry.expiredCount': 'expired membership',
+  
+  // Admin - Membership Dialog
+  'admin.dialog.title': 'Manage Membership',
+  'admin.dialog.membershipType': 'Membership Type',
+  'admin.dialog.paymentStatus': 'Payment Status',
+  'admin.dialog.quickRenewal': 'Quick Renewal',
+  'admin.dialog.startDate': 'Start Date',
+  'admin.dialog.endDate': 'End Date',
+  'admin.dialog.lastPayment': 'Last Payment Date',
+  'admin.dialog.amount': 'Payment Amount',
+  'admin.dialog.notes': 'Internal Notes',
+  'admin.dialog.notesPlaceholder': 'Add any internal notes about this member...',
+  'admin.dialog.cancel': 'Cancel',
+  'admin.dialog.save': 'Save Changes',
+  'admin.dialog.saving': 'Saving...',
+  'admin.dialog.month1': '+1 Month',
+  'admin.dialog.month3': '+3 Months',
+  'admin.dialog.month6': '+6 Months',
+  'admin.dialog.year1': '+1 Year',
+  
+  // Admin - Messages
+  'admin.message.success': 'Success',
+  'admin.message.error': 'Error',
+  'admin.message.statusUpdated': 'Member {status} successfully',
+  'admin.message.membershipUpdated': 'Membership updated successfully',
+  'admin.message.exportSuccess': 'Members list exported successfully',
+  'admin.message.exportError': 'Failed to export members',
+  'admin.message.loadError': 'Failed to load members',
+  'admin.message.updateError': 'Failed to update member'
 };
