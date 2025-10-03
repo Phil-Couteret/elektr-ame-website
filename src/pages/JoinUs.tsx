@@ -16,12 +16,18 @@ const joinUsSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
   lastName: z.string().min(2, "Last name must be at least 2 characters"),
   secondName: z.string().optional(),
+  artistName: z.string().optional(),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().regex(/^\+\d{1,3}\d{4,14}$/, "Please enter a valid international phone number (e.g., +1234567890)"),
   street: z.string().optional(),
   zipCode: z.string().optional(),
   city: z.string().min(2, "City must be at least 2 characters"),
   country: z.string().min(2, "Country must be at least 2 characters"),
+  isDj: z.boolean().optional(),
+  isProducer: z.boolean().optional(),
+  isVj: z.boolean().optional(),
+  isVisualArtist: z.boolean().optional(),
+  isFan: z.boolean().optional(),
 });
 
 type JoinUsFormData = z.infer<typeof joinUsSchema>;
@@ -167,6 +173,66 @@ const JoinUs = () => {
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                       placeholder={t('joinUs.secondNamePlaceholder', 'Enter your second name (optional)')}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="artistName" className="text-white">
+                      {t('joinUs.artistName', 'Nickname / Artist Name')} ({t('joinUs.optional', 'Optional')})
+                    </Label>
+                    <Input
+                      id="artistName"
+                      {...register('artistName')}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder={t('joinUs.artistNamePlaceholder', 'e.g. DJ Shadow, VJ Luna')}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-white">
+                      {t('joinUs.roles', 'What describes you best?')} ({t('joinUs.optional', 'Optional')})
+                    </Label>
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                      <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          {...register('isDj')}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-sm text-white">DJ</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          {...register('isProducer')}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-sm text-white">{t('joinUs.producer', 'Producer')}</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          {...register('isVj')}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-sm text-white">VJ</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          {...register('isVisualArtist')}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-sm text-white">{t('joinUs.visualArtist', 'Visual Artist')}</span>
+                      </label>
+                      <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          {...register('isFan')}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-sm text-white">{t('joinUs.fan', 'Fan')}</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
 

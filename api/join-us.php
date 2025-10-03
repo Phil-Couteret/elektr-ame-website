@@ -61,24 +61,36 @@ try {
     $sql = "INSERT INTO members (
         first_name, 
         last_name, 
-        second_name, 
+        second_name,
+        artist_name,
         email, 
         phone, 
         street, 
         zip_code, 
         city, 
-        country, 
+        country,
+        is_dj,
+        is_producer,
+        is_vj,
+        is_visual_artist,
+        is_fan,
         created_at
     ) VALUES (
         :firstName, 
         :lastName, 
-        :secondName, 
+        :secondName,
+        :artistName,
         :email, 
         :phone, 
         :street, 
         :zipCode, 
         :city, 
-        :country, 
+        :country,
+        :isDj,
+        :isProducer,
+        :isVj,
+        :isVisualArtist,
+        :isFan,
         NOW()
     )";
     
@@ -89,6 +101,8 @@ try {
     $stmt->bindParam(':lastName', $input['lastName']);
     $secondName = $input['secondName'] ?? null;
     $stmt->bindParam(':secondName', $secondName);
+    $artistName = $input['artistName'] ?? null;
+    $stmt->bindParam(':artistName', $artistName);
     $stmt->bindParam(':email', $input['email']);
     $stmt->bindParam(':phone', $input['phone']);
     $street = $input['street'] ?? null;
@@ -97,6 +111,16 @@ try {
     $stmt->bindParam(':zipCode', $zipCode);
     $stmt->bindParam(':city', $input['city']);
     $stmt->bindParam(':country', $input['country']);
+    $isDj = isset($input['isDj']) && $input['isDj'] ? 1 : 0;
+    $stmt->bindParam(':isDj', $isDj, PDO::PARAM_INT);
+    $isProducer = isset($input['isProducer']) && $input['isProducer'] ? 1 : 0;
+    $stmt->bindParam(':isProducer', $isProducer, PDO::PARAM_INT);
+    $isVj = isset($input['isVj']) && $input['isVj'] ? 1 : 0;
+    $stmt->bindParam(':isVj', $isVj, PDO::PARAM_INT);
+    $isVisualArtist = isset($input['isVisualArtist']) && $input['isVisualArtist'] ? 1 : 0;
+    $stmt->bindParam(':isVisualArtist', $isVisualArtist, PDO::PARAM_INT);
+    $isFan = isset($input['isFan']) && $input['isFan'] ? 1 : 0;
+    $stmt->bindParam(':isFan', $isFan, PDO::PARAM_INT);
     
     // Execute the statement
     $stmt->execute();
