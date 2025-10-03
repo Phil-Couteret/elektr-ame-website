@@ -158,6 +158,9 @@ export default {
   'admin.members.showing': 'Showing',
   'admin.members.of': 'of',
   'admin.members.members': 'members',
+  'admin.members.confirmDelete': 'Confirm Delete?',
+  'admin.members.deleted': 'Member deleted successfully',
+  'admin.members.deleteError': 'Failed to delete member',
   
   // Admin - Members Table
   'admin.members.table.name': 'Name',

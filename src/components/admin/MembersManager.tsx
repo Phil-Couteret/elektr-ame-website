@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus } from "lucide-react";
+import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MembershipDialog from "./MembershipDialog";
@@ -49,6 +49,8 @@ const MembersManager = () => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -192,6 +194,50 @@ const MembersManager = () => {
   const handleEditMembership = (member: Member) => {
     setSelectedMember(member);
     setIsDialogOpen(true);
+  };
+
+  const handleDeleteMember = async (member: Member) => {
+    if (!memberToDelete) {
+      // First click - show confirmation
+      setMemberToDelete(member);
+      return;
+    }
+
+    // Second confirmation - actually delete
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/members-delete.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          member_id: member.id
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('admin.message.success'),
+          description: t('admin.members.deleted'),
+        });
+        fetchMembers();
+        setMemberToDelete(null);
+      } else {
+        throw new Error(data.error || 'Failed to delete member');
+      }
+    } catch (error) {
+      toast({
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.members.deleteError'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -436,6 +482,33 @@ const MembersManager = () => {
                             <Edit className="h-3 w-3 mr-1" />
                             {t('admin.status.manage')}
                           </Button>
+                          
+                          {memberToDelete?.id === member.id ? (
+                            <Button
+                              size="sm"
+                              onClick={() => handleDeleteMember(member)}
+                              disabled={isDeleting}
+                              className="bg-red-600 hover:bg-red-700 text-white"
+                            >
+                              {isDeleting ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <>
+                                  <Trash2 className="h-3 w-3 mr-1" />
+                                  {t('admin.members.confirmDelete')}
+                                </>
+                              )}
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={() => setMemberToDelete(member)}
+                              variant="outline"
+                              className="border-red-400 text-red-400 hover:bg-red-400/20"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          )}
                           {member.status !== 'approved' && (
                             <Button
                               size="sm"

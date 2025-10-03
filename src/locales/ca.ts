@@ -155,6 +155,9 @@ export default {
   'admin.members.showing': 'Mostrant',
   'admin.members.of': 'de',
   'admin.members.members': 'membres',
+  'admin.members.confirmDelete': 'Confirmar Eliminació?',
+  'admin.members.deleted': 'Membre eliminat exitosament',
+  'admin.members.deleteError': 'Error en eliminar membre',
   
   // Admin - Members Table
   'admin.members.table.name': 'Nom',
