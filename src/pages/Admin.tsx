@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image, UserCog } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
 import { Link } from "react-router-dom";
 import EventsManager from "@/components/admin/EventsManager";
 import ArtistsManager from "@/components/admin/ArtistsManager";
 import GalleryManager from "@/components/admin/GalleryManager";
 import UsersManager from "@/components/admin/UsersManager";
+import MembersManager from "@/components/admin/MembersManager";
 
 const Admin = () => {
   const { logout, user, isSuperAdmin } = useAuth();
@@ -64,7 +65,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-4' : 'grid-cols-3'} bg-black/40 border-white/10`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'} bg-black/40 border-white/10`}>
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -85,6 +86,13 @@ const Admin = () => {
             >
               <Image className="h-4 w-4 mr-2" />
               Gallery
+            </TabsTrigger>
+            <TabsTrigger 
+              value="members"
+              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Members
             </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger 
@@ -107,6 +115,10 @@ const Admin = () => {
 
           <TabsContent value="gallery" className="mt-6">
             <GalleryManager />
+          </TabsContent>
+
+          <TabsContent value="members" className="mt-6">
+            <MembersManager />
           </TabsContent>
 
           {isSuperAdmin && (
