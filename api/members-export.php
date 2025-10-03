@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
 header('Access-Control-Allow-Credentials: true');
 
 // Check if user is authenticated
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit();

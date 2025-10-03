@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Check if user is authenticated
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit();
