@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Member {
   id: number;
@@ -31,6 +32,7 @@ interface MembershipDialogProps {
 
 const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipDialogProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     membership_type: '',
@@ -98,8 +100,8 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
 
       if (data.success) {
         toast({
-          title: "Success",
-          description: "Membership updated successfully",
+          title: t('admin.message.success'),
+          description: t('admin.message.membershipUpdated'),
         });
         onSuccess();
         onOpenChange(false);
@@ -108,8 +110,8 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update membership",
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.message.updateError'),
         variant: "destructive",
       });
     } finally {
@@ -123,7 +125,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-deep-purple border-white/10 text-white max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Manage Membership: {member.first_name} {member.last_name}</DialogTitle>
+          <DialogTitle>{t('admin.dialog.title')}: {member.first_name} {member.last_name}</DialogTitle>
           <DialogDescription className="text-white/60">
             {member.email}
           </DialogDescription>
@@ -132,56 +134,56 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Membership Type</Label>
+              <Label>{t('admin.dialog.membershipType')}</Label>
               <Select value={formData.membership_type} onValueChange={(value) => setFormData({ ...formData, membership_type: value })}>
                 <SelectTrigger className="bg-black/40 border-white/10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="free_trial">Free Trial</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                  <SelectItem value="lifetime">Lifetime</SelectItem>
+                  <SelectItem value="free_trial">{t('admin.membership.freeTrial')}</SelectItem>
+                  <SelectItem value="monthly">{t('admin.membership.monthly')}</SelectItem>
+                  <SelectItem value="yearly">{t('admin.membership.yearly')}</SelectItem>
+                  <SelectItem value="lifetime">{t('admin.membership.lifetime')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Status</Label>
+              <Label>{t('admin.dialog.paymentStatus')}</Label>
               <Select value={formData.payment_status} onValueChange={(value) => setFormData({ ...formData, payment_status: value })}>
                 <SelectTrigger className="bg-black/40 border-white/10">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="unpaid">Unpaid</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
+                  <SelectItem value="unpaid">{t('admin.payment.unpaid')}</SelectItem>
+                  <SelectItem value="paid">{t('admin.payment.paid')}</SelectItem>
+                  <SelectItem value="overdue">{t('admin.payment.overdue')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Quick Renewal</Label>
+            <Label>{t('admin.dialog.quickRenewal')}</Label>
             <div className="flex gap-2">
               <Button type="button" variant="outline" size="sm" onClick={() => handleQuickRenewal(1)} className="border-electric-blue text-electric-blue">
-                +1 Month
+                {t('admin.dialog.month1')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => handleQuickRenewal(3)} className="border-electric-blue text-electric-blue">
-                +3 Months
+                {t('admin.dialog.month3')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => handleQuickRenewal(6)} className="border-electric-blue text-electric-blue">
-                +6 Months
+                {t('admin.dialog.month6')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => handleQuickRenewal(12)} className="border-electric-blue text-electric-blue">
-                +1 Year
+                {t('admin.dialog.year1')}
               </Button>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Start Date</Label>
+              <Label>{t('admin.dialog.startDate')}</Label>
               <Input
                 type="date"
                 value={formData.membership_start_date}
@@ -191,7 +193,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             </div>
 
             <div className="space-y-2">
-              <Label>End Date</Label>
+              <Label>{t('admin.dialog.endDate')}</Label>
               <Input
                 type="date"
                 value={formData.membership_end_date}
@@ -203,7 +205,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Last Payment Date</Label>
+              <Label>{t('admin.dialog.lastPayment')}</Label>
               <Input
                 type="date"
                 value={formData.last_payment_date}
@@ -213,7 +215,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             </div>
 
             <div className="space-y-2">
-              <Label>Payment Amount (€)</Label>
+              <Label>{t('admin.dialog.amount')} (€)</Label>
               <Input
                 type="number"
                 step="0.01"
@@ -226,27 +228,27 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
           </div>
 
           <div className="space-y-2">
-            <Label>Internal Notes</Label>
+            <Label>{t('admin.dialog.notes')}</Label>
             <Textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
               className="bg-black/40 border-white/10 min-h-[80px]"
-              placeholder="Add any internal notes about this member..."
+              placeholder={t('admin.dialog.notesPlaceholder')}
             />
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-white/10">
-              Cancel
+              {t('admin.dialog.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting} className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple">
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
+                  {t('admin.dialog.saving')}
                 </>
               ) : (
-                'Save Changes'
+                t('admin.dialog.save')
               )}
             </Button>
           </DialogFooter>

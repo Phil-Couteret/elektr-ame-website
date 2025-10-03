@@ -95,8 +95,8 @@ const MembersManager = () => {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load members",
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.message.loadError'),
         variant: "destructive",
       });
     } finally {
@@ -126,13 +126,13 @@ const MembersManager = () => {
       document.body.removeChild(a);
       
       toast({
-        title: "Success",
-        description: "Members list exported successfully",
+        title: t('admin.message.success'),
+        description: t('admin.message.exportSuccess'),
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to export members",
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.message.exportError'),
         variant: "destructive",
       });
     } finally {
@@ -163,8 +163,8 @@ const MembersManager = () => {
       
       if (data.success) {
         toast({
-          title: "Success",
-          description: `Member ${newStatus} successfully`,
+          title: t('admin.message.success'),
+          description: t('admin.message.statusUpdated').replace('{status}', newStatus),
         });
         fetchMembers();
       } else {
@@ -172,8 +172,8 @@ const MembersManager = () => {
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to update member status",
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.message.updateError'),
         variant: "destructive",
       });
     } finally {
@@ -198,7 +198,7 @@ const MembersManager = () => {
     return (
       <Badge variant={variant} className="flex items-center gap-1 w-fit">
         <Icon className="h-3 w-3" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {t(`admin.status.${status}`)}
       </Badge>
     );
   };
@@ -206,14 +206,18 @@ const MembersManager = () => {
   const getMembershipTypeBadge = (type?: string) => {
     if (!type) return <span className="text-white/40">-</span>;
     
-    const config: Record<string, { label: string, color: string }> = {
-      free_trial: { label: 'Free Trial', color: 'bg-gray-500' },
-      monthly: { label: 'Monthly', color: 'bg-blue-500' },
-      yearly: { label: 'Yearly', color: 'bg-purple-500' },
-      lifetime: { label: 'Lifetime', color: 'bg-green-500' }
+    const config: Record<string, { color: string }> = {
+      free_trial: { color: 'bg-gray-500' },
+      monthly: { color: 'bg-blue-500' },
+      yearly: { color: 'bg-purple-500' },
+      lifetime: { color: 'bg-green-500' }
     };
     
-    const { label, color } = config[type] || { label: type, color: 'bg-gray-500' };
+    const { color } = config[type] || { color: 'bg-gray-500' };
+    const label = type === 'free_trial' ? t('admin.membership.freeTrial') :
+                  type === 'monthly' ? t('admin.membership.monthly') :
+                  type === 'yearly' ? t('admin.membership.yearly') :
+                  type === 'lifetime' ? t('admin.membership.lifetime') : type;
     
     return (
       <Badge className={`${color} text-white border-0`}>
@@ -236,7 +240,7 @@ const MembersManager = () => {
     return (
       <Badge variant={variant} className="flex items-center gap-1 w-fit">
         <Icon className="h-3 w-3" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {t(`admin.payment.${status}`)}
       </Badge>
     );
   };
@@ -249,11 +253,11 @@ const MembersManager = () => {
     const daysUntilExpiry = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     if (daysUntilExpiry < 0) {
-      return <span className="text-red-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Expired</span>;
+      return <span className="text-red-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {t('admin.expiry.expired')}</span>;
     } else if (daysUntilExpiry <= 7) {
-      return <span className="text-orange-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {daysUntilExpiry} days left</span>;
+      return <span className="text-orange-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {daysUntilExpiry} {t('admin.expiry.daysLeft')}</span>;
     } else if (daysUntilExpiry <= 30) {
-      return <span className="text-yellow-400 text-xs">Expires in {daysUntilExpiry} days</span>;
+      return <span className="text-yellow-400 text-xs">{t('admin.expiry.expiresIn')} {daysUntilExpiry} {t('admin.expiry.daysLeft')}</span>;
     }
     return null;
   };
@@ -314,10 +318,10 @@ const MembersManager = () => {
             <div>
               <CardTitle className="text-white flex items-center gap-2">
                 <Users className="h-5 w-5 text-electric-blue" />
-                Membership Management
+                {t('admin.members.title')}
               </CardTitle>
               <CardDescription className="text-white/60">
-                Manage member registrations, payments, and membership renewals
+                {t('admin.members.subtitle')}
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -326,12 +330,12 @@ const MembersManager = () => {
                   <SelectValue placeholder="Filter" />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="all" className="text-white">All Members ({counts.total})</SelectItem>
-                  <SelectItem value="pending" className="text-white">Pending ({counts.pending})</SelectItem>
-                  <SelectItem value="approved" className="text-white">Approved ({counts.approved})</SelectItem>
-                  <SelectItem value="rejected" className="text-white">Rejected ({counts.rejected})</SelectItem>
-                  <SelectItem value="expiring_soon" className="text-yellow-400">Expiring Soon ({counts.expiring_soon})</SelectItem>
-                  <SelectItem value="expired" className="text-red-400">Expired ({counts.expired})</SelectItem>
+                  <SelectItem value="all" className="text-white">{t('admin.filter.all')} ({counts.total})</SelectItem>
+                  <SelectItem value="pending" className="text-white">{t('admin.filter.pending')} ({counts.pending})</SelectItem>
+                  <SelectItem value="approved" className="text-white">{t('admin.filter.approved')} ({counts.approved})</SelectItem>
+                  <SelectItem value="rejected" className="text-white">{t('admin.filter.rejected')} ({counts.rejected})</SelectItem>
+                  <SelectItem value="expiring_soon" className="text-yellow-400">{t('admin.filter.expiringSoon')} ({counts.expiring_soon})</SelectItem>
+                  <SelectItem value="expired" className="text-red-400">{t('admin.filter.expired')} ({counts.expired})</SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -342,12 +346,12 @@ const MembersManager = () => {
                 {isExporting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Exporting...
+                    {t('admin.members.exporting')}
                   </>
                 ) : (
                   <>
                     <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                    {t('admin.members.exportCSV')}
                   </>
                 )}
               </Button>
@@ -358,21 +362,21 @@ const MembersManager = () => {
           {filteredMembers.length === 0 ? (
             <div className="text-center py-8 text-white/60">
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>{members.length === 0 ? 'No members registered yet' : `No ${statusFilter} members`}</p>
+              <p>{members.length === 0 ? t('admin.members.noMembers') : `No ${statusFilter} members`}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/10 hover:bg-white/5">
-                    <TableHead className="text-white/80">Name</TableHead>
-                    <TableHead className="text-white/80">Email</TableHead>
-                    <TableHead className="text-white/80">Status</TableHead>
-                    <TableHead className="text-white/80">Membership</TableHead>
-                    <TableHead className="text-white/80">Expires</TableHead>
-                    <TableHead className="text-white/80">Payment</TableHead>
-                    <TableHead className="text-white/80">Amount</TableHead>
-                    <TableHead className="text-white/80 text-right">Actions</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.name')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.email')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.status')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.membership')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.expires')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.payment')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.amount')}</TableHead>
+                    <TableHead className="text-white/80 text-right">{t('admin.members.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -405,7 +409,7 @@ const MembersManager = () => {
                             className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
                           >
                             <Edit className="h-3 w-3 mr-1" />
-                            Manage
+                            {t('admin.status.manage')}
                           </Button>
                           {member.status !== 'approved' && (
                             <Button
@@ -419,7 +423,7 @@ const MembersManager = () => {
                               ) : (
                                 <>
                                   <CheckCircle className="h-3 w-3 mr-1" />
-                                  Approve
+                                  {t('admin.status.approve')}
                                 </>
                               )}
                             </Button>
@@ -436,7 +440,7 @@ const MembersManager = () => {
                               ) : (
                                 <>
                                   <XCircle className="h-3 w-3 mr-1" />
-                                  Reject
+                                  {t('admin.status.reject')}
                                 </>
                               )}
                             </Button>
@@ -448,17 +452,17 @@ const MembersManager = () => {
                 </TableBody>
               </Table>
               <div className="mt-4 text-white/60 text-sm flex items-center justify-between">
-                <span>Showing {filteredMembers.length} of {members.length} members</span>
+                <span>{t('admin.members.showing')} {filteredMembers.length} {t('admin.members.of')} {members.length} {t('admin.members.members')}</span>
                 {counts.expiring_soon > 0 && (
                   <span className="text-yellow-400 flex items-center gap-1">
                     <AlertTriangle className="h-4 w-4" />
-                    {counts.expiring_soon} membership{counts.expiring_soon !== 1 ? 's' : ''} expiring soon
+                    {counts.expiring_soon} {t('admin.expiry.expiringSoon')}
                   </span>
                 )}
                 {counts.expired > 0 && (
                   <span className="text-red-400 flex items-center gap-1">
                     <AlertTriangle className="h-4 w-4" />
-                    {counts.expired} expired membership{counts.expired !== 1 ? 's' : ''}
+                    {counts.expired} {t('admin.expiry.expiredCount')}
                   </span>
                 )}
               </div>
