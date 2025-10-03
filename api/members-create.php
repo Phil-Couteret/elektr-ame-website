@@ -50,13 +50,19 @@ try {
     $sql = "INSERT INTO members (
         first_name, 
         last_name, 
-        second_name, 
+        second_name,
+        artist_name,
         email, 
         phone, 
         street, 
         zip_code, 
         city, 
         country,
+        is_dj,
+        is_producer,
+        is_vj,
+        is_visual_artist,
+        is_fan,
         status,
         membership_type,
         membership_start_date,
@@ -71,12 +77,18 @@ try {
         :first_name,
         :last_name,
         :second_name,
+        :artist_name,
         :email,
         :phone,
         :street,
         :zip_code,
         :city,
         :country,
+        :is_dj,
+        :is_producer,
+        :is_vj,
+        :is_visual_artist,
+        :is_fan,
         :status,
         :membership_type,
         :membership_start_date,
@@ -94,12 +106,18 @@ try {
     $stmt->bindParam(':first_name', $input['first_name']);
     $stmt->bindParam(':last_name', $input['last_name']);
     $stmt->bindParam(':second_name', $input['second_name']);
+    $stmt->bindParam(':artist_name', $input['artist_name']);
     $stmt->bindParam(':email', $input['email']);
     $stmt->bindParam(':phone', $input['phone']);
     $stmt->bindParam(':street', $input['street']);
     $stmt->bindParam(':zip_code', $input['zip_code']);
     $stmt->bindParam(':city', $input['city']);
     $stmt->bindParam(':country', $input['country']);
+    $stmt->bindParam(':is_dj', $input['is_dj'], PDO::PARAM_BOOL);
+    $stmt->bindParam(':is_producer', $input['is_producer'], PDO::PARAM_BOOL);
+    $stmt->bindParam(':is_vj', $input['is_vj'], PDO::PARAM_BOOL);
+    $stmt->bindParam(':is_visual_artist', $input['is_visual_artist'], PDO::PARAM_BOOL);
+    $stmt->bindParam(':is_fan', $input['is_fan'], PDO::PARAM_BOOL);
     $stmt->bindParam(':status', $input['status']);
     $stmt->bindParam(':membership_type', $input['membership_type']);
     $stmt->bindParam(':membership_start_date', $input['membership_start_date']);

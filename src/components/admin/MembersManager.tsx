@@ -15,12 +15,18 @@ interface Member {
   first_name: string;
   last_name: string;
   second_name: string | null;
+  artist_name: string | null;
   email: string;
   phone: string;
   street: string | null;
   zip_code: string | null;
   city: string;
   country: string;
+  is_dj: boolean;
+  is_producer: boolean;
+  is_vj: boolean;
+  is_visual_artist: boolean;
+  is_fan: boolean;
   status: 'pending' | 'approved' | 'rejected';
   membership_type?: 'free_trial' | 'monthly' | 'yearly' | 'lifetime';
   membership_start_date?: string;
@@ -393,8 +399,18 @@ const MembersManager = () => {
                     <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
                       <TableCell className="text-white">
                         <div>
-                          <div>{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
+                          <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
+                          {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
                           <div className="text-xs text-white/40">{member.city}, {member.country}</div>
+                          {(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
+                            <div className="flex gap-1 mt-1 flex-wrap">
+                              {member.is_dj && <span className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded">DJ</span>}
+                              {member.is_producer && <span className="text-xs bg-blue-600/30 text-blue-300 px-1.5 py-0.5 rounded">Producer</span>}
+                              {member.is_vj && <span className="text-xs bg-pink-600/30 text-pink-300 px-1.5 py-0.5 rounded">VJ</span>}
+                              {member.is_visual_artist && <span className="text-xs bg-green-600/30 text-green-300 px-1.5 py-0.5 rounded">Visual Artist</span>}
+                              {member.is_fan && <span className="text-xs bg-yellow-600/30 text-yellow-300 px-1.5 py-0.5 rounded">Fan</span>}
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell className="text-white/80 text-sm">{member.email}</TableCell>

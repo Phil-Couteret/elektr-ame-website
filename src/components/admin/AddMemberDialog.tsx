@@ -23,12 +23,18 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
     first_name: '',
     last_name: '',
     second_name: '',
+    artist_name: '',
     email: '',
     phone: '',
     street: '',
     zip_code: '',
     city: '',
     country: '',
+    is_dj: false,
+    is_producer: false,
+    is_vj: false,
+    is_visual_artist: false,
+    is_fan: false,
     status: 'approved',
     membership_type: 'free_trial',
     membership_start_date: '',
@@ -67,12 +73,18 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
           first_name: '',
           last_name: '',
           second_name: '',
+          artist_name: '',
           email: '',
           phone: '',
           street: '',
           zip_code: '',
           city: '',
           country: '',
+          is_dj: false,
+          is_producer: false,
+          is_vj: false,
+          is_visual_artist: false,
+          is_fan: false,
           status: 'approved',
           membership_type: 'free_trial',
           membership_start_date: '',
@@ -141,6 +153,67 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
                   onChange={(e) => setFormData({ ...formData, second_name: e.target.value })}
                   className="bg-black/40 border-white/10 text-white"
                 />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.addMember.artistName')}</Label>
+              <Input
+                value={formData.artist_name}
+                onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
+                className="bg-black/40 border-white/10 text-white"
+                placeholder={t('admin.addMember.artistNamePlaceholder')}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.addMember.roles')}</Label>
+              <div className="grid grid-cols-5 gap-2">
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_dj}
+                    onChange={(e) => setFormData({ ...formData, is_dj: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">DJ</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_producer}
+                    onChange={(e) => setFormData({ ...formData, is_producer: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.producer')}</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_vj}
+                    onChange={(e) => setFormData({ ...formData, is_vj: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">VJ</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_visual_artist}
+                    onChange={(e) => setFormData({ ...formData, is_visual_artist: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.visualArtist')}</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_fan}
+                    onChange={(e) => setFormData({ ...formData, is_fan: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.fan')}</span>
+                </label>
               </div>
             </div>
 
