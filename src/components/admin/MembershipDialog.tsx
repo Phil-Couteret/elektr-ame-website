@@ -136,14 +136,14 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             <div className="space-y-2">
               <Label>{t('admin.dialog.membershipType')}</Label>
               <Select value={formData.membership_type} onValueChange={(value) => setFormData({ ...formData, membership_type: value })}>
-                <SelectTrigger className="bg-black/40 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="free_trial">{t('admin.membership.freeTrial')}</SelectItem>
-                  <SelectItem value="monthly">{t('admin.membership.monthly')}</SelectItem>
-                  <SelectItem value="yearly">{t('admin.membership.yearly')}</SelectItem>
-                  <SelectItem value="lifetime">{t('admin.membership.lifetime')}</SelectItem>
+                  <SelectItem value="free_trial" className="text-white">{t('admin.membership.freeTrial')}</SelectItem>
+                  <SelectItem value="monthly" className="text-white">{t('admin.membership.monthly')}</SelectItem>
+                  <SelectItem value="yearly" className="text-white">{t('admin.membership.yearly')}</SelectItem>
+                  <SelectItem value="lifetime" className="text-white">{t('admin.membership.lifetime')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -151,13 +151,13 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             <div className="space-y-2">
               <Label>{t('admin.dialog.paymentStatus')}</Label>
               <Select value={formData.payment_status} onValueChange={(value) => setFormData({ ...formData, payment_status: value })}>
-                <SelectTrigger className="bg-black/40 border-white/10">
+                <SelectTrigger className="bg-black/40 border-white/10 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="unpaid">{t('admin.payment.unpaid')}</SelectItem>
-                  <SelectItem value="paid">{t('admin.payment.paid')}</SelectItem>
-                  <SelectItem value="overdue">{t('admin.payment.overdue')}</SelectItem>
+                  <SelectItem value="unpaid" className="text-white">{t('admin.payment.unpaid')}</SelectItem>
+                  <SelectItem value="paid" className="text-white">{t('admin.payment.paid')}</SelectItem>
+                  <SelectItem value="overdue" className="text-white">{t('admin.payment.overdue')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -188,7 +188,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                 type="date"
                 value={formData.membership_start_date}
                 onChange={(e) => setFormData({ ...formData, membership_start_date: e.target.value })}
-                className="bg-black/40 border-white/10"
+                className="bg-black/40 border-white/10 text-white"
               />
             </div>
 
@@ -198,7 +198,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                 type="date"
                 value={formData.membership_end_date}
                 onChange={(e) => setFormData({ ...formData, membership_end_date: e.target.value })}
-                className="bg-black/40 border-white/10"
+                className="bg-black/40 border-white/10 text-white"
               />
             </div>
           </div>
@@ -210,7 +210,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                 type="date"
                 value={formData.last_payment_date}
                 onChange={(e) => setFormData({ ...formData, last_payment_date: e.target.value })}
-                className="bg-black/40 border-white/10"
+                className="bg-black/40 border-white/10 text-white"
               />
             </div>
 
@@ -221,7 +221,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                 step="0.01"
                 value={formData.payment_amount}
                 onChange={(e) => setFormData({ ...formData, payment_amount: e.target.value })}
-                className="bg-black/40 border-white/10"
+                className="bg-black/40 border-white/10 text-white"
                 placeholder="0.00"
               />
             </div>
@@ -232,7 +232,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             <Textarea
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="bg-black/40 border-white/10 min-h-[80px]"
+              className="bg-black/40 border-white/10 text-white min-h-[80px]"
               placeholder={t('admin.dialog.notesPlaceholder')}
             />
           </div>
