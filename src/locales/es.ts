@@ -221,5 +221,27 @@ export default {
   'admin.message.exportSuccess': 'Lista de miembros exportada exitosamente',
   'admin.message.exportError': 'Error al exportar miembros',
   'admin.message.loadError': 'Error al cargar miembros',
-  'admin.message.updateError': 'Error al actualizar miembro'
+  'admin.message.updateError': 'Error al actualizar miembro',
+  
+  // Admin - Add Member
+  'admin.addMember.button': 'Añadir Miembro',
+  'admin.addMember.title': 'Añadir Nuevo Miembro',
+  'admin.addMember.description': 'Crear manualmente una nueva cuenta de miembro con información completa',
+  'admin.addMember.personalInfo': 'Información Personal',
+  'admin.addMember.address': 'Dirección',
+  'admin.addMember.membershipDetails': 'Detalles de Membresía',
+  'admin.addMember.firstName': 'Nombre',
+  'admin.addMember.lastName': 'Apellido',
+  'admin.addMember.secondName': 'Segundo Nombre',
+  'admin.addMember.email': 'Correo Electrónico',
+  'admin.addMember.phone': 'Teléfono',
+  'admin.addMember.street': 'Calle',
+  'admin.addMember.zipCode': 'Código Postal',
+  'admin.addMember.city': 'Ciudad',
+  'admin.addMember.country': 'País',
+  'admin.addMember.status': 'Estado',
+  'admin.addMember.create': 'Crear Miembro',
+  'admin.addMember.creating': 'Creando...',
+  'admin.addMember.created': 'Miembro creado exitosamente',
+  'admin.addMember.createError': 'Error al crear miembro'
 };

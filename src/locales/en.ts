@@ -224,5 +224,27 @@ export default {
   'admin.message.exportSuccess': 'Members list exported successfully',
   'admin.message.exportError': 'Failed to export members',
   'admin.message.loadError': 'Failed to load members',
-  'admin.message.updateError': 'Failed to update member'
+  'admin.message.updateError': 'Failed to update member',
+  
+  // Admin - Add Member
+  'admin.addMember.button': 'Add Member',
+  'admin.addMember.title': 'Add New Member',
+  'admin.addMember.description': 'Manually create a new member account with complete information',
+  'admin.addMember.personalInfo': 'Personal Information',
+  'admin.addMember.address': 'Address',
+  'admin.addMember.membershipDetails': 'Membership Details',
+  'admin.addMember.firstName': 'First Name',
+  'admin.addMember.lastName': 'Last Name',
+  'admin.addMember.secondName': 'Second Name',
+  'admin.addMember.email': 'Email',
+  'admin.addMember.phone': 'Phone',
+  'admin.addMember.street': 'Street',
+  'admin.addMember.zipCode': 'Zip Code',
+  'admin.addMember.city': 'City',
+  'admin.addMember.country': 'Country',
+  'admin.addMember.status': 'Status',
+  'admin.addMember.create': 'Create Member',
+  'admin.addMember.creating': 'Creating...',
+  'admin.addMember.created': 'Member created successfully',
+  'admin.addMember.createError': 'Failed to create member'
 };

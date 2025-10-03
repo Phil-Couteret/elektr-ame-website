@@ -221,5 +221,27 @@ export default {
   'admin.message.exportSuccess': 'Llista de membres exportada exitosament',
   'admin.message.exportError': 'Error en exportar membres',
   'admin.message.loadError': 'Error en carregar membres',
-  'admin.message.updateError': 'Error en actualitzar membre'
+  'admin.message.updateError': 'Error en actualitzar membre',
+  
+  // Admin - Add Member
+  'admin.addMember.button': 'Afegir Membre',
+  'admin.addMember.title': 'Afegir Nou Membre',
+  'admin.addMember.description': 'Crear manualment un nou compte de membre amb informació completa',
+  'admin.addMember.personalInfo': 'Informació Personal',
+  'admin.addMember.address': 'Adreça',
+  'admin.addMember.membershipDetails': 'Detalls de Membresia',
+  'admin.addMember.firstName': 'Nom',
+  'admin.addMember.lastName': 'Cognom',
+  'admin.addMember.secondName': 'Segon Nom',
+  'admin.addMember.email': 'Correu Electrònic',
+  'admin.addMember.phone': 'Telèfon',
+  'admin.addMember.street': 'Carrer',
+  'admin.addMember.zipCode': 'Codi Postal',
+  'admin.addMember.city': 'Ciutat',
+  'admin.addMember.country': 'País',
+  'admin.addMember.status': 'Estat',
+  'admin.addMember.create': 'Crear Membre',
+  'admin.addMember.creating': 'Creant...',
+  'admin.addMember.created': 'Membre creat exitosament',
+  'admin.addMember.createError': 'Error en crear membre'
 };
