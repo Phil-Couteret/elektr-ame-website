@@ -3,15 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import EventsManager from "@/components/admin/EventsManager";
 import ArtistsManager from "@/components/admin/ArtistsManager";
 import GalleryManager from "@/components/admin/GalleryManager";
 import UsersManager from "@/components/admin/UsersManager";
 import MembersManager from "@/components/admin/MembersManager";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Admin = () => {
   const { logout, user, isSuperAdmin } = useAuth();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("events");
 
   const handleLogout = () => {
@@ -34,19 +37,20 @@ const Admin = () => {
                 alt="Elektr-Âme" 
                 className="h-8 w-auto"
               />
-              <h1 className="text-xl font-bold text-white">Admin Panel</h1>
+              <h1 className="text-xl font-bold text-white">{t('admin.header.title')}</h1>
               {user && (
                 <span className="text-electric-blue text-sm">
-                  Welcome, {user.name} {isSuperAdmin && '(Superadmin)'}
+                  {t('admin.header.welcome')}, {user.name} {isSuperAdmin && `(${t('admin.header.superadmin')})`}
                 </span>
               )}
             </div>
             
             <div className="flex items-center gap-2">
+              <LanguageSelector />
               <Link to="/" onClick={handleHomeClick}>
                 <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue/20">
                   <Home className="h-4 w-4 mr-2" />
-                  Home
+                  {t('admin.header.home')}
                 </Button>
               </Link>
               <Button 
@@ -55,7 +59,7 @@ const Admin = () => {
                 className="border-red-400 text-red-400 hover:bg-red-400/20"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Logout
+                {t('admin.header.logout')}
               </Button>
             </div>
           </div>
@@ -71,28 +75,28 @@ const Admin = () => {
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
             >
               <Calendar className="h-4 w-4 mr-2" />
-              Events
+              {t('admin.tabs.events')}
             </TabsTrigger>
             <TabsTrigger 
               value="artists"
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
             >
               <Users className="h-4 w-4 mr-2" />
-              Artists
+              {t('admin.tabs.artists')}
             </TabsTrigger>
             <TabsTrigger 
               value="gallery"
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
             >
               <Image className="h-4 w-4 mr-2" />
-              Gallery
+              {t('admin.tabs.gallery')}
             </TabsTrigger>
             <TabsTrigger 
               value="members"
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
             >
               <UserPlus className="h-4 w-4 mr-2" />
-              Members
+              {t('admin.tabs.members')}
             </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger 
@@ -100,7 +104,7 @@ const Admin = () => {
                 className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
               >
                 <UserCog className="h-4 w-4 mr-2" />
-                Users
+                {t('admin.tabs.users')}
               </TabsTrigger>
             )}
           </TabsList>

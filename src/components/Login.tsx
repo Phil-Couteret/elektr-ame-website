@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Lock, User, Home } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 
 interface LoginProps {
@@ -18,6 +19,7 @@ const Login = ({ onSuccess }: LoginProps) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,7 +49,7 @@ const Login = ({ onSuccess }: LoginProps) => {
             className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue/20"
           >
             <Home className="h-4 w-4 mr-2" />
-            Back to Home
+            {t('admin.login.backToHome')}
           </Button>
         </Link>
         
@@ -55,14 +57,14 @@ const Login = ({ onSuccess }: LoginProps) => {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-white flex items-center justify-center gap-2">
               <Lock className="h-6 w-6 text-electric-blue" />
-              Admin Login
+              {t('admin.login.title')}
             </CardTitle>
           </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username" className="text-white">
-                Email Address
+                {t('admin.login.email')}
               </Label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
@@ -72,7 +74,7 @@ const Login = ({ onSuccess }: LoginProps) => {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  placeholder="Enter email address"
+                  placeholder={t('admin.login.emailPlaceholder')}
                   required
                 />
               </div>
@@ -80,7 +82,7 @@ const Login = ({ onSuccess }: LoginProps) => {
             
             <div className="space-y-2">
               <Label htmlFor="password" className="text-white">
-                Password
+                {t('admin.login.password')}
               </Label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
@@ -90,7 +92,7 @@ const Login = ({ onSuccess }: LoginProps) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  placeholder="Enter password"
+                  placeholder={t('admin.login.passwordPlaceholder')}
                   required
                 />
               </div>
@@ -109,7 +111,7 @@ const Login = ({ onSuccess }: LoginProps) => {
               disabled={isLoading}
               className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? t('admin.login.submitting') : t('admin.login.submit')}
             </Button>
           </form>
         </CardContent>
