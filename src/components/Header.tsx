@@ -22,7 +22,7 @@ const Header = () => {
           <div className="flex items-center">
             <Link to="/" onClick={handleHomeClick} className="cursor-pointer">
               <img 
-                src="/lovable-uploads/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
+                src="/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
                 alt="Elektr-Âme" 
                 className="h-8 sm:h-10 w-auto hover:opacity-80 transition-opacity"
               />

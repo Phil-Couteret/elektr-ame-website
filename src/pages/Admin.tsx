@@ -29,7 +29,7 @@ const Admin = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <img 
-                src="/lovable-uploads/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
+                src="/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
                 alt="Elektr-Âme" 
                 className="h-8 w-auto"
               />

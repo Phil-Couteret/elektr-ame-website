@@ -87,7 +87,7 @@ export const usePublicData = () => {
           nickname: "",
           bio: "Barcelona-based electronic music producer known for blending deep house with ambient textures. Mixel has been crafting immersive soundscapes since 2018.",
           bioKey: "artist.mixel.bio",
-          picture: "/lovable-uploads/999c996c-ad69-4db9-b585-0fcdc4c5f718.png",
+          picture: "/elektr-ame-media/999c996c-ad69-4db9-b585-0fcdc4c5f718.png",
           socialLinks: {
             soundcloud: "#",
             instagram: "#"
@@ -101,7 +101,7 @@ export const usePublicData = () => {
           nickname: "Raquel Porta",
           bio: "Born in Lleida, Raquel Porta —better known as Rakel— is passionate about music and everything related to creativity. Her artistic universe is marked by a wide and diverse musical influence that has been part of her life from a very young age, both personally and professionally. For Rakel, music is pure electricity. That energy that runs through the body is impossible to contain: you have to let it flow. After 15 years living in London, where she began her career as a DJ, Rakel moved to Barcelona, the city where she currently resides and where she has developed her career professionally. She has performed at numerous private events and clubs throughout Barcelona and beyond. Rakel doesn't just play music, she lives it, transforms it and shares it. Currently, co-founder of 'Elektr'Âme', a musical association based in Barcelona and focused on developing new projects.",
           bioKey: "artist.rakel.bio",
-          picture: "/lovable-uploads/40fb0100-2718-415c-b9d2-84d7887d7471.png",
+          picture: "/elektr-ame-media/40fb0100-2718-415c-b9d2-84d7887d7471.png",
           socialLinks: {
             soundcloud: "https://soundcloud.com/rakel_raquel-porta",
             instagram: "#",
