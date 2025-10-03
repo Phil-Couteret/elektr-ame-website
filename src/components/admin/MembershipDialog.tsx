@@ -14,6 +14,13 @@ interface Member {
   first_name: string;
   last_name: string;
   email: string;
+  phone: string;
+  artist_name?: string | null;
+  is_dj?: boolean;
+  is_producer?: boolean;
+  is_vj?: boolean;
+  is_visual_artist?: boolean;
+  is_fan?: boolean;
   membership_type?: string;
   membership_start_date?: string;
   membership_end_date?: string;
@@ -35,6 +42,13 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    phone: '',
+    artist_name: '',
+    is_dj: false,
+    is_producer: false,
+    is_vj: false,
+    is_visual_artist: false,
+    is_fan: false,
     membership_type: '',
     membership_start_date: '',
     membership_end_date: '',
@@ -47,6 +61,13 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
   useEffect(() => {
     if (member) {
       setFormData({
+        phone: member.phone || '',
+        artist_name: member.artist_name || '',
+        is_dj: member.is_dj || false,
+        is_producer: member.is_producer || false,
+        is_vj: member.is_vj || false,
+        is_visual_artist: member.is_visual_artist || false,
+        is_fan: member.is_fan || false,
         membership_type: member.membership_type || 'free_trial',
         membership_start_date: member.membership_start_date || '',
         membership_end_date: member.membership_end_date || '',
@@ -132,6 +153,89 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Contact & Identity Info */}
+          <div className="space-y-3 border-b border-white/10 pb-3">
+            <h3 className="text-sm font-semibold text-white/80">{t('admin.addMember.personalInfo')}</h3>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>{t('admin.addMember.phone')}</Label>
+                <Input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  className="bg-black/40 border-white/10 text-white"
+                  placeholder="+1234567890"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label>{t('admin.addMember.artistName')}</Label>
+                <Input
+                  value={formData.artist_name}
+                  onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
+                  className="bg-black/40 border-white/10 text-white"
+                  placeholder={t('admin.addMember.artistNamePlaceholder')}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>{t('admin.addMember.roles')}</Label>
+              <div className="grid grid-cols-5 gap-2">
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_dj}
+                    onChange={(e) => setFormData({ ...formData, is_dj: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">DJ</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_producer}
+                    onChange={(e) => setFormData({ ...formData, is_producer: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.producer')}</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_vj}
+                    onChange={(e) => setFormData({ ...formData, is_vj: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">VJ</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_visual_artist}
+                    onChange={(e) => setFormData({ ...formData, is_visual_artist: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.visualArtist')}</span>
+                </label>
+                <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_fan}
+                    onChange={(e) => setFormData({ ...formData, is_fan: e.target.checked })}
+                    className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-sm text-white">{t('admin.addMember.fan')}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          {/* Membership Info */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-white/80">{t('admin.addMember.membershipDetails')}</h3>
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>{t('admin.dialog.membershipType')}</Label>
@@ -235,6 +339,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
               className="bg-black/40 border-white/10 text-white min-h-[80px]"
               placeholder={t('admin.dialog.notesPlaceholder')}
             />
+          </div>
           </div>
 
           <DialogFooter>

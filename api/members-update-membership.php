@@ -46,6 +46,41 @@ try {
     $params = [':id' => $memberId];
     
     // Build dynamic UPDATE query based on provided fields
+    if (isset($input['phone'])) {
+        $updates[] = "phone = :phone";
+        $params[':phone'] = $input['phone'];
+    }
+    
+    if (isset($input['artist_name'])) {
+        $updates[] = "artist_name = :artist_name";
+        $params[':artist_name'] = $input['artist_name'];
+    }
+    
+    if (isset($input['is_dj'])) {
+        $updates[] = "is_dj = :is_dj";
+        $params[':is_dj'] = $input['is_dj'] ? 1 : 0;
+    }
+    
+    if (isset($input['is_producer'])) {
+        $updates[] = "is_producer = :is_producer";
+        $params[':is_producer'] = $input['is_producer'] ? 1 : 0;
+    }
+    
+    if (isset($input['is_vj'])) {
+        $updates[] = "is_vj = :is_vj";
+        $params[':is_vj'] = $input['is_vj'] ? 1 : 0;
+    }
+    
+    if (isset($input['is_visual_artist'])) {
+        $updates[] = "is_visual_artist = :is_visual_artist";
+        $params[':is_visual_artist'] = $input['is_visual_artist'] ? 1 : 0;
+    }
+    
+    if (isset($input['is_fan'])) {
+        $updates[] = "is_fan = :is_fan";
+        $params[':is_fan'] = $input['is_fan'] ? 1 : 0;
+    }
+    
     if (isset($input['membership_type'])) {
         $validTypes = ['free_trial', 'monthly', 'yearly', 'lifetime'];
         if (!in_array($input['membership_type'], $validTypes)) {
