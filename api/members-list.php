@@ -43,6 +43,13 @@ try {
             city,
             country,
             status,
+            membership_type,
+            membership_start_date,
+            membership_end_date,
+            payment_status,
+            last_payment_date,
+            payment_amount,
+            notes,
             created_at,
             updated_at
         FROM members

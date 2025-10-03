@@ -4,9 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle } from "lucide-react";
+import { Download, Users, Loader2, CheckCircle, XCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import MembershipDialog from "./MembershipDialog";
 
 interface Member {
   id: number;
@@ -20,13 +19,6 @@ interface Member {
   city: string;
   country: string;
   status: 'pending' | 'approved' | 'rejected';
-  membership_type?: 'free_trial' | 'monthly' | 'yearly' | 'lifetime';
-  membership_start_date?: string;
-  membership_end_date?: string;
-  payment_status?: 'unpaid' | 'paid' | 'overdue';
-  last_payment_date?: string;
-  payment_amount?: string | number;
-  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -38,8 +30,6 @@ const MembersManager = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
-  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -50,25 +40,6 @@ const MembersManager = () => {
     // Apply status filter
     if (statusFilter === 'all') {
       setFilteredMembers(members);
-    } else if (statusFilter === 'expiring_soon') {
-      // Show members expiring in the next 30 days
-      const today = new Date();
-      const thirtyDaysLater = new Date(today);
-      thirtyDaysLater.setDate(today.getDate() + 30);
-      
-      setFilteredMembers(members.filter(m => {
-        if (!m.membership_end_date) return false;
-        const endDate = new Date(m.membership_end_date);
-        return endDate > today && endDate <= thirtyDaysLater && m.status === 'approved';
-      }));
-    } else if (statusFilter === 'expired') {
-      // Show members with expired memberships
-      const today = new Date();
-      setFilteredMembers(members.filter(m => {
-        if (!m.membership_end_date) return false;
-        const endDate = new Date(m.membership_end_date);
-        return endDate < today && m.status === 'approved';
-      }));
     } else {
       setFilteredMembers(members.filter(m => m.status === statusFilter));
     }
@@ -113,7 +84,10 @@ const MembersManager = () => {
         throw new Error('Failed to export members');
       }
       
+      // Create blob from response
       const blob = await response.blob();
+      
+      // Create download link
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -164,6 +138,7 @@ const MembersManager = () => {
           title: "Success",
           description: `Member ${newStatus} successfully`,
         });
+        // Refresh the members list
         fetchMembers();
       } else {
         throw new Error(data.error || 'Failed to update status');
@@ -177,11 +152,6 @@ const MembersManager = () => {
     } finally {
       setUpdatingStatus(null);
     }
-  };
-
-  const handleEditMembership = (member: Member) => {
-    setSelectedMember(member);
-    setIsDialogOpen(true);
   };
 
   const getStatusBadge = (status: string) => {
@@ -201,81 +171,12 @@ const MembersManager = () => {
     );
   };
 
-  const getMembershipTypeBadge = (type?: string) => {
-    if (!type) return <span className="text-white/40">-</span>;
-    
-    const config: Record<string, { label: string, color: string }> = {
-      free_trial: { label: 'Free Trial', color: 'bg-gray-500' },
-      monthly: { label: 'Monthly', color: 'bg-blue-500' },
-      yearly: { label: 'Yearly', color: 'bg-purple-500' },
-      lifetime: { label: 'Lifetime', color: 'bg-green-500' }
-    };
-    
-    const { label, color } = config[type] || { label: type, color: 'bg-gray-500' };
-    
-    return (
-      <Badge className={`${color} text-white border-0`}>
-        {label}
-      </Badge>
-    );
-  };
-
-  const getPaymentStatusBadge = (status?: string) => {
-    if (!status) return <span className="text-white/40">-</span>;
-    
-    const config: Record<string, { variant: "default" | "secondary" | "destructive", icon: any }> = {
-      paid: { variant: "default", icon: CheckCircle },
-      unpaid: { variant: "secondary", icon: Clock },
-      overdue: { variant: "destructive", icon: AlertTriangle }
-    };
-    
-    const { variant, icon: Icon } = config[status] || config.unpaid;
-    
-    return (
-      <Badge variant={variant} className="flex items-center gap-1 w-fit">
-        <Icon className="h-3 w-3" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </Badge>
-    );
-  };
-
-  const getExpirationWarning = (endDate?: string) => {
-    if (!endDate) return null;
-    
-    const today = new Date();
-    const end = new Date(endDate);
-    const daysUntilExpiry = Math.ceil((end.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (daysUntilExpiry < 0) {
-      return <span className="text-red-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> Expired</span>;
-    } else if (daysUntilExpiry <= 7) {
-      return <span className="text-orange-400 text-xs flex items-center gap-1"><AlertTriangle className="h-3 w-3" /> {daysUntilExpiry} days left</span>;
-    } else if (daysUntilExpiry <= 30) {
-      return <span className="text-yellow-400 text-xs">Expires in {daysUntilExpiry} days</span>;
-    }
-    return null;
-  };
-
   const getStatusCounts = () => {
-    const today = new Date();
-    const thirtyDaysLater = new Date(today);
-    thirtyDaysLater.setDate(today.getDate() + 30);
-    
     return {
       total: members.length,
       pending: members.filter(m => m.status === 'pending').length,
       approved: members.filter(m => m.status === 'approved').length,
       rejected: members.filter(m => m.status === 'rejected').length,
-      expiring_soon: members.filter(m => {
-        if (!m.membership_end_date || m.status !== 'approved') return false;
-        const endDate = new Date(m.membership_end_date);
-        return endDate > today && endDate <= thirtyDaysLater;
-      }).length,
-      expired: members.filter(m => {
-        if (!m.membership_end_date || m.status !== 'approved') return false;
-        const endDate = new Date(m.membership_end_date);
-        return endDate < today;
-      }).length,
     };
   };
 
@@ -287,11 +188,6 @@ const MembersManager = () => {
       hour: '2-digit',
       minute: '2-digit'
     });
-  };
-
-  const formatSimpleDate = (dateString?: string) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-GB');
   };
 
   if (isLoading) {
@@ -312,24 +208,22 @@ const MembersManager = () => {
             <div>
               <CardTitle className="text-white flex items-center gap-2">
                 <Users className="h-5 w-5 text-electric-blue" />
-                Membership Management
+                Registered Members
               </CardTitle>
               <CardDescription className="text-white/60">
-                Manage member registrations, payments, and membership renewals
+                Review and manage member applications from the "Join Us" form
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px] bg-black/40 border-white/10 text-white">
-                  <SelectValue placeholder="Filter" />
+                <SelectTrigger className="w-[180px] bg-black/40 border-white/10 text-white">
+                  <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
                 <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="all" className="text-white">All Members ({counts.total})</SelectItem>
+                  <SelectItem value="all" className="text-white">All ({counts.total})</SelectItem>
                   <SelectItem value="pending" className="text-white">Pending ({counts.pending})</SelectItem>
                   <SelectItem value="approved" className="text-white">Approved ({counts.approved})</SelectItem>
                   <SelectItem value="rejected" className="text-white">Rejected ({counts.rejected})</SelectItem>
-                  <SelectItem value="expiring_soon" className="text-yellow-400">Expiring Soon ({counts.expiring_soon})</SelectItem>
-                  <SelectItem value="expired" className="text-red-400">Expired ({counts.expired})</SelectItem>
                 </SelectContent>
               </Select>
               <Button
@@ -365,11 +259,11 @@ const MembersManager = () => {
                   <TableRow className="border-white/10 hover:bg-white/5">
                     <TableHead className="text-white/80">Name</TableHead>
                     <TableHead className="text-white/80">Email</TableHead>
+                    <TableHead className="text-white/80">Phone</TableHead>
+                    <TableHead className="text-white/80">City</TableHead>
+                    <TableHead className="text-white/80">Country</TableHead>
                     <TableHead className="text-white/80">Status</TableHead>
-                    <TableHead className="text-white/80">Membership</TableHead>
-                    <TableHead className="text-white/80">Expires</TableHead>
-                    <TableHead className="text-white/80">Payment</TableHead>
-                    <TableHead className="text-white/80">Amount</TableHead>
+                    <TableHead className="text-white/80">Registered</TableHead>
                     <TableHead className="text-white/80 text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -377,34 +271,16 @@ const MembersManager = () => {
                   {filteredMembers.map((member) => (
                     <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
                       <TableCell className="text-white">
-                        <div>
-                          <div>{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
-                          <div className="text-xs text-white/40">{member.city}, {member.country}</div>
-                        </div>
+                        {member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}
                       </TableCell>
-                      <TableCell className="text-white/80 text-sm">{member.email}</TableCell>
+                      <TableCell className="text-white/80">{member.email}</TableCell>
+                      <TableCell className="text-white/80">{member.phone}</TableCell>
+                      <TableCell className="text-white/80">{member.city}</TableCell>
+                      <TableCell className="text-white/80">{member.country}</TableCell>
                       <TableCell>{getStatusBadge(member.status)}</TableCell>
-                      <TableCell>{getMembershipTypeBadge(member.membership_type)}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-white/80 text-sm">{formatSimpleDate(member.membership_end_date)}</span>
-                          {member.status === 'approved' && getExpirationWarning(member.membership_end_date)}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getPaymentStatusBadge(member.payment_status)}</TableCell>
-                      <TableCell className="text-white/80">
-                        {member.payment_amount ? `€${parseFloat(member.payment_amount.toString()).toFixed(2)}` : '-'}
-                      </TableCell>
+                      <TableCell className="text-white/80">{formatDate(member.created_at)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            onClick={() => handleEditMembership(member)}
-                            className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
-                          >
-                            <Edit className="h-3 w-3 mr-1" />
-                            Manage
-                          </Button>
                           {member.status !== 'approved' && (
                             <Button
                               size="sm"
@@ -445,32 +321,13 @@ const MembersManager = () => {
                   ))}
                 </TableBody>
               </Table>
-              <div className="mt-4 text-white/60 text-sm flex items-center justify-between">
-                <span>Showing {filteredMembers.length} of {members.length} members</span>
-                {counts.expiring_soon > 0 && (
-                  <span className="text-yellow-400 flex items-center gap-1">
-                    <AlertTriangle className="h-4 w-4" />
-                    {counts.expiring_soon} membership{counts.expiring_soon !== 1 ? 's' : ''} expiring soon
-                  </span>
-                )}
-                {counts.expired > 0 && (
-                  <span className="text-red-400 flex items-center gap-1">
-                    <AlertTriangle className="h-4 w-4" />
-                    {counts.expired} expired membership{counts.expired !== 1 ? 's' : ''}
-                  </span>
-                )}
+              <div className="mt-4 text-white/60 text-sm">
+                Showing {filteredMembers.length} of {members.length} members
               </div>
             </div>
           )}
         </CardContent>
       </Card>
-
-      <MembershipDialog
-        member={selectedMember}
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onSuccess={fetchMembers}
-      />
     </div>
   );
 };

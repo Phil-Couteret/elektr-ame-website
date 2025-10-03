@@ -35,6 +35,13 @@ try {
             city,
             country,
             status,
+            membership_type,
+            membership_start_date,
+            membership_end_date,
+            payment_status,
+            last_payment_date,
+            payment_amount,
+            notes,
             created_at
         FROM members
         ORDER BY created_at DESC
@@ -65,6 +72,13 @@ try {
         'City',
         'Country',
         'Status',
+        'Membership Type',
+        'Start Date',
+        'End Date',
+        'Payment Status',
+        'Last Payment',
+        'Amount',
+        'Notes',
         'Registration Date'
     ]);
     
@@ -82,6 +96,13 @@ try {
             $member['city'],
             $member['country'],
             $member['status'],
+            $member['membership_type'] ?? '',
+            $member['membership_start_date'] ?? '',
+            $member['membership_end_date'] ?? '',
+            $member['payment_status'] ?? '',
+            $member['last_payment_date'] ?? '',
+            $member['payment_amount'] ?? '',
+            $member['notes'] ?? '',
             $member['created_at']
         ]);
     }
