@@ -60,7 +60,8 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (params) {
       Object.keys(params).forEach(paramKey => {
         const placeholder = `{${paramKey}}`;
-        translation = translation.replace(new RegExp(placeholder, 'g'), String(params[paramKey]));
+        // Use split/join instead of regex to avoid special character issues
+        translation = translation.split(placeholder).join(String(params[paramKey]));
       });
     }
                          
