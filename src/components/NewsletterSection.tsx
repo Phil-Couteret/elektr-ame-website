@@ -8,30 +8,55 @@ import { X } from "lucide-react";
 
 const NewsletterSection = () => {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast({
-        title: "Invalid email",
-        description: "Please enter a valid email address.",
+        title: t('newsletter.error.title'),
+        description: t('newsletter.error.invalid'),
         variant: "destructive",
       });
       return;
     }
     
-    // Success toast (in a real app, this would send the email to a server)
-    toast({
-      title: "Subscription successful!",
-      description: "You've been added to our newsletter.",
-    });
-    
-    setEmail("");
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/newsletter-subscribe.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('newsletter.success.title'),
+          description: data.message || t('newsletter.success.description'),
+        });
+        setEmail("");
+      } else {
+        throw new Error(data.error || 'Subscription failed');
+      }
+    } catch (error) {
+      toast({
+        title: t('newsletter.error.title'),
+        description: error instanceof Error ? error.message : t('newsletter.error.network'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -62,9 +87,10 @@ const NewsletterSection = () => {
             />
             <Button 
               type="submit" 
+              disabled={isSubmitting}
               className="bg-blue-medium hover:bg-blue-dark text-white"
             >
-              {t('newsletter.button')}
+              {isSubmitting ? t('newsletter.submitting') : t('newsletter.button')}
             </Button>
           </form>
           <p className="text-white/50 text-sm mt-3 text-center">

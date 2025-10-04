@@ -48,11 +48,17 @@ export default {
   'newsletter.description': 'Subscribe to our newsletter to get the latest updates on events, artist features, and educational workshops.',
   'newsletter.placeholder': 'Your email address',
   'newsletter.button': 'Subscribe',
+  'newsletter.submitting': 'Subscribing...',
   'newsletter.privacy': 'We respect your privacy. Unsubscribe at any time.',
   'newsletter.follow': 'Follow Us',
   'newsletter.follow.text': 'Join our social media community for daily updates.',
   'newsletter.email': 'Email Us',
   'newsletter.email.text': 'Have questions or want to collaborate?',
+  'newsletter.success.title': 'Success!',
+  'newsletter.success.description': 'Thank you for subscribing to our newsletter!',
+  'newsletter.error.title': 'Error',
+  'newsletter.error.invalid': 'Please enter a valid email address.',
+  'newsletter.error.network': 'Network error. Please try again.',
   
   // Footer
   'footer.rights': '© {year} Elektr-Âme. All rights reserved.',
@@ -147,6 +153,7 @@ export default {
   'admin.tabs.artists': 'Artists',
   'admin.tabs.gallery': 'Gallery',
   'admin.tabs.members': 'Members',
+  'admin.tabs.newsletter': 'Newsletter',
   'admin.tabs.users': 'Users',
   
   // Admin - Members Management
@@ -261,5 +268,38 @@ export default {
   'admin.addMember.create': 'Create Member',
   'admin.addMember.creating': 'Creating...',
   'admin.addMember.created': 'Member created successfully',
-  'admin.addMember.createError': 'Failed to create member'
+  'admin.addMember.createError': 'Failed to create member',
+
+  // Admin - Newsletter Management
+  'admin.newsletter.title': 'Newsletter Subscribers',
+  'admin.newsletter.subtitle': 'Manage email subscribers and export mailing lists',
+  'admin.newsletter.exportCSV': 'Export CSV',
+  'admin.newsletter.exporting': 'Exporting...',
+  'admin.newsletter.exported': 'Subscribers exported successfully',
+  'admin.newsletter.exportError': 'Failed to export subscribers',
+  'admin.newsletter.fetchError': 'Failed to fetch subscribers',
+  'admin.newsletter.noSubscribers': 'No subscribers yet',
+  'admin.newsletter.showing': 'Showing',
+  'admin.newsletter.of': 'of',
+  'admin.newsletter.subscribers': 'subscribers',
+  
+  // Admin - Newsletter Stats
+  'admin.newsletter.stats.total': 'Total Subscribers',
+  'admin.newsletter.stats.active': 'Active',
+  'admin.newsletter.stats.unsubscribed': 'Unsubscribed',
+  
+  // Admin - Newsletter Table
+  'admin.newsletter.table.email': 'Email',
+  'admin.newsletter.table.subscribed': 'Subscribed At',
+  'admin.newsletter.table.status': 'Status',
+  'admin.newsletter.table.ip': 'IP Address',
+  
+  // Admin - Newsletter Filters
+  'admin.newsletter.filter.active': 'Active Only',
+  'admin.newsletter.filter.all': 'All Subscribers',
+  'admin.newsletter.filter.unsubscribed': 'Unsubscribed',
+  
+  // Admin - Newsletter Status
+  'admin.newsletter.status.active': 'Active',
+  'admin.newsletter.status.unsubscribed': 'Unsubscribed'
 };

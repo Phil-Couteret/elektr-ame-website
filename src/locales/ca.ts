@@ -48,11 +48,17 @@ export default {
   'newsletter.description': 'Subscriu-te al nostre butlletí per rebre les últimes actualitzacions sobre esdeveniments, artistes destacats i tallers educatius.',
   'newsletter.placeholder': 'El teu correu electrònic',
   'newsletter.button': 'Subscriu-te',
+  'newsletter.submitting': 'Subscrivint...',
   'newsletter.privacy': 'Respectem la teva privacitat. Cancel·la la teva subscripció en qualsevol moment.',
   'newsletter.follow': 'Segueix-nos',
   'newsletter.follow.text': 'Uneix-te a la nostra comunitat a les xarxes socials per a actualitzacions diàries.',
   'newsletter.email': 'Escriu-nos',
   'newsletter.email.text': 'Tens preguntes o vols col·laborar?',
+  'newsletter.success.title': 'Èxit!',
+  'newsletter.success.description': 'Gràcies per subscriure\'t al nostre butlletí!',
+  'newsletter.error.title': 'Error',
+  'newsletter.error.invalid': 'Si us plau, introdueix una adreça de correu vàlida.',
+  'newsletter.error.network': 'Error de xarxa. Si us plau, torna-ho a provar.',
   'newsletter.visit': 'Visita\'ns',
   'newsletter.visit.text': 'El nostre espai comunitari està obert entre setmana.',
   
@@ -144,6 +150,7 @@ export default {
   'admin.tabs.artists': 'Artistes',
   'admin.tabs.gallery': 'Galeria',
   'admin.tabs.members': 'Membres',
+  'admin.tabs.newsletter': 'Butlletí',
   'admin.tabs.users': 'Usuaris',
   
   // Admin - Members Management
@@ -258,5 +265,38 @@ export default {
   'admin.addMember.create': 'Crear Membre',
   'admin.addMember.creating': 'Creant...',
   'admin.addMember.created': 'Membre creat exitosament',
-  'admin.addMember.createError': 'Error en crear membre'
+  'admin.addMember.createError': 'Error en crear membre',
+
+  // Admin - Newsletter Management
+  'admin.newsletter.title': 'Subscriptors del Butlletí',
+  'admin.newsletter.subtitle': 'Gestiona subscriptors de correu i exporta llistes de distribució',
+  'admin.newsletter.exportCSV': 'Exportar CSV',
+  'admin.newsletter.exporting': 'Exportant...',
+  'admin.newsletter.exported': 'Subscriptors exportats exitosament',
+  'admin.newsletter.exportError': 'Error en exportar subscriptors',
+  'admin.newsletter.fetchError': 'Error en obtenir subscriptors',
+  'admin.newsletter.noSubscribers': 'Encara no hi ha subscriptors',
+  'admin.newsletter.showing': 'Mostrant',
+  'admin.newsletter.of': 'de',
+  'admin.newsletter.subscribers': 'subscriptors',
+  
+  // Admin - Newsletter Stats
+  'admin.newsletter.stats.total': 'Total Subscriptors',
+  'admin.newsletter.stats.active': 'Actius',
+  'admin.newsletter.stats.unsubscribed': 'Donats de Baixa',
+  
+  // Admin - Newsletter Table
+  'admin.newsletter.table.email': 'Correu',
+  'admin.newsletter.table.subscribed': 'Subscrit',
+  'admin.newsletter.table.status': 'Estat',
+  'admin.newsletter.table.ip': 'Adreça IP',
+  
+  // Admin - Newsletter Filters
+  'admin.newsletter.filter.active': 'Només Actius',
+  'admin.newsletter.filter.all': 'Tots',
+  'admin.newsletter.filter.unsubscribed': 'Donats de Baixa',
+  
+  // Admin - Newsletter Status
+  'admin.newsletter.status.active': 'Actiu',
+  'admin.newsletter.status.unsubscribed': 'Donat de Baixa'
 };

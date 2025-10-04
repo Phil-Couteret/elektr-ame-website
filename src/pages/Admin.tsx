@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
@@ -10,6 +10,7 @@ import ArtistsManager from "@/components/admin/ArtistsManager";
 import GalleryManager from "@/components/admin/GalleryManager";
 import UsersManager from "@/components/admin/UsersManager";
 import MembersManager from "@/components/admin/MembersManager";
+import NewsletterManager from "@/components/admin/NewsletterManager";
 import LanguageSelector from "@/components/LanguageSelector";
 
 const Admin = () => {
@@ -69,7 +70,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-5' : 'grid-cols-4'} bg-black/40 border-white/10`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-6' : 'grid-cols-5'} bg-black/40 border-white/10`}>
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -98,6 +99,13 @@ const Admin = () => {
               <UserPlus className="h-4 w-4 mr-2" />
               {t('admin.tabs.members')}
             </TabsTrigger>
+            <TabsTrigger 
+              value="newsletter"
+              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              {t('admin.tabs.newsletter')}
+            </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger 
                 value="users"
@@ -123,6 +131,10 @@ const Admin = () => {
 
           <TabsContent value="members" className="mt-6">
             <MembersManager />
+          </TabsContent>
+
+          <TabsContent value="newsletter" className="mt-6">
+            <NewsletterManager />
           </TabsContent>
 
           {isSuperAdmin && (

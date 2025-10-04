@@ -48,11 +48,17 @@ export default {
   'newsletter.description': 'Suscríbete a nuestro boletín para recibir las últimas actualizaciones sobre eventos, artistas destacados y talleres educativos.',
   'newsletter.placeholder': 'Tu correo electrónico',
   'newsletter.button': 'Suscribirse',
+  'newsletter.submitting': 'Suscribiendo...',
   'newsletter.privacy': 'Respetamos tu privacidad. Cancela tu suscripción en cualquier momento.',
   'newsletter.follow': 'Síguenos',
   'newsletter.follow.text': 'Únete a nuestra comunidad en redes sociales para actualizaciones diarias.',
   'newsletter.email': 'Escríbenos',
   'newsletter.email.text': '¿Tienes preguntas o quieres colaborar?',
+  'newsletter.success.title': '¡Éxito!',
+  'newsletter.success.description': '¡Gracias por suscribirte a nuestro boletín!',
+  'newsletter.error.title': 'Error',
+  'newsletter.error.invalid': 'Por favor, introduce una dirección de correo válida.',
+  'newsletter.error.network': 'Error de red. Por favor, inténtalo de nuevo.',
   'newsletter.visit': 'Visítanos',
   'newsletter.visit.text': 'Nuestro espacio comunitario está abierto entre semana.',
   
@@ -144,6 +150,7 @@ export default {
   'admin.tabs.artists': 'Artistas',
   'admin.tabs.gallery': 'Galería',
   'admin.tabs.members': 'Miembros',
+  'admin.tabs.newsletter': 'Boletín',
   'admin.tabs.users': 'Usuarios',
   
   // Admin - Members Management
@@ -258,5 +265,38 @@ export default {
   'admin.addMember.create': 'Crear Miembro',
   'admin.addMember.creating': 'Creando...',
   'admin.addMember.created': 'Miembro creado exitosamente',
-  'admin.addMember.createError': 'Error al crear miembro'
+  'admin.addMember.createError': 'Error al crear miembro',
+
+  // Admin - Newsletter Management
+  'admin.newsletter.title': 'Suscriptores del Boletín',
+  'admin.newsletter.subtitle': 'Gestiona suscriptores de correo y exporta listas de distribución',
+  'admin.newsletter.exportCSV': 'Exportar CSV',
+  'admin.newsletter.exporting': 'Exportando...',
+  'admin.newsletter.exported': 'Suscriptores exportados exitosamente',
+  'admin.newsletter.exportError': 'Error al exportar suscriptores',
+  'admin.newsletter.fetchError': 'Error al obtener suscriptores',
+  'admin.newsletter.noSubscribers': 'Aún no hay suscriptores',
+  'admin.newsletter.showing': 'Mostrando',
+  'admin.newsletter.of': 'de',
+  'admin.newsletter.subscribers': 'suscriptores',
+  
+  // Admin - Newsletter Stats
+  'admin.newsletter.stats.total': 'Total Suscriptores',
+  'admin.newsletter.stats.active': 'Activos',
+  'admin.newsletter.stats.unsubscribed': 'Dados de Baja',
+  
+  // Admin - Newsletter Table
+  'admin.newsletter.table.email': 'Correo',
+  'admin.newsletter.table.subscribed': 'Suscrito',
+  'admin.newsletter.table.status': 'Estado',
+  'admin.newsletter.table.ip': 'Dirección IP',
+  
+  // Admin - Newsletter Filters
+  'admin.newsletter.filter.active': 'Solo Activos',
+  'admin.newsletter.filter.all': 'Todos',
+  'admin.newsletter.filter.unsubscribed': 'Dados de Baja',
+  
+  // Admin - Newsletter Status
+  'admin.newsletter.status.active': 'Activo',
+  'admin.newsletter.status.unsubscribed': 'Dado de Baja'
 };
