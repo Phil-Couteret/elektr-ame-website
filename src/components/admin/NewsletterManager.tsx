@@ -4,7 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Mail, Loader2, CheckCircle, XCircle, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Download, Mail, Loader2, CheckCircle, XCircle, Users, Send, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -22,18 +25,33 @@ interface Stats {
   unsubscribed: number;
 }
 
+interface Campaign {
+  id: number;
+  subject: string;
+  content: string;
+  sent_at: string;
+  recipients_count: number;
+  opened_count: number;
+}
+
 const NewsletterManager = () => {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [filteredSubscribers, setFilteredSubscribers] = useState<Subscriber[]>([]);
   const [stats, setStats] = useState<Stats>({ total: 0, active: 0, unsubscribed: 0 });
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('active');
+  const [activeView, setActiveView] = useState<'subscribers' | 'compose' | 'history'>('subscribers');
+  const [subject, setSubject] = useState('');
+  const [content, setContent] = useState('');
   const { toast } = useToast();
   const { t } = useLanguage();
 
   useEffect(() => {
     fetchSubscribers();
+    fetchCampaigns();
   }, []);
 
   useEffect(() => {
@@ -62,6 +80,76 @@ const NewsletterManager = () => {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCampaigns = async () => {
+    try {
+      const response = await fetch('/api/newsletter-campaigns-list.php', {
+        credentials: 'include',
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setCampaigns(data.campaigns || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch campaigns:', error);
+    }
+  };
+
+  const handleSendNewsletter = async () => {
+    if (!subject || !content) {
+      toast({
+        title: t('admin.message.error'),
+        description: t('admin.newsletter.compose.validation'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (stats.active === 0) {
+      toast({
+        title: t('admin.message.error'),
+        description: t('admin.newsletter.compose.noSubscribers'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const response = await fetch('/api/newsletter-send.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ subject, content })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('admin.message.success'),
+          description: t('admin.newsletter.compose.sent', { count: data.sent }),
+        });
+        setSubject('');
+        setContent('');
+        setActiveView('history');
+        fetchCampaigns();
+      } else {
+        throw new Error(data.error || 'Failed to send newsletter');
+      }
+    } catch (error) {
+      toast({
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : t('admin.newsletter.compose.sendError'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -127,19 +215,49 @@ const NewsletterManager = () => {
 
   return (
     <div className="space-y-6">
-      <Card className="bg-black/50 backdrop-blur-md border-white/10">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl text-white flex items-center gap-2">
-                <Mail className="h-6 w-6 text-electric-blue" />
-                {t('admin.newsletter.title')}
-              </CardTitle>
-              <CardDescription className="text-white/60 mt-2">
-                {t('admin.newsletter.subtitle')}
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
+      {/* Navigation Buttons */}
+      <div className="flex gap-2">
+        <Button
+          onClick={() => setActiveView('subscribers')}
+          variant={activeView === 'subscribers' ? 'default' : 'outline'}
+          className={activeView === 'subscribers' ? 'bg-electric-blue text-deep-purple' : 'border-white/20 text-white'}
+        >
+          <Users className="h-4 w-4 mr-2" />
+          {t('admin.newsletter.view.subscribers')}
+        </Button>
+        <Button
+          onClick={() => setActiveView('compose')}
+          variant={activeView === 'compose' ? 'default' : 'outline'}
+          className={activeView === 'compose' ? 'bg-electric-blue text-deep-purple' : 'border-white/20 text-white'}
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {t('admin.newsletter.view.compose')}
+        </Button>
+        <Button
+          onClick={() => setActiveView('history')}
+          variant={activeView === 'history' ? 'default' : 'outline'}
+          className={activeView === 'history' ? 'bg-electric-blue text-deep-purple' : 'border-white/20 text-white'}
+        >
+          <History className="h-4 w-4 mr-2" />
+          {t('admin.newsletter.view.history')}
+        </Button>
+      </div>
+
+      {/* Subscribers View */}
+      {activeView === 'subscribers' && (
+        <Card className="bg-black/50 backdrop-blur-md border-white/10">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-2xl text-white flex items-center gap-2">
+                  <Mail className="h-6 w-6 text-electric-blue" />
+                  {t('admin.newsletter.title')}
+                </CardTitle>
+                <CardDescription className="text-white/60 mt-2">
+                  {t('admin.newsletter.subtitle')}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
               <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px] bg-black/40 border-white/10 text-white">
                   <SelectValue />
@@ -255,6 +373,121 @@ const NewsletterManager = () => {
           </p>
         </CardContent>
       </Card>
+      )}
+
+      {/* Compose Newsletter View */}
+      {activeView === 'compose' && (
+        <Card className="bg-black/50 backdrop-blur-md border-white/10">
+          <CardHeader>
+            <CardTitle className="text-2xl text-white flex items-center gap-2">
+              <Send className="h-6 w-6 text-electric-blue" />
+              {t('admin.newsletter.compose.title')}
+            </CardTitle>
+            <CardDescription className="text-white/60 mt-2">
+              {t('admin.newsletter.compose.subtitle', { count: stats.active })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label className="text-white">{t('admin.newsletter.compose.subject')}</Label>
+              <Input
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder={t('admin.newsletter.compose.subjectPlaceholder')}
+                className="bg-black/40 border-white/10 text-white"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-white">{t('admin.newsletter.compose.content')}</Label>
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder={t('admin.newsletter.compose.contentPlaceholder')}
+                className="bg-black/40 border-white/10 text-white min-h-[300px]"
+              />
+              <p className="text-white/40 text-sm">
+                {t('admin.newsletter.compose.note')}
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between pt-4 border-t border-white/10">
+              <div className="text-white/60 text-sm">
+                {t('admin.newsletter.compose.willSend', { count: stats.active })}
+              </div>
+              <Button
+                onClick={handleSendNewsletter}
+                disabled={isSending || !subject || !content || stats.active === 0}
+                className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+              >
+                {isSending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    {t('admin.newsletter.compose.sending')}
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-4 w-4 mr-2" />
+                    {t('admin.newsletter.compose.send')}
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Campaign History View */}
+      {activeView === 'history' && (
+        <Card className="bg-black/50 backdrop-blur-md border-white/10">
+          <CardHeader>
+            <CardTitle className="text-2xl text-white flex items-center gap-2">
+              <History className="h-6 w-6 text-electric-blue" />
+              {t('admin.newsletter.history.title')}
+            </CardTitle>
+            <CardDescription className="text-white/60 mt-2">
+              {t('admin.newsletter.history.subtitle')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {campaigns.length === 0 ? (
+              <div className="text-center py-12">
+                <Mail className="h-12 w-12 text-white/30 mx-auto mb-4" />
+                <p className="text-white/60">{t('admin.newsletter.history.noCampaigns')}</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {campaigns.map((campaign) => (
+                  <Card key={campaign.id} className="bg-black/40 border-white/10">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-white mb-2">{campaign.subject}</h3>
+                          <p className="text-white/60 text-sm mb-2">
+                            {formatDate(campaign.sent_at)}
+                          </p>
+                          <div className="flex gap-4 text-sm">
+                            <span className="text-white/80">
+                              <Mail className="h-4 w-4 inline mr-1" />
+                              {campaign.recipients_count} {t('admin.newsletter.history.sent')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="bg-black/20 p-4 rounded border border-white/5">
+                        <p className="text-white/70 text-sm whitespace-pre-wrap">
+                          {campaign.content.substring(0, 200)}
+                          {campaign.content.length > 200 && '...'}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

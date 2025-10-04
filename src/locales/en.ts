@@ -301,5 +301,32 @@ export default {
   
   // Admin - Newsletter Status
   'admin.newsletter.status.active': 'Active',
-  'admin.newsletter.status.unsubscribed': 'Unsubscribed'
+  'admin.newsletter.status.unsubscribed': 'Unsubscribed',
+  
+  // Admin - Newsletter Views
+  'admin.newsletter.view.subscribers': 'Subscribers',
+  'admin.newsletter.view.compose': 'Compose Newsletter',
+  'admin.newsletter.view.history': 'Campaign History',
+  
+  // Admin - Newsletter Compose
+  'admin.newsletter.compose.title': 'Compose Newsletter',
+  'admin.newsletter.compose.subtitle': 'Send email to {count} active subscribers',
+  'admin.newsletter.compose.subject': 'Subject',
+  'admin.newsletter.compose.subjectPlaceholder': 'Enter newsletter subject...',
+  'admin.newsletter.compose.content': 'Message Content',
+  'admin.newsletter.compose.contentPlaceholder': 'Write your newsletter message here...',
+  'admin.newsletter.compose.note': 'Note: Unsubscribe links will be automatically added to all emails',
+  'admin.newsletter.compose.willSend': 'Will be sent to {count} subscribers',
+  'admin.newsletter.compose.send': 'Send Newsletter',
+  'admin.newsletter.compose.sending': 'Sending...',
+  'admin.newsletter.compose.sent': 'Newsletter sent successfully to {count} subscribers!',
+  'admin.newsletter.compose.validation': 'Please fill in both subject and content',
+  'admin.newsletter.compose.noSubscribers': 'No active subscribers to send to',
+  'admin.newsletter.compose.sendError': 'Failed to send newsletter',
+  
+  // Admin - Newsletter History
+  'admin.newsletter.history.title': 'Campaign History',
+  'admin.newsletter.history.subtitle': 'View previously sent newsletters',
+  'admin.newsletter.history.noCampaigns': 'No newsletters sent yet',
+  'admin.newsletter.history.sent': 'sent'
 };

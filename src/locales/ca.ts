@@ -298,5 +298,32 @@ export default {
   
   // Admin - Newsletter Status
   'admin.newsletter.status.active': 'Actiu',
-  'admin.newsletter.status.unsubscribed': 'Donat de Baixa'
+  'admin.newsletter.status.unsubscribed': 'Donat de Baixa',
+  
+  // Admin - Newsletter Views
+  'admin.newsletter.view.subscribers': 'Subscriptors',
+  'admin.newsletter.view.compose': 'Redactar Butlletí',
+  'admin.newsletter.view.history': 'Historial d\'Enviaments',
+  
+  // Admin - Newsletter Compose
+  'admin.newsletter.compose.title': 'Redactar Butlletí',
+  'admin.newsletter.compose.subtitle': 'Enviar correu a {count} subscriptors actius',
+  'admin.newsletter.compose.subject': 'Assumpte',
+  'admin.newsletter.compose.subjectPlaceholder': 'Introdueix l\'assumpte del butlletí...',
+  'admin.newsletter.compose.content': 'Contingut del Missatge',
+  'admin.newsletter.compose.contentPlaceholder': 'Escriu el teu missatge aquí...',
+  'admin.newsletter.compose.note': 'Nota: Els enllaços per donar-se de baixa s\'afegiran automàticament',
+  'admin.newsletter.compose.willSend': 'S\'enviarà a {count} subscriptors',
+  'admin.newsletter.compose.send': 'Enviar Butlletí',
+  'admin.newsletter.compose.sending': 'Enviant...',
+  'admin.newsletter.compose.sent': 'Butlletí enviat exitosament a {count} subscriptors!',
+  'admin.newsletter.compose.validation': 'Si us plau, completa l\'assumpte i el contingut',
+  'admin.newsletter.compose.noSubscribers': 'No hi ha subscriptors actius',
+  'admin.newsletter.compose.sendError': 'Error en enviar el butlletí',
+  
+  // Admin - Newsletter History
+  'admin.newsletter.history.title': 'Historial de Campanyes',
+  'admin.newsletter.history.subtitle': 'Veure butlletins enviats anteriorment',
+  'admin.newsletter.history.noCampaigns': 'Encara no s\'han enviat butlletins',
+  'admin.newsletter.history.sent': 'enviat'
 };

@@ -298,5 +298,32 @@ export default {
   
   // Admin - Newsletter Status
   'admin.newsletter.status.active': 'Activo',
-  'admin.newsletter.status.unsubscribed': 'Dado de Baja'
+  'admin.newsletter.status.unsubscribed': 'Dado de Baja',
+  
+  // Admin - Newsletter Views
+  'admin.newsletter.view.subscribers': 'Suscriptores',
+  'admin.newsletter.view.compose': 'Redactar Boletín',
+  'admin.newsletter.view.history': 'Historial de Envíos',
+  
+  // Admin - Newsletter Compose
+  'admin.newsletter.compose.title': 'Redactar Boletín',
+  'admin.newsletter.compose.subtitle': 'Enviar correo a {count} suscriptores activos',
+  'admin.newsletter.compose.subject': 'Asunto',
+  'admin.newsletter.compose.subjectPlaceholder': 'Introduce el asunto del boletín...',
+  'admin.newsletter.compose.content': 'Contenido del Mensaje',
+  'admin.newsletter.compose.contentPlaceholder': 'Escribe tu mensaje aquí...',
+  'admin.newsletter.compose.note': 'Nota: Los enlaces para darse de baja se añadirán automáticamente',
+  'admin.newsletter.compose.willSend': 'Se enviará a {count} suscriptores',
+  'admin.newsletter.compose.send': 'Enviar Boletín',
+  'admin.newsletter.compose.sending': 'Enviando...',
+  'admin.newsletter.compose.sent': '¡Boletín enviado exitosamente a {count} suscriptores!',
+  'admin.newsletter.compose.validation': 'Por favor, completa el asunto y el contenido',
+  'admin.newsletter.compose.noSubscribers': 'No hay suscriptores activos',
+  'admin.newsletter.compose.sendError': 'Error al enviar el boletín',
+  
+  // Admin - Newsletter History
+  'admin.newsletter.history.title': 'Historial de Campañas',
+  'admin.newsletter.history.subtitle': 'Ver boletines enviados anteriormente',
+  'admin.newsletter.history.noCampaigns': 'Aún no se han enviado boletines',
+  'admin.newsletter.history.sent': 'enviado'
 };
