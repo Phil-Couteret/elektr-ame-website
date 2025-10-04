@@ -8,7 +8,7 @@ export type Language = 'en' | 'es' | 'ca';
 type LanguageContextType = {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 };
 
 // Create context with default values
@@ -45,20 +45,26 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   }, [language]);
 
   // Translation function
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     if (typeof window === 'undefined') return key;
     
-    // Replace {year} with current year if present
-    const replaceYearTemplate = (text: string) => {
-      return text.replace('{year}', new Date().getFullYear().toString());
-    };
-    
     // Get translation from global translations object
-    const translation = window.translations?.[language]?.[key] || 
-                         window.translations?.['en']?.[key] || 
-                         key;
+    let translation = window.translations?.[language]?.[key] || 
+                       window.translations?.['en']?.[key] || 
+                       key;
+    
+    // Replace {year} with current year
+    translation = translation.replace('{year}', new Date().getFullYear().toString());
+    
+    // Replace all parameters like {count}, {name}, etc.
+    if (params) {
+      Object.keys(params).forEach(paramKey => {
+        const placeholder = `{${paramKey}}`;
+        translation = translation.replace(new RegExp(placeholder, 'g'), String(params[paramKey]));
+      });
+    }
                          
-    return replaceYearTemplate(translation);
+    return translation;
   };
 
   return (
