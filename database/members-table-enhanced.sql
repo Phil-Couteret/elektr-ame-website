@@ -18,3 +18,5 @@ ADD INDEX idx_payment_status (payment_status);
 -- Uncomment the line below if you want to set all existing pending members to free trial
 -- UPDATE members SET membership_type = 'free_trial', membership_start_date = created_at WHERE status = 'pending';
 
+
+

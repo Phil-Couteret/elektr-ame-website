@@ -11,3 +11,5 @@ ADD COLUMN is_fan BOOLEAN DEFAULT FALSE AFTER is_visual_artist;
 -- Add index for searching by artist name
 CREATE INDEX idx_artist_name ON members (artist_name);
 
+
+

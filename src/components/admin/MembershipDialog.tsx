@@ -144,15 +144,16 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-deep-purple border-white/10 text-white max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="bg-deep-purple border-white/10 text-white max-w-2xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{t('admin.dialog.title')}: {member.first_name} {member.last_name}</DialogTitle>
           <DialogDescription className="text-white/60">
             {member.email}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+          <form onSubmit={handleSubmit} className="space-y-4">
           {/* Contact & Identity Info */}
           <div className="space-y-3 border-b border-white/10 pb-3">
             <h3 className="text-sm font-semibold text-white/80">{t('admin.addMember.personalInfo')}</h3>
@@ -341,23 +342,33 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             />
           </div>
           </div>
+          </form>
+        </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-white/10">
-              {t('admin.dialog.cancel')}
-            </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple">
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {t('admin.dialog.saving')}
-                </>
-              ) : (
-                t('admin.dialog.save')
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter className="flex-shrink-0 pt-4 border-t border-white/10">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="border-white/10">
+            {t('admin.dialog.cancel')}
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isSubmitting} 
+            className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+            onClick={(e) => {
+              e.preventDefault();
+              const form = document.querySelector('form') as HTMLFormElement;
+              form?.requestSubmit();
+            }}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                {t('admin.dialog.saving')}
+              </>
+            ) : (
+              t('admin.dialog.save')
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

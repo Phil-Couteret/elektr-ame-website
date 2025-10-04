@@ -78,8 +78,8 @@ const JoinUs = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20 overflow-y-auto">
+      <div className="container mx-auto px-4 py-8 pb-20">
         {/* Back button */}
         <div className="mb-6">
           <Link 

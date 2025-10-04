@@ -179,3 +179,6 @@ Once deployed, your Elektr-Âme website will be live and accessible to the world
 - Consider SEO optimization
 - Set up monitoring and backups
 
+
+
+
