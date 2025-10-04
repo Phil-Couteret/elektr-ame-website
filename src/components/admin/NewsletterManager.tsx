@@ -219,24 +219,30 @@ const NewsletterManager = () => {
       <div className="flex gap-2">
         <Button
           onClick={() => setActiveView('subscribers')}
-          variant={activeView === 'subscribers' ? 'default' : 'outline'}
-          className={activeView === 'subscribers' ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' : 'border-white/20 text-white hover:bg-white/10 hover:text-white'}
+          className={activeView === 'subscribers' 
+            ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' 
+            : 'bg-transparent border border-white/20 text-white hover:bg-white/10 hover:text-white'
+          }
         >
           <Users className="h-4 w-4 mr-2" />
           {t('admin.newsletter.view.subscribers')}
         </Button>
         <Button
           onClick={() => setActiveView('compose')}
-          variant={activeView === 'compose' ? 'default' : 'outline'}
-          className={activeView === 'compose' ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' : 'border-white/20 text-white hover:bg-white/10 hover:text-white'}
+          className={activeView === 'compose' 
+            ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' 
+            : 'bg-transparent border border-white/20 text-white hover:bg-white/10 hover:text-white'
+          }
         >
           <Send className="h-4 w-4 mr-2" />
           {t('admin.newsletter.view.compose')}
         </Button>
         <Button
           onClick={() => setActiveView('history')}
-          variant={activeView === 'history' ? 'default' : 'outline'}
-          className={activeView === 'history' ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' : 'border-white/20 text-white hover:bg-white/10 hover:text-white'}
+          className={activeView === 'history' 
+            ? 'bg-electric-blue text-deep-purple hover:bg-electric-blue/80' 
+            : 'bg-transparent border border-white/20 text-white hover:bg-white/10 hover:text-white'
+          }
         >
           <History className="h-4 w-4 mr-2" />
           {t('admin.newsletter.view.history')}
