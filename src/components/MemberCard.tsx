@@ -32,9 +32,9 @@ const MemberCard = ({
 
   const getMembershipColor = (type: string) => {
     switch (type) {
-      case 'free_trial': return 'from-blue-600 to-blue-800';
-      case 'monthly': return 'from-purple-600 to-purple-800';
-      case 'yearly': return 'from-orange-600 to-orange-800';
+      case 'free': return 'from-gray-600 to-gray-800';
+      case 'basic': return 'from-blue-600 to-blue-800';
+      case 'sponsor': return 'from-purple-600 to-purple-800';
       case 'lifetime': return 'from-yellow-600 to-yellow-800';
       default: return 'from-gray-600 to-gray-800';
     }
@@ -42,9 +42,9 @@ const MemberCard = ({
 
   const getMembershipLabel = (type: string) => {
     switch (type) {
-      case 'free_trial': return 'Free Trial';
-      case 'monthly': return 'Monthly Member';
-      case 'yearly': return 'Yearly Member';
+      case 'free': return 'Free Member';
+      case 'basic': return 'Basic Member (€40/year)';
+      case 'sponsor': return 'Sponsor Member (>€40/year)';
       case 'lifetime': return 'Lifetime Member';
       default: return 'Member';
     }

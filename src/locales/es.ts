@@ -356,13 +356,22 @@ export default {
   'portal.status.active': 'Activo',
   
   // Tipos de Membresía
-  'portal.membership.freeTrial': 'Prueba Gratuita',
-  'portal.membership.monthly': 'Mensual',
-  'portal.membership.yearly': 'Anual',
+  'portal.membership.free': 'Gratuita',
+  'portal.membership.basic': 'Básica',
+  'portal.membership.sponsor': 'Patrocinador',
   'portal.membership.lifetime': 'Vitalicia',
-  'portal.membership.monthlyMember': 'Miembro Mensual',
-  'portal.membership.yearlyMember': 'Miembro Anual',
+  'portal.membership.freeMember': 'Miembro Gratuito',
+  'portal.membership.basicMember': 'Miembro Básico (€40/año)',
+  'portal.membership.sponsorMember': 'Miembro Patrocinador (>€40/año)',
   'portal.membership.lifetimeMember': 'Miembro Vitalicio',
+  'portal.membership.freeDescription': 'Acceso limitado - Solo boletín',
+  'portal.membership.basicDescription': '€40/año - Membresía completa',
+  'portal.membership.sponsorDescription': '>€40/año - Membresía completa + Deducción fiscal',
+  'portal.membership.lifetimeDescription': 'Pago único - Membresía permanente',
+  'portal.membership.taxDeduction': 'Deducción Fiscal',
+  'portal.membership.taxDeductionInfo': 'Puedes deducir el {percentage}% de tu contribución',
+  'portal.membership.taxDeductionDetails': 'Primeros €250: 80% | Más de €250: 40%',
+  'portal.membership.netCost': 'Coste neto tras deducción fiscal: €{amount}',
   
   // Estado de Pago
   'portal.payment.paid': 'Pagado',

@@ -356,13 +356,22 @@ export default {
   'portal.status.active': 'Actiu',
   
   // Tipus de Membresa
-  'portal.membership.freeTrial': 'Prova Gratuïta',
-  'portal.membership.monthly': 'Mensual',
-  'portal.membership.yearly': 'Anual',
+  'portal.membership.free': 'Gratuïta',
+  'portal.membership.basic': 'Bàsica',
+  'portal.membership.sponsor': 'Patrocinador',
   'portal.membership.lifetime': 'Vitalícia',
-  'portal.membership.monthlyMember': 'Membre Mensual',
-  'portal.membership.yearlyMember': 'Membre Anual',
+  'portal.membership.freeMember': 'Membre Gratuït',
+  'portal.membership.basicMember': 'Membre Bàsic (€40/any)',
+  'portal.membership.sponsorMember': 'Membre Patrocinador (>€40/any)',
   'portal.membership.lifetimeMember': 'Membre Vitalici',
+  'portal.membership.freeDescription': 'Accés limitat - Només butlletí',
+  'portal.membership.basicDescription': '€40/any - Membresa completa',
+  'portal.membership.sponsorDescription': '>€40/any - Membresa completa + Deducció fiscal',
+  'portal.membership.lifetimeDescription': 'Pagament únic - Membresa permanent',
+  'portal.membership.taxDeduction': 'Deducció Fiscal',
+  'portal.membership.taxDeductionInfo': 'Pots deduir el {percentage}% de la teva contribució',
+  'portal.membership.taxDeductionDetails': 'Primers €250: 80% | Més de €250: 40%',
+  'portal.membership.netCost': 'Cost net després de deducció fiscal: €{amount}',
   
   // Estat de Pagament
   'portal.payment.paid': 'Pagat',

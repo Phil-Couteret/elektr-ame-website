@@ -359,13 +359,22 @@ export default {
   'portal.status.active': 'Active',
   
   // Membership Types
-  'portal.membership.freeTrial': 'Free Trial',
-  'portal.membership.monthly': 'Monthly',
-  'portal.membership.yearly': 'Yearly',
+  'portal.membership.free': 'Free',
+  'portal.membership.basic': 'Basic',
+  'portal.membership.sponsor': 'Sponsor',
   'portal.membership.lifetime': 'Lifetime',
-  'portal.membership.monthlyMember': 'Monthly Member',
-  'portal.membership.yearlyMember': 'Yearly Member',
+  'portal.membership.freeMember': 'Free Member',
+  'portal.membership.basicMember': 'Basic Member (€40/year)',
+  'portal.membership.sponsorMember': 'Sponsor Member (>€40/year)',
   'portal.membership.lifetimeMember': 'Lifetime Member',
+  'portal.membership.freeDescription': 'Limited access - Newsletter only',
+  'portal.membership.basicDescription': '€40/year - Full membership',
+  'portal.membership.sponsorDescription': '>€40/year - Full membership + Tax deduction',
+  'portal.membership.lifetimeDescription': 'One-time payment - Permanent membership',
+  'portal.membership.taxDeduction': 'Tax Deduction',
+  'portal.membership.taxDeductionInfo': 'You can deduct {percentage}% of your contribution',
+  'portal.membership.taxDeductionDetails': 'First €250: 80% | Above €250: 40%',
+  'portal.membership.netCost': 'Net cost after tax deduction: €{amount}',
   
   // Payment Status
   'portal.payment.paid': 'Paid',

@@ -40,7 +40,7 @@ interface MemberData {
   postal_code?: string;
   country?: string;
   status: 'pending' | 'approved' | 'rejected';
-  membership_type: 'free_trial' | 'monthly' | 'yearly' | 'lifetime';
+  membership_type: 'free' | 'basic' | 'sponsor' | 'lifetime';
   membership_start_date?: string;
   membership_end_date?: string;
   payment_status: 'unpaid' | 'paid' | 'overdue';
@@ -124,12 +124,12 @@ const MemberPortal = () => {
 
   const getMembershipTypeBadge = (type: string) => {
     const types = {
-      free_trial: { label: 'Free Trial', color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' },
-      monthly: { label: 'Monthly', color: 'bg-purple-500/20 text-purple-400 border-purple-500/50' },
-      yearly: { label: 'Yearly', color: 'bg-orange-500/20 text-orange-400 border-orange-500/50' },
-      lifetime: { label: 'Lifetime', color: 'bg-gold-500/20 text-gold-400 border-gold-500/50' },
+      free: { label: t('portal.membership.free'), color: 'bg-gray-500/20 text-gray-400 border-gray-500/50' },
+      basic: { label: t('portal.membership.basic'), color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' },
+      sponsor: { label: t('portal.membership.sponsor'), color: 'bg-purple-500/20 text-purple-400 border-purple-500/50' },
+      lifetime: { label: t('portal.membership.lifetime'), color: 'bg-gold-500/20 text-yellow-400 border-yellow-500/50' },
     };
-    const typeInfo = types[type as keyof typeof types] || types.free_trial;
+    const typeInfo = types[type as keyof typeof types] || types.free;
     return <Badge className={typeInfo.color}>{typeInfo.label}</Badge>;
   };
 
