@@ -11,6 +11,7 @@ import Initiatives from "./pages/Initiatives";
 import Contact from "./pages/Contact";
 import JoinUs from "./pages/JoinUs";
 import Admin from "./pages/Admin";
+import MemberPortal from "./pages/MemberPortal";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/initiatives" element={<Initiatives />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/join-us" element={<JoinUs />} />
+              <Route path="/member-portal" element={<MemberPortal />} />
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <Admin />

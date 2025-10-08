@@ -2,10 +2,13 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+session_start();
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Credentials: true');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -125,14 +128,23 @@ try {
     // Execute the statement
     $stmt->execute();
     
+    // Get the new member ID
+    $memberId = $pdo->lastInsertId();
+    
+    // Set session for member portal access
+    $_SESSION['member_id'] = $memberId;
+    $_SESSION['member_email'] = $input['email'];
+    $_SESSION['member_name'] = $input['firstName'] . ' ' . $input['lastName'];
+    
     // Return success response
     echo json_encode([
         'success' => true,
         'message' => 'Member registration successful',
-        'member_id' => $pdo->lastInsertId(),
+        'member_id' => $memberId,
         'debug' => [
             'received_data' => $input,
-            'php_version' => phpversion()
+            'php_version' => phpversion(),
+            'session_set' => true
         ]
     ]);
     
