@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
@@ -11,6 +11,7 @@ import GalleryManager from "@/components/admin/GalleryManager";
 import UsersManager from "@/components/admin/UsersManager";
 import MembersManager from "@/components/admin/MembersManager";
 import NewsletterManager from "@/components/admin/NewsletterManager";
+import EmailAutomationManager from "@/components/admin/EmailAutomationManager";
 import LanguageSelector from "@/components/LanguageSelector";
 
 const Admin = () => {
@@ -70,7 +71,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-6' : 'grid-cols-5'} bg-black/40 border-white/10`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-7' : 'grid-cols-6'} bg-black/40 border-white/10`}>
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -106,6 +107,13 @@ const Admin = () => {
               <Mail className="h-4 w-4 mr-2" />
               {t('admin.tabs.newsletter')}
             </TabsTrigger>
+            <TabsTrigger 
+              value="email-automation"
+              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+            >
+              <Send className="h-4 w-4 mr-2" />
+              {t('admin.tabs.emailAutomation')}
+            </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger 
                 value="users"
@@ -135,6 +143,10 @@ const Admin = () => {
 
           <TabsContent value="newsletter" className="mt-6">
             <NewsletterManager />
+          </TabsContent>
+
+          <TabsContent value="email-automation" className="mt-6">
+            <EmailAutomationManager />
           </TabsContent>
 
           {isSuperAdmin && (

@@ -131,12 +131,34 @@ try {
     // Always update the updated_at timestamp
     $updates[] = "updated_at = NOW()";
     
+    // Get member data before update to detect changes
+    $stmtBefore = $pdo->prepare("SELECT payment_status, membership_end_date, payment_amount FROM members WHERE id = :id");
+    $stmtBefore->execute([':id' => $memberId]);
+    $before = $stmtBefore->fetch(PDO::FETCH_ASSOC);
+    
     $sql = "UPDATE members SET " . implode(", ", $updates) . " WHERE id = :id";
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
     
     if ($stmt->rowCount() === 0) {
         throw new Exception('Member not found or no changes made');
+    }
+    
+    // Trigger email automation for renewal
+    if ($before && isset($input['payment_status']) && $input['payment_status'] === 'paid' && $before['payment_status'] !== 'paid') {
+        try {
+            require_once __DIR__ . '/classes/EmailAutomation.php';
+            $emailAutomation = new EmailAutomation($pdo);
+            $emailAutomation->triggerAutomation('membership_renewed', $memberId);
+            
+            // If sponsor (amount > 40), also send tax receipt
+            if (isset($input['payment_amount']) && $input['payment_amount'] > 40) {
+                $emailAutomation->triggerAutomation('sponsor_tax_receipt', $memberId);
+            }
+        } catch (Exception $e) {
+            error_log("Renewal email automation failed: " . $e->getMessage());
+            // Don't fail the update if email fails
+        }
     }
     
     echo json_encode([

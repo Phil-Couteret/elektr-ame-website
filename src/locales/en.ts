@@ -154,6 +154,7 @@ export default {
   'admin.tabs.gallery': 'Gallery',
   'admin.tabs.members': 'Members',
   'admin.tabs.newsletter': 'Newsletter',
+  'admin.tabs.emailAutomation': 'Email Automation',
   'admin.tabs.users': 'Users',
   
   // Admin - Members Management
@@ -428,5 +429,84 @@ export default {
   'portal.error.network': 'Network error. Please try again.',
   'portal.error.notAuthenticated': 'Not authenticated. Please log in or register.',
   'portal.comingSoon': 'Coming Soon',
-  'portal.comingSoonMessage': 'This feature will be available soon!'
+  'portal.comingSoonMessage': 'This feature will be available soon!',
+  
+  // Email Automation
+  'emailAutomation.title': 'Email Automation',
+  'emailAutomation.description': 'Manage automated email campaigns and notifications',
+  'emailAutomation.sendTest': 'Send Test',
+  'emailAutomation.runNow': 'Run Now',
+  'emailAutomation.processing': 'Processing...',
+  'emailAutomation.cronRunSuccess': 'Automation completed successfully!',
+  'emailAutomation.selectTemplate': 'Please select a template',
+  
+  // Stats
+  'emailAutomation.statsSent': 'Emails Sent',
+  'emailAutomation.statsPending': 'Pending in Queue',
+  'emailAutomation.statsFailed': 'Failed',
+  'emailAutomation.statsLast30Days': 'Last 30 days',
+  'emailAutomation.statsWaitingSend': 'Waiting to be sent',
+  
+  // Tabs
+  'emailAutomation.tabRecent': 'Recent Emails',
+  'emailAutomation.tabQueue': 'Queue Status',
+  'emailAutomation.tabRules': 'Automation Rules',
+  'emailAutomation.tabTemplates': 'Templates',
+  
+  // Recent Emails
+  'emailAutomation.recentEmailsTitle': 'Recent Emails',
+  'emailAutomation.recentEmailsDesc': 'Last 50 sent emails',
+  'emailAutomation.noEmails': 'No emails sent yet',
+  
+  // Queue
+  'emailAutomation.queueTitle': 'Email Queue',
+  'emailAutomation.queueDesc': 'Current status of email queue',
+  'emailAutomation.queueEmpty': 'Queue is empty',
+  
+  // Rules
+  'emailAutomation.rulesTitle': 'Automation Rules',
+  'emailAutomation.rulesDesc': 'Configured email automation triggers',
+  
+  // Templates
+  'emailAutomation.templatesTitle': 'Email Templates',
+  'emailAutomation.templatesDesc': 'Available email templates',
+  
+  // Table Columns
+  'emailAutomation.colStatus': 'Status',
+  'emailAutomation.colRecipient': 'Recipient',
+  'emailAutomation.colSubject': 'Subject',
+  'emailAutomation.colTemplate': 'Template',
+  'emailAutomation.colSent': 'Sent At',
+  'emailAutomation.colPriority': 'Priority',
+  'emailAutomation.colCount': 'Count',
+  'emailAutomation.colNextScheduled': 'Next Scheduled',
+  'emailAutomation.colRule': 'Rule',
+  'emailAutomation.colTrigger': 'Trigger',
+  'emailAutomation.colTiming': 'Timing',
+  'emailAutomation.colKey': 'Key',
+  
+  // Triggers
+  'emailAutomation.triggerRegistered': 'Member Registered',
+  'emailAutomation.triggerApproved': 'Member Approved',
+  'emailAutomation.triggerRejected': 'Member Rejected',
+  'emailAutomation.triggerExpiring7d': 'Expiring in 7 Days',
+  'emailAutomation.triggerExpiring3d': 'Expiring in 3 Days',
+  'emailAutomation.triggerExpiring1d': 'Expiring in 1 Day',
+  'emailAutomation.triggerExpired': 'Membership Expired',
+  'emailAutomation.triggerRenewed': 'Membership Renewed',
+  'emailAutomation.triggerTaxReceipt': 'Tax Receipt (Sponsor)',
+  
+  // Timing
+  'emailAutomation.timingImmediate': 'Immediate',
+  'emailAutomation.timingDaysBefore': '{0} days before',
+  'emailAutomation.timingDaysAfter': '{0} days after',
+  
+  // Status
+  'emailAutomation.statusActive': 'Active',
+  'emailAutomation.statusInactive': 'Inactive',
+  
+  // Test Dialog
+  'emailAutomation.testDialogTitle': 'Send Test Email',
+  'emailAutomation.testDialogDesc': 'Choose a template to send a test email to your admin email address',
+  'emailAutomation.selectTemplatePlaceholder': 'Choose a template...'
 };

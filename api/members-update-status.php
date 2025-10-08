@@ -66,6 +66,21 @@ try {
         throw new Exception('Member not found');
     }
     
+    // Trigger email automation for status change
+    try {
+        require_once __DIR__ . '/classes/EmailAutomation.php';
+        $emailAutomation = new EmailAutomation($pdo);
+        
+        if ($status === 'approved') {
+            $emailAutomation->triggerAutomation('member_approved', $memberId);
+        } elseif ($status === 'rejected') {
+            $emailAutomation->triggerAutomation('member_rejected', $memberId);
+        }
+    } catch (Exception $e) {
+        error_log("Status change email automation failed: " . $e->getMessage());
+        // Don't fail the status update if email fails
+    }
+    
     echo json_encode([
         'success' => true,
         'message' => 'Member status updated successfully'

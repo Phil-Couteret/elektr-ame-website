@@ -151,6 +151,7 @@ export default {
   'admin.tabs.gallery': 'Galeria',
   'admin.tabs.members': 'Membres',
   'admin.tabs.newsletter': 'Butlletí',
+  'admin.tabs.emailAutomation': 'Automatització de Correus',
   'admin.tabs.users': 'Usuaris',
   
   // Admin - Members Management
@@ -425,5 +426,84 @@ export default {
   'portal.error.network': 'Error de xarxa. Si us plau, torna-ho a intentar.',
   'portal.error.notAuthenticated': 'No autenticat. Si us plau, inicia sessió o registra\'t.',
   'portal.comingSoon': 'Properament',
-  'portal.comingSoonMessage': 'Aquesta funció estarà disponible aviat!'
+  'portal.comingSoonMessage': 'Aquesta funció estarà disponible aviat!',
+  
+  // Automatització de Correus
+  'emailAutomation.title': 'Automatització de Correus',
+  'emailAutomation.description': 'Gestiona campanyes de correu automatitzades i notificacions',
+  'emailAutomation.sendTest': 'Enviar Prova',
+  'emailAutomation.runNow': 'Executar Ara',
+  'emailAutomation.processing': 'Processant...',
+  'emailAutomation.cronRunSuccess': 'Automatització completada amb èxit!',
+  'emailAutomation.selectTemplate': 'Si us plau, selecciona una plantilla',
+  
+  // Estadístiques
+  'emailAutomation.statsSent': 'Correus Enviats',
+  'emailAutomation.statsPending': 'Pendents a la Cua',
+  'emailAutomation.statsFailed': 'Fallits',
+  'emailAutomation.statsLast30Days': 'Últims 30 dies',
+  'emailAutomation.statsWaitingSend': 'Esperant ser enviats',
+  
+  // Pestanyes
+  'emailAutomation.tabRecent': 'Correus Recents',
+  'emailAutomation.tabQueue': 'Estat de Cua',
+  'emailAutomation.tabRules': 'Regles d\'Automatització',
+  'emailAutomation.tabTemplates': 'Plantilles',
+  
+  // Correus Recents
+  'emailAutomation.recentEmailsTitle': 'Correus Recents',
+  'emailAutomation.recentEmailsDesc': 'Últims 50 correus enviats',
+  'emailAutomation.noEmails': 'No s\'han enviat correus encara',
+  
+  // Cua
+  'emailAutomation.queueTitle': 'Cua de Correus',
+  'emailAutomation.queueDesc': 'Estat actual de la cua de correus',
+  'emailAutomation.queueEmpty': 'La cua està buida',
+  
+  // Regles
+  'emailAutomation.rulesTitle': 'Regles d\'Automatització',
+  'emailAutomation.rulesDesc': 'Disparadors d\'automatització de correus configurats',
+  
+  // Plantilles
+  'emailAutomation.templatesTitle': 'Plantilles de Correu',
+  'emailAutomation.templatesDesc': 'Plantilles de correu disponibles',
+  
+  // Columnes de Taula
+  'emailAutomation.colStatus': 'Estat',
+  'emailAutomation.colRecipient': 'Destinatari',
+  'emailAutomation.colSubject': 'Assumpte',
+  'emailAutomation.colTemplate': 'Plantilla',
+  'emailAutomation.colSent': 'Enviat',
+  'emailAutomation.colPriority': 'Prioritat',
+  'emailAutomation.colCount': 'Quantitat',
+  'emailAutomation.colNextScheduled': 'Proper Programat',
+  'emailAutomation.colRule': 'Regla',
+  'emailAutomation.colTrigger': 'Disparador',
+  'emailAutomation.colTiming': 'Temporització',
+  'emailAutomation.colKey': 'Clau',
+  
+  // Disparadors
+  'emailAutomation.triggerRegistered': 'Membre Registrat',
+  'emailAutomation.triggerApproved': 'Membre Aprovat',
+  'emailAutomation.triggerRejected': 'Membre Rebutjat',
+  'emailAutomation.triggerExpiring7d': 'Expira en 7 Dies',
+  'emailAutomation.triggerExpiring3d': 'Expira en 3 Dies',
+  'emailAutomation.triggerExpiring1d': 'Expira en 1 Dia',
+  'emailAutomation.triggerExpired': 'Membresa Expirada',
+  'emailAutomation.triggerRenewed': 'Membresa Renovada',
+  'emailAutomation.triggerTaxReceipt': 'Rebut Fiscal (Patrocinador)',
+  
+  // Temporització
+  'emailAutomation.timingImmediate': 'Immediat',
+  'emailAutomation.timingDaysBefore': '{0} dies abans',
+  'emailAutomation.timingDaysAfter': '{0} dies després',
+  
+  // Estat
+  'emailAutomation.statusActive': 'Actiu',
+  'emailAutomation.statusInactive': 'Inactiu',
+  
+  // Diàleg de Prova
+  'emailAutomation.testDialogTitle': 'Enviar Correu de Prova',
+  'emailAutomation.testDialogDesc': 'Tria una plantilla per enviar un correu de prova a la teva adreça de correu d\'administrador',
+  'emailAutomation.selectTemplatePlaceholder': 'Tria una plantilla...'
 };

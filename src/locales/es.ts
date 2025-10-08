@@ -151,6 +151,7 @@ export default {
   'admin.tabs.gallery': 'Galería',
   'admin.tabs.members': 'Miembros',
   'admin.tabs.newsletter': 'Boletín',
+  'admin.tabs.emailAutomation': 'Automatización de Correos',
   'admin.tabs.users': 'Usuarios',
   
   // Admin - Members Management
@@ -425,5 +426,84 @@ export default {
   'portal.error.network': 'Error de red. Por favor, inténtalo de nuevo.',
   'portal.error.notAuthenticated': 'No autenticado. Por favor, inicia sesión o regístrate.',
   'portal.comingSoon': 'Próximamente',
-  'portal.comingSoonMessage': '¡Esta función estará disponible pronto!'
+  'portal.comingSoonMessage': '¡Esta función estará disponible pronto!',
+  
+  // Automatización de Correos
+  'emailAutomation.title': 'Automatización de Correos',
+  'emailAutomation.description': 'Gestiona campañas de correo automatizadas y notificaciones',
+  'emailAutomation.sendTest': 'Enviar Prueba',
+  'emailAutomation.runNow': 'Ejecutar Ahora',
+  'emailAutomation.processing': 'Procesando...',
+  'emailAutomation.cronRunSuccess': '¡Automatización completada con éxito!',
+  'emailAutomation.selectTemplate': 'Por favor, selecciona una plantilla',
+  
+  // Estadísticas
+  'emailAutomation.statsSent': 'Correos Enviados',
+  'emailAutomation.statsPending': 'Pendientes en Cola',
+  'emailAutomation.statsFailed': 'Fallidos',
+  'emailAutomation.statsLast30Days': 'Últimos 30 días',
+  'emailAutomation.statsWaitingSend': 'Esperando ser enviados',
+  
+  // Pestañas
+  'emailAutomation.tabRecent': 'Correos Recientes',
+  'emailAutomation.tabQueue': 'Estado de Cola',
+  'emailAutomation.tabRules': 'Reglas de Automatización',
+  'emailAutomation.tabTemplates': 'Plantillas',
+  
+  // Correos Recientes
+  'emailAutomation.recentEmailsTitle': 'Correos Recientes',
+  'emailAutomation.recentEmailsDesc': 'Últimos 50 correos enviados',
+  'emailAutomation.noEmails': 'No se han enviado correos aún',
+  
+  // Cola
+  'emailAutomation.queueTitle': 'Cola de Correos',
+  'emailAutomation.queueDesc': 'Estado actual de la cola de correos',
+  'emailAutomation.queueEmpty': 'La cola está vacía',
+  
+  // Reglas
+  'emailAutomation.rulesTitle': 'Reglas de Automatización',
+  'emailAutomation.rulesDesc': 'Disparadores de automatización de correos configurados',
+  
+  // Plantillas
+  'emailAutomation.templatesTitle': 'Plantillas de Correo',
+  'emailAutomation.templatesDesc': 'Plantillas de correo disponibles',
+  
+  // Columnas de Tabla
+  'emailAutomation.colStatus': 'Estado',
+  'emailAutomation.colRecipient': 'Destinatario',
+  'emailAutomation.colSubject': 'Asunto',
+  'emailAutomation.colTemplate': 'Plantilla',
+  'emailAutomation.colSent': 'Enviado',
+  'emailAutomation.colPriority': 'Prioridad',
+  'emailAutomation.colCount': 'Cantidad',
+  'emailAutomation.colNextScheduled': 'Próximo Programado',
+  'emailAutomation.colRule': 'Regla',
+  'emailAutomation.colTrigger': 'Disparador',
+  'emailAutomation.colTiming': 'Temporización',
+  'emailAutomation.colKey': 'Clave',
+  
+  // Disparadores
+  'emailAutomation.triggerRegistered': 'Miembro Registrado',
+  'emailAutomation.triggerApproved': 'Miembro Aprobado',
+  'emailAutomation.triggerRejected': 'Miembro Rechazado',
+  'emailAutomation.triggerExpiring7d': 'Expira en 7 Días',
+  'emailAutomation.triggerExpiring3d': 'Expira en 3 Días',
+  'emailAutomation.triggerExpiring1d': 'Expira en 1 Día',
+  'emailAutomation.triggerExpired': 'Membresía Expirada',
+  'emailAutomation.triggerRenewed': 'Membresía Renovada',
+  'emailAutomation.triggerTaxReceipt': 'Recibo Fiscal (Patrocinador)',
+  
+  // Temporización
+  'emailAutomation.timingImmediate': 'Inmediato',
+  'emailAutomation.timingDaysBefore': '{0} días antes',
+  'emailAutomation.timingDaysAfter': '{0} días después',
+  
+  // Estado
+  'emailAutomation.statusActive': 'Activo',
+  'emailAutomation.statusInactive': 'Inactivo',
+  
+  // Diálogo de Prueba
+  'emailAutomation.testDialogTitle': 'Enviar Correo de Prueba',
+  'emailAutomation.testDialogDesc': 'Elige una plantilla para enviar un correo de prueba a tu dirección de correo de administrador',
+  'emailAutomation.selectTemplatePlaceholder': 'Elige una plantilla...'
 };

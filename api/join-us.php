@@ -136,6 +136,16 @@ try {
     $_SESSION['member_email'] = $input['email'];
     $_SESSION['member_name'] = $input['firstName'] . ' ' . $input['lastName'];
     
+    // Trigger welcome email automation
+    try {
+        require_once __DIR__ . '/classes/EmailAutomation.php';
+        $emailAutomation = new EmailAutomation($pdo);
+        $emailAutomation->triggerAutomation('member_registered', $memberId);
+    } catch (Exception $e) {
+        error_log("Welcome email automation failed: " . $e->getMessage());
+        // Don't fail the registration if email fails
+    }
+    
     // Return success response
     echo json_encode([
         'success' => true,
