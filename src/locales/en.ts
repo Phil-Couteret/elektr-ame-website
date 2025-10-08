@@ -328,5 +328,96 @@ export default {
   'admin.newsletter.history.title': 'Campaign History',
   'admin.newsletter.history.subtitle': 'View previously sent newsletters',
   'admin.newsletter.history.noCampaigns': 'No newsletters sent yet',
-  'admin.newsletter.history.sent': 'sent'
+  'admin.newsletter.history.sent': 'sent',
+
+  // Member Portal
+  'portal.header.title': 'Member Portal',
+  'portal.header.welcome': 'Welcome back, {name}!',
+  'portal.header.backHome': 'Back to Home',
+  'portal.status.title': 'Status',
+  'portal.membership.title': 'Membership',
+  'portal.payment.title': 'Payment',
+  'portal.tabs.overview': 'Overview',
+  'portal.tabs.card': 'Digital Card',
+  'portal.tabs.profile': 'Profile',
+  
+  // Overview Tab
+  'portal.overview.membershipInfo': 'Membership Information',
+  'portal.overview.memberId': 'Member ID',
+  'portal.overview.memberSince': 'Member Since',
+  'portal.overview.membershipStart': 'Membership Start',
+  'portal.overview.membershipExpires': 'Membership Expires',
+  'portal.overview.roles': 'Roles',
+  'portal.overview.downloadCard': 'Download Membership Card',
+  'portal.overview.pending.title': 'Membership Pending Approval',
+  'portal.overview.pending.message': 'Your membership application is currently under review. You\'ll receive an email once it\'s approved.',
+  
+  // Status Badges
+  'portal.status.approved': 'Approved',
+  'portal.status.pending': 'Pending',
+  'portal.status.rejected': 'Rejected',
+  'portal.status.active': 'Active',
+  
+  // Membership Types
+  'portal.membership.freeTrial': 'Free Trial',
+  'portal.membership.monthly': 'Monthly',
+  'portal.membership.yearly': 'Yearly',
+  'portal.membership.lifetime': 'Lifetime',
+  'portal.membership.monthlyMember': 'Monthly Member',
+  'portal.membership.yearlyMember': 'Yearly Member',
+  'portal.membership.lifetimeMember': 'Lifetime Member',
+  
+  // Payment Status
+  'portal.payment.paid': 'Paid',
+  'portal.payment.unpaid': 'Unpaid',
+  'portal.payment.overdue': 'Overdue',
+  
+  // Digital Card Tab
+  'portal.card.title': 'Digital Membership Card',
+  'portal.card.notAvailable.title': 'Card Not Available',
+  'portal.card.notAvailable.message': 'Your digital membership card will be available once your membership is approved.',
+  'portal.card.qrCode.message': 'Show this QR code at partner venues for member benefits',
+  'portal.card.download': 'Download Card',
+  'portal.card.share': 'Share',
+  'portal.card.addToAppleWallet': 'Add to Apple Wallet',
+  'portal.card.addToGoogleWallet': 'Add to Google Wallet',
+  'portal.card.walletNote': '* Apple Wallet and Google Wallet integration coming soon',
+  'portal.card.memberName': 'Member Name',
+  'portal.card.validUntil': 'Valid Until',
+  'portal.card.downloaded': 'Card Downloaded',
+  'portal.card.downloadSuccess': 'Your membership card has been downloaded successfully!',
+  'portal.card.downloadError': 'Failed to download card. Please try again.',
+  'portal.card.shareNotSupported': 'Share Not Supported',
+  'portal.card.shareNotSupportedMessage': 'Sharing is not supported on this device.',
+  
+  // Profile Tab
+  'portal.profile.title': 'Your Profile',
+  'portal.profile.email': 'Email',
+  'portal.profile.name': 'Name',
+  'portal.profile.artist': 'Artist',
+  'portal.profile.phone': 'Phone',
+  'portal.profile.address': 'Address',
+  'portal.profile.editProfile': 'Edit Profile',
+  'portal.profile.saveChanges': 'Save Changes',
+  'portal.profile.cancel': 'Cancel',
+  'portal.profile.updateSuccess': 'Profile Updated',
+  'portal.profile.updateSuccessMessage': 'Your profile has been updated successfully!',
+  'portal.profile.updateError': 'Update Failed',
+  'portal.profile.updateErrorMessage': 'Failed to update profile. Please try again.',
+  
+  // Renewal
+  'portal.renewal.title': 'Renew Membership',
+  'portal.renewal.message': 'Your membership expires on {date}. Renew now to continue enjoying member benefits!',
+  'portal.renewal.button': 'Renew Now',
+  'portal.renewal.comingSoon': 'Coming Soon',
+  'portal.renewal.comingSoonMessage': 'Online renewal will be available soon! Please contact us for now.',
+  
+  // Loading & Errors
+  'portal.loading': 'Loading...',
+  'portal.error.title': 'Error',
+  'portal.error.loadFailed': 'Failed to load member data',
+  'portal.error.network': 'Network error. Please try again.',
+  'portal.error.notAuthenticated': 'Not authenticated. Please log in or register.',
+  'portal.comingSoon': 'Coming Soon',
+  'portal.comingSoonMessage': 'This feature will be available soon!'
 };

@@ -325,5 +325,96 @@ export default {
   'admin.newsletter.history.title': 'Historial de Campañas',
   'admin.newsletter.history.subtitle': 'Ver boletines enviados anteriormente',
   'admin.newsletter.history.noCampaigns': 'Aún no se han enviado boletines',
-  'admin.newsletter.history.sent': 'enviado'
+  'admin.newsletter.history.sent': 'enviado',
+
+  // Portal de Miembros
+  'portal.header.title': 'Portal de Miembros',
+  'portal.header.welcome': '¡Bienvenido de nuevo, {name}!',
+  'portal.header.backHome': 'Volver al Inicio',
+  'portal.status.title': 'Estado',
+  'portal.membership.title': 'Membresía',
+  'portal.payment.title': 'Pago',
+  'portal.tabs.overview': 'Resumen',
+  'portal.tabs.card': 'Tarjeta Digital',
+  'portal.tabs.profile': 'Perfil',
+  
+  // Pestaña Resumen
+  'portal.overview.membershipInfo': 'Información de Membresía',
+  'portal.overview.memberId': 'ID de Miembro',
+  'portal.overview.memberSince': 'Miembro Desde',
+  'portal.overview.membershipStart': 'Inicio de Membresía',
+  'portal.overview.membershipExpires': 'La Membresía Expira',
+  'portal.overview.roles': 'Roles',
+  'portal.overview.downloadCard': 'Descargar Tarjeta de Membresía',
+  'portal.overview.pending.title': 'Membresía Pendiente de Aprobación',
+  'portal.overview.pending.message': 'Tu solicitud de membresía está actualmente en revisión. Recibirás un correo electrónico una vez que sea aprobada.',
+  
+  // Insignias de Estado
+  'portal.status.approved': 'Aprobado',
+  'portal.status.pending': 'Pendiente',
+  'portal.status.rejected': 'Rechazado',
+  'portal.status.active': 'Activo',
+  
+  // Tipos de Membresía
+  'portal.membership.freeTrial': 'Prueba Gratuita',
+  'portal.membership.monthly': 'Mensual',
+  'portal.membership.yearly': 'Anual',
+  'portal.membership.lifetime': 'Vitalicia',
+  'portal.membership.monthlyMember': 'Miembro Mensual',
+  'portal.membership.yearlyMember': 'Miembro Anual',
+  'portal.membership.lifetimeMember': 'Miembro Vitalicio',
+  
+  // Estado de Pago
+  'portal.payment.paid': 'Pagado',
+  'portal.payment.unpaid': 'Sin Pagar',
+  'portal.payment.overdue': 'Vencido',
+  
+  // Pestaña Tarjeta Digital
+  'portal.card.title': 'Tarjeta de Membresía Digital',
+  'portal.card.notAvailable.title': 'Tarjeta No Disponible',
+  'portal.card.notAvailable.message': 'Tu tarjeta de membresía digital estará disponible una vez que tu membresía sea aprobada.',
+  'portal.card.qrCode.message': 'Muestra este código QR en locales asociados para obtener beneficios de miembro',
+  'portal.card.download': 'Descargar Tarjeta',
+  'portal.card.share': 'Compartir',
+  'portal.card.addToAppleWallet': 'Añadir a Apple Wallet',
+  'portal.card.addToGoogleWallet': 'Añadir a Google Wallet',
+  'portal.card.walletNote': '* La integración con Apple Wallet y Google Wallet estará disponible pronto',
+  'portal.card.memberName': 'Nombre del Miembro',
+  'portal.card.validUntil': 'Válido Hasta',
+  'portal.card.downloaded': 'Tarjeta Descargada',
+  'portal.card.downloadSuccess': '¡Tu tarjeta de membresía se ha descargado correctamente!',
+  'portal.card.downloadError': 'Error al descargar la tarjeta. Por favor, inténtalo de nuevo.',
+  'portal.card.shareNotSupported': 'Compartir No Soportado',
+  'portal.card.shareNotSupportedMessage': 'Compartir no es compatible con este dispositivo.',
+  
+  // Pestaña Perfil
+  'portal.profile.title': 'Tu Perfil',
+  'portal.profile.email': 'Correo Electrónico',
+  'portal.profile.name': 'Nombre',
+  'portal.profile.artist': 'Artista',
+  'portal.profile.phone': 'Teléfono',
+  'portal.profile.address': 'Dirección',
+  'portal.profile.editProfile': 'Editar Perfil',
+  'portal.profile.saveChanges': 'Guardar Cambios',
+  'portal.profile.cancel': 'Cancelar',
+  'portal.profile.updateSuccess': 'Perfil Actualizado',
+  'portal.profile.updateSuccessMessage': '¡Tu perfil ha sido actualizado correctamente!',
+  'portal.profile.updateError': 'Error en la Actualización',
+  'portal.profile.updateErrorMessage': 'Error al actualizar el perfil. Por favor, inténtalo de nuevo.',
+  
+  // Renovación
+  'portal.renewal.title': 'Renovar Membresía',
+  'portal.renewal.message': 'Tu membresía expira el {date}. ¡Renueva ahora para seguir disfrutando de los beneficios!',
+  'portal.renewal.button': 'Renovar Ahora',
+  'portal.renewal.comingSoon': 'Próximamente',
+  'portal.renewal.comingSoonMessage': '¡La renovación en línea estará disponible pronto! Por favor, contáctanos por ahora.',
+  
+  // Carga y Errores
+  'portal.loading': 'Cargando...',
+  'portal.error.title': 'Error',
+  'portal.error.loadFailed': 'Error al cargar datos del miembro',
+  'portal.error.network': 'Error de red. Por favor, inténtalo de nuevo.',
+  'portal.error.notAuthenticated': 'No autenticado. Por favor, inicia sesión o regístrate.',
+  'portal.comingSoon': 'Próximamente',
+  'portal.comingSoonMessage': '¡Esta función estará disponible pronto!'
 };

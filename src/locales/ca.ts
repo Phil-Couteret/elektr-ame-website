@@ -325,5 +325,96 @@ export default {
   'admin.newsletter.history.title': 'Historial de Campanyes',
   'admin.newsletter.history.subtitle': 'Veure butlletins enviats anteriorment',
   'admin.newsletter.history.noCampaigns': 'Encara no s\'han enviat butlletins',
-  'admin.newsletter.history.sent': 'enviat'
+  'admin.newsletter.history.sent': 'enviat',
+
+  // Portal de Membres
+  'portal.header.title': 'Portal de Membres',
+  'portal.header.welcome': 'Benvingut de nou, {name}!',
+  'portal.header.backHome': 'Tornar a l\'Inici',
+  'portal.status.title': 'Estat',
+  'portal.membership.title': 'Membresa',
+  'portal.payment.title': 'Pagament',
+  'portal.tabs.overview': 'Resum',
+  'portal.tabs.card': 'Targeta Digital',
+  'portal.tabs.profile': 'Perfil',
+  
+  // Pestanya Resum
+  'portal.overview.membershipInfo': 'Informació de Membresa',
+  'portal.overview.memberId': 'ID de Membre',
+  'portal.overview.memberSince': 'Membre Des De',
+  'portal.overview.membershipStart': 'Inici de Membresa',
+  'portal.overview.membershipExpires': 'La Membresa Expira',
+  'portal.overview.roles': 'Rols',
+  'portal.overview.downloadCard': 'Descarregar Targeta de Membresa',
+  'portal.overview.pending.title': 'Membresa Pendent d\'Aprovació',
+  'portal.overview.pending.message': 'La teva sol·licitud de membresa està actualment en revisió. Rebràs un correu electrònic un cop sigui aprovada.',
+  
+  // Insígnies d\'Estat
+  'portal.status.approved': 'Aprovat',
+  'portal.status.pending': 'Pendent',
+  'portal.status.rejected': 'Rebutjat',
+  'portal.status.active': 'Actiu',
+  
+  // Tipus de Membresa
+  'portal.membership.freeTrial': 'Prova Gratuïta',
+  'portal.membership.monthly': 'Mensual',
+  'portal.membership.yearly': 'Anual',
+  'portal.membership.lifetime': 'Vitalícia',
+  'portal.membership.monthlyMember': 'Membre Mensual',
+  'portal.membership.yearlyMember': 'Membre Anual',
+  'portal.membership.lifetimeMember': 'Membre Vitalici',
+  
+  // Estat de Pagament
+  'portal.payment.paid': 'Pagat',
+  'portal.payment.unpaid': 'Sense Pagar',
+  'portal.payment.overdue': 'Vençut',
+  
+  // Pestanya Targeta Digital
+  'portal.card.title': 'Targeta de Membresa Digital',
+  'portal.card.notAvailable.title': 'Targeta No Disponible',
+  'portal.card.notAvailable.message': 'La teva targeta de membresa digital estarà disponible un cop la teva membresa sigui aprovada.',
+  'portal.card.qrCode.message': 'Mostra aquest codi QR en locals associats per obtenir beneficis de membre',
+  'portal.card.download': 'Descarregar Targeta',
+  'portal.card.share': 'Compartir',
+  'portal.card.addToAppleWallet': 'Afegir a Apple Wallet',
+  'portal.card.addToGoogleWallet': 'Afegir a Google Wallet',
+  'portal.card.walletNote': '* La integració amb Apple Wallet i Google Wallet estarà disponible aviat',
+  'portal.card.memberName': 'Nom del Membre',
+  'portal.card.validUntil': 'Vàlid Fins',
+  'portal.card.downloaded': 'Targeta Descarregada',
+  'portal.card.downloadSuccess': 'La teva targeta de membresa s\'ha descarregat correctament!',
+  'portal.card.downloadError': 'Error al descarregar la targeta. Si us plau, torna-ho a intentar.',
+  'portal.card.shareNotSupported': 'Compartir No Suportat',
+  'portal.card.shareNotSupportedMessage': 'Compartir no és compatible amb aquest dispositiu.',
+  
+  // Pestanya Perfil
+  'portal.profile.title': 'El Teu Perfil',
+  'portal.profile.email': 'Correu Electrònic',
+  'portal.profile.name': 'Nom',
+  'portal.profile.artist': 'Artista',
+  'portal.profile.phone': 'Telèfon',
+  'portal.profile.address': 'Adreça',
+  'portal.profile.editProfile': 'Editar Perfil',
+  'portal.profile.saveChanges': 'Desar Canvis',
+  'portal.profile.cancel': 'Cancel·lar',
+  'portal.profile.updateSuccess': 'Perfil Actualitzat',
+  'portal.profile.updateSuccessMessage': 'El teu perfil s\'ha actualitzat correctament!',
+  'portal.profile.updateError': 'Error en l\'Actualització',
+  'portal.profile.updateErrorMessage': 'Error en actualitzar el perfil. Si us plau, torna-ho a intentar.',
+  
+  // Renovació
+  'portal.renewal.title': 'Renovar Membresa',
+  'portal.renewal.message': 'La teva membresa expira el {date}. Renova ara per seguir gaudint dels beneficis!',
+  'portal.renewal.button': 'Renovar Ara',
+  'portal.renewal.comingSoon': 'Properament',
+  'portal.renewal.comingSoonMessage': 'La renovació en línia estarà disponible aviat! Si us plau, contacta\'ns de moment.',
+  
+  // Càrrega i Errors
+  'portal.loading': 'Carregant...',
+  'portal.error.title': 'Error',
+  'portal.error.loadFailed': 'Error al carregar dades del membre',
+  'portal.error.network': 'Error de xarxa. Si us plau, torna-ho a intentar.',
+  'portal.error.notAuthenticated': 'No autenticat. Si us plau, inicia sessió o registra\'t.',
+  'portal.comingSoon': 'Properament',
+  'portal.comingSoonMessage': 'Aquesta funció estarà disponible aviat!'
 };
