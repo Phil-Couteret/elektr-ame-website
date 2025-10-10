@@ -84,11 +84,7 @@ try {
         throw new Exception('Your membership application was not approved. Please contact us.');
     }
     
-    // Update last login time
-    $updateStmt = $pdo->prepare("UPDATE members SET last_login = NOW() WHERE id = :id");
-    $updateStmt->execute([':id' => $member['id']]);
-    
-    // Create session
+    // Create session (skipping last_login update as column may not exist)
     $_SESSION['member_id'] = $member['id'];
     $_SESSION['member_email'] = $member['email'];
     $_SESSION['member_name'] = $member['first_name'] . ' ' . $member['second_name'];
