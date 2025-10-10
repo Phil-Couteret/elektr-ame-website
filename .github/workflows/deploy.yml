@@ -1,0 +1,105 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build project
+      run: npm run build
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment-package
+        
+        # Copy frontend build
+        cp -r dist/* deployment-package/
+        
+        # Copy API files (excluding config.php - must be maintained on server!)
+        mkdir -p deployment-package/api
+        cp -r api/* deployment-package/api/
+        rm -f deployment-package/api/config.php  # Never deploy config.php!
+        
+        # Copy database migrations
+        mkdir -p deployment-package/database
+        cp -r database/* deployment-package/database/
+        
+        # Create deployment instructions
+        cat > deployment-package/DEPLOY_INSTRUCTIONS.txt << 'EOF'
+        ═══════════════════════════════════════════════════════════════
+        🚀 DEPLOYMENT INSTRUCTIONS
+        ═══════════════════════════════════════════════════════════════
+        
+        STEP 1: Upload Frontend Files
+        -------------------------------
+        Upload everything from the root to: /home/elektry/www/
+        
+        Files to upload:
+        - index.html
+        - assets/ (entire folder)
+        - elektr-ame-media/ (entire folder)
+        - favicon.ico
+        - placeholder.svg
+        - robots.txt
+        
+        STEP 2: Upload Backend Files  
+        -------------------------------
+        Upload api/ folder contents to: /home/elektry/www/api/
+        
+        ⚠️ IMPORTANT: Do NOT upload api/config.php!
+        Your existing config.php on the server has the correct database
+        credentials and must NOT be overwritten.
+        
+        STEP 3: Run Database Migrations (if needed)
+        ---------------------------------------------
+        Check database/ folder for any new .sql files
+        Run them in phpMyAdmin if you haven't already
+        
+        STEP 4: Test
+        --------------
+        ✅ Admin panel works
+        ✅ Email automation shows templates
+        ✅ Members can set passwords
+        ✅ Members can log in
+        ✅ Member portal loads
+        
+        ═══════════════════════════════════════════════════════════════
+        ✅ DEPLOYMENT COMPLETE!
+        ═══════════════════════════════════════════════════════════════
+        EOF
+
+    - name: Upload deployment artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: deployment
+        path: deployment-package/
+        retention-days: 30
+
+    - name: Show artifact info
+      run: |
+        echo "✅ Deployment package created successfully!"
+        echo "📦 Package contents:"
+        ls -lhR deployment-package/
+        echo ""
+        echo "📥 Download from GitHub Actions artifacts"
+        echo "🔗 https://github.com/${{ github.repository }}/actions"
+
