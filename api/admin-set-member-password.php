@@ -35,6 +35,10 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
 // Include database configuration
 require_once __DIR__ . '/config.php';
 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Don't display errors in output, log them instead
+
 try {
     // Get JSON input
     $input = json_decode(file_get_contents('php://input'), true);
@@ -60,8 +64,7 @@ try {
     // Update member's password
     $stmt = $pdo->prepare("
         UPDATE members 
-        SET password_hash = :password_hash,
-            updated_at = NOW()
+        SET password_hash = :password_hash
         WHERE id = :member_id
     ");
     
