@@ -208,11 +208,11 @@ class EmailAutomation {
 
             foreach ($periods as $period) {
                 $stmt = $this->db->prepare("
-                    SELECT m.* 
-                    FROM members m
-                    WHERE m.status = 'approved'
-                    AND m.membership_type IN ('basic', 'sponsor')
-                    AND DATE(m.end_date) = DATE(NOW() + INTERVAL :days DAY)
+                SELECT m.* 
+                FROM members m
+                WHERE m.status = 'approved'
+                AND m.membership_type IN ('basic', 'sponsor')
+                AND DATE(m.membership_end_date) = DATE(NOW() + INTERVAL :days DAY)
                     AND NOT EXISTS (
                         SELECT 1 FROM email_logs el
                         WHERE el.member_id = m.id
@@ -261,7 +261,7 @@ class EmailAutomation {
             'full_name' => $member['first_name'] . ' ' . $member['second_name'],
             'email' => $member['email'],
             'membership_type' => ucfirst($member['membership_type']),
-            'end_date' => $member['end_date'] ? date('F j, Y', strtotime($member['end_date'])) : 'N/A',
+            'end_date' => $member['membership_end_date'] ? date('F j, Y', strtotime($member['membership_end_date'])) : 'N/A',
             'amount' => $member['payment_amount'] ?? '0.00',
             'date' => date('F j, Y'),
             'receipt_id' => 'EA-' . date('Y') . '-' . str_pad($member['id'], 6, '0', STR_PAD_LEFT)
