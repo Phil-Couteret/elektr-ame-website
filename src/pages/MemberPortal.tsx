@@ -22,7 +22,8 @@ import {
   Loader2,
   Save,
   X as CloseIcon,
-  RefreshCw
+  RefreshCw,
+  LogOut
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -239,6 +240,31 @@ const MemberPortal = () => {
     });
   };
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/member-logout.php', {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('portal.logout.success'),
+          description: t('portal.logout.goodbye'),
+        });
+        navigate('/');
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if logout API fails, redirect to home
+      navigate('/');
+    }
+  };
+
   const isExpiringSoon = () => {
     if (!memberData?.membership_end_date) return false;
     const expiryDate = new Date(memberData.membership_end_date);
@@ -267,19 +293,29 @@ const MemberPortal = () => {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                Member Portal
+                {t('portal.title')}
               </h1>
               <p className="text-white/70">
-                Welcome back, {memberData.first_name}!
+                {t('portal.welcomeBack', { name: memberData.first_name })}
               </p>
             </div>
-            <Button
-              onClick={() => navigate('/')}
-              variant="outline"
-              className="border-white/20 text-white hover:bg-white/10"
-            >
-              Back to Home
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                onClick={() => navigate('/')}
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                {t('portal.backToHome')}
+              </Button>
+              <Button
+                onClick={handleLogout}
+                variant="outline"
+                className="border-red-500/50 text-red-400 hover:bg-red-500/20"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                {t('portal.logout.button')}
+              </Button>
+            </div>
           </div>
         </div>
 

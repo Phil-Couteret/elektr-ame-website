@@ -38,6 +38,7 @@ const JoinUs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [temporaryPassword, setTemporaryPassword] = useState('');
 
   const {
     register,
@@ -64,12 +65,14 @@ const JoinUs = () => {
       });
 
       if (response.ok) {
+        const responseData = await response.json();
         setSubmitStatus('success');
+        setTemporaryPassword(responseData.temporary_password || '');
         reset();
-        // Redirect to member portal after 2 seconds
+        // Redirect to member portal after 8 seconds (give time to read password)
         setTimeout(() => {
           navigate('/member-portal');
-        }, 2000);
+        }, 8000);
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || 'An error occurred while submitting the form');
@@ -102,10 +105,10 @@ const JoinUs = () => {
           <Card className="bg-black/50 backdrop-blur-md border-white/10">
             <CardHeader className="text-center">
               <CardTitle className="text-3xl font-bold text-white mb-2">
-                {t('joinUs.title', 'Join Elektr-Âme')}
+                {t('joinUs.title')}
               </CardTitle>
               <CardDescription className="text-white/70 text-lg">
-                {t('joinUs.description', 'Become part of Barcelona\'s vibrant electronic music community')}
+                {t('joinUs.description')}
               </CardDescription>
             </CardHeader>
             
@@ -114,8 +117,15 @@ const JoinUs = () => {
               {submitStatus === 'success' && (
                 <Alert className="border-green-500/50 bg-green-500/10">
                   <CheckCircle className="h-4 w-4 text-green-400" />
-                  <AlertDescription className="text-green-400">
-                    {t('joinUs.success', 'Thank you! Your application has been submitted successfully.')}
+                  <AlertDescription className="text-green-400 space-y-2">
+                    <p>{t('joinUs.success')}</p>
+                    {temporaryPassword && (
+                      <div className="mt-3 p-3 bg-black/30 rounded border border-green-500/30">
+                        <p className="font-semibold mb-1">{t('joinUs.tempPasswordTitle')}</p>
+                        <p className="font-mono text-lg text-white">{temporaryPassword}</p>
+                        <p className="text-xs mt-2 text-green-300">{t('joinUs.tempPasswordNote')}</p>
+                      </div>
+                    )}
                   </AlertDescription>
                 </Alert>
               )}
@@ -134,19 +144,19 @@ const JoinUs = () => {
                 {/* Personal Information */}
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">
-                    {t('joinUs.personalInfo', 'Personal Information')}
+                    {t('joinUs.personalInfo')}
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName" className="text-white">
-                        {t('joinUs.firstName', 'First Name')} *
+                        {t('joinUs.firstName')} *
                       </Label>
                       <Input
                         id="firstName"
                         {...register('firstName')}
                         className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder={t('joinUs.firstNamePlaceholder', 'Enter your first name')}
+                        placeholder={t('joinUs.firstNamePlaceholder')}
                       />
                       {errors.firstName && (
                         <p className="text-red-400 text-sm">{errors.firstName.message}</p>
@@ -155,13 +165,13 @@ const JoinUs = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="lastName" className="text-white">
-                        {t('joinUs.lastName', 'Last Name')} *
+                        {t('joinUs.lastName')} *
                       </Label>
                       <Input
                         id="lastName"
                         {...register('lastName')}
                         className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder={t('joinUs.lastNamePlaceholder', 'Enter your last name')}
+                        placeholder={t('joinUs.lastNamePlaceholder')}
                       />
                       {errors.lastName && (
                         <p className="text-red-400 text-sm">{errors.lastName.message}</p>
@@ -171,31 +181,31 @@ const JoinUs = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="secondName" className="text-white">
-                      {t('joinUs.secondName', 'Second Name')} ({t('joinUs.optional', 'Optional')})
+                      {t('joinUs.secondName')} ({t('joinUs.optional')})
                     </Label>
                     <Input
                       id="secondName"
                       {...register('secondName')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.secondNamePlaceholder', 'Enter your second name (optional)')}
+                      placeholder={t('joinUs.secondNamePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="artistName" className="text-white">
-                      {t('joinUs.artistName', 'Nickname / Artist Name')} ({t('joinUs.optional', 'Optional')})
+                      {t('joinUs.artistName')} ({t('joinUs.optional')})
                     </Label>
                     <Input
                       id="artistName"
                       {...register('artistName')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.artistNamePlaceholder', 'e.g. DJ Shadow, VJ Luna')}
+                      placeholder={t('joinUs.artistNamePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-white">
-                      {t('joinUs.roles', 'What describes you best?')} ({t('joinUs.optional', 'Optional')})
+                      {t('joinUs.roles')} ({t('joinUs.optional')})
                     </Label>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                       <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
@@ -212,7 +222,7 @@ const JoinUs = () => {
                           {...register('isProducer')}
                           className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
                         />
-                        <span className="text-sm text-white">{t('joinUs.producer', 'Producer')}</span>
+                        <span className="text-sm text-white">{t('joinUs.producer')}</span>
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
                         <input
@@ -228,7 +238,7 @@ const JoinUs = () => {
                           {...register('isVisualArtist')}
                           className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
                         />
-                        <span className="text-sm text-white">{t('joinUs.visualArtist', 'Visual Artist')}</span>
+                        <span className="text-sm text-white">{t('joinUs.visualArtist')}</span>
                       </label>
                       <label className="flex items-center space-x-2 cursor-pointer bg-white/5 p-3 rounded-lg border border-white/20 hover:border-electric-blue/50 transition-colors">
                         <input
@@ -236,7 +246,7 @@ const JoinUs = () => {
                           {...register('isFan')}
                           className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
                         />
-                        <span className="text-sm text-white">{t('joinUs.fan', 'Fan')}</span>
+                        <span className="text-sm text-white">{t('joinUs.fan')}</span>
                       </label>
                     </div>
                   </div>
@@ -245,19 +255,19 @@ const JoinUs = () => {
                 {/* Contact Information */}
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">
-                    {t('joinUs.contactInfo', 'Contact Information')}
+                    {t('joinUs.contactInfo')}
                   </h3>
                   
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-white">
-                      {t('joinUs.email', 'Email Address')} *
+                      {t('joinUs.email')} *
                     </Label>
                     <Input
                       id="email"
                       type="email"
                       {...register('email')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.emailPlaceholder', 'Enter your email address')}
+                      placeholder={t('joinUs.emailPlaceholder')}
                     />
                     {errors.email && (
                       <p className="text-red-400 text-sm">{errors.email.message}</p>
@@ -266,19 +276,19 @@ const JoinUs = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="phone" className="text-white">
-                      {t('joinUs.phone', 'Phone Number')} *
+                      {t('joinUs.phone')} *
                     </Label>
                     <Input
                       id="phone"
                       {...register('phone')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.phonePlaceholder', '+1234567890')}
+                      placeholder={t('joinUs.phonePlaceholder')}
                     />
                     {errors.phone && (
                       <p className="text-red-400 text-sm">{errors.phone.message}</p>
                     )}
                     <p className="text-white/60 text-sm">
-                      {t('joinUs.phoneHelp', 'Use international format with country code (e.g., +34 for Spain)')}
+                      {t('joinUs.phoneHelp')}
                     </p>
                   </div>
                 </div>
@@ -286,43 +296,43 @@ const JoinUs = () => {
                 {/* Address Information */}
                 <div className="space-y-4">
                   <h3 className="text-xl font-semibold text-white border-b border-white/20 pb-2">
-                    {t('joinUs.addressInfo', 'Address Information')}
+                    {t('joinUs.addressInfo')}
                   </h3>
                   
                   <div className="space-y-2">
                     <Label htmlFor="street" className="text-white">
-                      {t('joinUs.street', 'Street Address')} ({t('joinUs.optional', 'Optional')})
+                      {t('joinUs.street')} ({t('joinUs.optional')})
                     </Label>
                     <Input
                       id="street"
                       {...register('street')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.streetPlaceholder', 'Enter your street address')}
+                      placeholder={t('joinUs.streetPlaceholder')}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="zipCode" className="text-white">
-                        {t('joinUs.zipCode', 'Zip Code')} ({t('joinUs.optional', 'Optional')})
+                        {t('joinUs.zipCode')} ({t('joinUs.optional')})
                       </Label>
                       <Input
                         id="zipCode"
                         {...register('zipCode')}
                         className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder={t('joinUs.zipCodePlaceholder', 'Enter your zip code')}
+                        placeholder={t('joinUs.zipCodePlaceholder')}
                       />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="city" className="text-white">
-                        {t('joinUs.city', 'City')} *
+                        {t('joinUs.city')} *
                       </Label>
                       <Input
                         id="city"
                         {...register('city')}
                         className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                        placeholder={t('joinUs.cityPlaceholder', 'Enter your city')}
+                        placeholder={t('joinUs.cityPlaceholder')}
                       />
                       {errors.city && (
                         <p className="text-red-400 text-sm">{errors.city.message}</p>
@@ -332,13 +342,13 @@ const JoinUs = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="country" className="text-white">
-                      {t('joinUs.country', 'Country')} *
+                      {t('joinUs.country')} *
                     </Label>
                     <Input
                       id="country"
                       {...register('country')}
                       className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                      placeholder={t('joinUs.countryPlaceholder', 'Enter your country')}
+                      placeholder={t('joinUs.countryPlaceholder')}
                     />
                     {errors.country && (
                       <p className="text-red-400 text-sm">{errors.country.message}</p>
@@ -354,8 +364,8 @@ const JoinUs = () => {
                     className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold py-3 text-lg"
                   >
                     {isSubmitting 
-                      ? t('joinUs.submitting', 'Submitting...') 
-                      : t('joinUs.submit', 'Join Elektr-Âme')
+                      ? t('joinUs.submitting') 
+                      : t('joinUs.submit')
                     }
                   </Button>
                 </div>

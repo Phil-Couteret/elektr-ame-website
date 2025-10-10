@@ -5,6 +5,7 @@ export default {
   'nav.about': 'Qui som',
   'nav.artists': 'Artistes',
   'nav.joinUs': 'Uneix-te',
+  'nav.memberLogin': 'Accés Membres',
   
   // Hero
   'hero.title': 'Elektr-Âme',
@@ -127,6 +128,24 @@ export default {
   'joinUs.submitting': 'Enviant...',
   'joinUs.success': 'Gràcies! La teva sol·licitud ha estat enviada exitosament.',
   'joinUs.error': 'Ha ocorregut un error. Si us plau, torna-ho a intentar.',
+  'joinUs.tempPasswordTitle': 'La Teva Contrasenya Temporal:',
+  'joinUs.tempPasswordNote': 'Si us plau, desa aquesta contrasenya! Utilitza-la per iniciar sessió al Portal de Membres. Pots canviar-la després d\'iniciar sessió.',
+  
+  // Member Login
+  'memberLogin.title': 'Accés Membres',
+  'memberLogin.subtitle': 'Accedeix al teu portal de membres',
+  'memberLogin.emailLabel': 'Correu Electrònic',
+  'memberLogin.emailPlaceholder': 'Introdueix el teu correu',
+  'memberLogin.passwordLabel': 'Contrasenya',
+  'memberLogin.passwordPlaceholder': 'Introdueix la teva contrasenya',
+  'memberLogin.loginButton': 'Iniciar Sessió',
+  'memberLogin.loginSuccess': 'Inici de Sessió Exitós',
+  'memberLogin.welcomeBack': 'Benvingut de nou! Redirigint al teu portal...',
+  'memberLogin.loginFailed': 'Error en iniciar sessió',
+  'memberLogin.serverError': 'Error del servidor. Si us plau, intenta-ho més tard.',
+  'memberLogin.noAccount': 'No tens compte?',
+  'memberLogin.joinNow': 'Uneix-te ara',
+  'memberLogin.forgotPassword': 'Has oblidat la contrasenya?',
   
   // Admin - Login
   'admin.login.title': 'Inici de Sessió Admin',
@@ -329,6 +348,12 @@ export default {
   'admin.newsletter.history.sent': 'enviat',
 
   // Portal de Membres
+  'portal.title': 'Portal de Membres',
+  'portal.welcomeBack': 'Benvingut de nou, {name}!',
+  'portal.backToHome': 'Tornar a l\'Inici',
+  'portal.logout.button': 'Tancar Sessió',
+  'portal.logout.success': 'Sessió Tancada',
+  'portal.logout.goodbye': 'Fins aviat!',
   'portal.header.title': 'Portal de Membres',
   'portal.header.welcome': 'Benvingut de nou, {name}!',
   'portal.header.backHome': 'Tornar a l\'Inici',

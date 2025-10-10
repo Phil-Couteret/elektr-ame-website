@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Initiatives from "./pages/Initiatives";
 import Contact from "./pages/Contact";
 import JoinUs from "./pages/JoinUs";
+import MemberLogin from "./pages/MemberLogin";
 import Admin from "./pages/Admin";
 import MemberPortal from "./pages/MemberPortal";
 import NotFound from "./pages/NotFound";
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/initiatives" element={<Initiatives />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/join-us" element={<JoinUs />} />
+              <Route path="/member-login" element={<MemberLogin />} />
               <Route path="/member-portal" element={<MemberPortal />} />
               <Route path="/admin" element={
                 <ProtectedRoute>

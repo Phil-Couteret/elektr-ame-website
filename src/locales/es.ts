@@ -5,6 +5,7 @@ export default {
   'nav.about': 'Sobre nosotros',
   'nav.artists': 'Artistas',
   'nav.joinUs': 'Únete',
+  'nav.memberLogin': 'Acceso Miembros',
   
   // Hero
   'hero.title': 'Elektr-Âme',
@@ -127,6 +128,24 @@ export default {
   'joinUs.submitting': 'Enviando...',
   'joinUs.success': '¡Gracias! Tu solicitud ha sido enviada exitosamente.',
   'joinUs.error': 'Ocurrió un error. Por favor intenta de nuevo.',
+  'joinUs.tempPasswordTitle': 'Tu Contraseña Temporal:',
+  'joinUs.tempPasswordNote': '¡Por favor guarda esta contraseña! Úsala para iniciar sesión en el Portal de Miembros. Puedes cambiarla después de iniciar sesión.',
+  
+  // Member Login
+  'memberLogin.title': 'Acceso Miembros',
+  'memberLogin.subtitle': 'Accede a tu portal de miembros',
+  'memberLogin.emailLabel': 'Correo Electrónico',
+  'memberLogin.emailPlaceholder': 'Ingresa tu correo',
+  'memberLogin.passwordLabel': 'Contraseña',
+  'memberLogin.passwordPlaceholder': 'Ingresa tu contraseña',
+  'memberLogin.loginButton': 'Iniciar Sesión',
+  'memberLogin.loginSuccess': 'Inicio de Sesión Exitoso',
+  'memberLogin.welcomeBack': '¡Bienvenido de nuevo! Redirigiendo a tu portal...',
+  'memberLogin.loginFailed': 'Error al iniciar sesión',
+  'memberLogin.serverError': 'Error del servidor. Por favor intenta más tarde.',
+  'memberLogin.noAccount': '¿No tienes cuenta?',
+  'memberLogin.joinNow': 'Únete ahora',
+  'memberLogin.forgotPassword': '¿Olvidaste tu contraseña?',
   
   // Admin - Login
   'admin.login.title': 'Inicio de Sesión Admin',
@@ -329,6 +348,12 @@ export default {
   'admin.newsletter.history.sent': 'enviado',
 
   // Portal de Miembros
+  'portal.title': 'Portal de Miembros',
+  'portal.welcomeBack': '¡Bienvenido de nuevo, {name}!',
+  'portal.backToHome': 'Volver al Inicio',
+  'portal.logout.button': 'Cerrar Sesión',
+  'portal.logout.success': 'Sesión Cerrada',
+  'portal.logout.goodbye': '¡Hasta pronto!',
   'portal.header.title': 'Portal de Miembros',
   'portal.header.welcome': '¡Bienvenido de nuevo, {name}!',
   'portal.header.backHome': 'Volver al Inicio',

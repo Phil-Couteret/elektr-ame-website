@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home } from "lucide-react";
+import { Menu, X, Home, LogIn } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
@@ -44,6 +44,12 @@ const Header = () => {
             <Link to="/join-us">
               <Button className="bg-blue-dark hover:bg-blue-darker text-white">
                 {t('nav.joinUs')}
+              </Button>
+            </Link>
+            <Link to="/member-login">
+              <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple flex items-center gap-2">
+                <LogIn className="h-4 w-4" />
+                {t('nav.memberLogin')}
               </Button>
             </Link>
             <Link to="/" onClick={handleHomeClick}>
@@ -105,6 +111,14 @@ const Header = () => {
               <Link to="/join-us" className="block w-full" onClick={() => setIsMenuOpen(false)}>
                 <Button className="w-full bg-blue-dark hover:bg-blue-darker text-white">
                   {t('nav.joinUs')}
+                </Button>
+              </Link>
+            </div>
+            <div className="px-3 py-2">
+              <Link to="/member-login" className="block w-full" onClick={() => setIsMenuOpen(false)}>
+                <Button variant="outline" className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple">
+                  <LogIn className="h-4 w-4 mr-2" />
+                  {t('nav.memberLogin')}
                 </Button>
               </Link>
             </div>

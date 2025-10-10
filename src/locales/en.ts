@@ -5,6 +5,7 @@ export default {
   'nav.about': 'About',
   'nav.artists': 'Artists',
   'nav.joinUs': 'Join Us',
+  'nav.memberLogin': 'Member Login',
   
   // Hero
   'hero.title': 'Elektr-Âme',
@@ -130,6 +131,24 @@ export default {
   'joinUs.submitting': 'Submitting...',
   'joinUs.success': 'Thank you! Your application has been submitted successfully.',
   'joinUs.error': 'An error occurred. Please try again.',
+  'joinUs.tempPasswordTitle': 'Your Temporary Password:',
+  'joinUs.tempPasswordNote': 'Please save this password! Use it to log in to the Member Portal. You can change it after logging in.',
+  
+  // Member Login
+  'memberLogin.title': 'Member Login',
+  'memberLogin.subtitle': 'Access your member portal',
+  'memberLogin.emailLabel': 'Email',
+  'memberLogin.emailPlaceholder': 'Enter your email',
+  'memberLogin.passwordLabel': 'Password',
+  'memberLogin.passwordPlaceholder': 'Enter your password',
+  'memberLogin.loginButton': 'Login',
+  'memberLogin.loginSuccess': 'Login Successful',
+  'memberLogin.welcomeBack': 'Welcome back! Redirecting to your portal...',
+  'memberLogin.loginFailed': 'Login failed',
+  'memberLogin.serverError': 'Server error. Please try again later.',
+  'memberLogin.noAccount': 'Don\'t have an account?',
+  'memberLogin.joinNow': 'Join now',
+  'memberLogin.forgotPassword': 'Forgot password?',
   
   // Admin - Login
   'admin.login.title': 'Admin Login',
@@ -332,6 +351,12 @@ export default {
   'admin.newsletter.history.sent': 'sent',
 
   // Member Portal
+  'portal.title': 'Member Portal',
+  'portal.welcomeBack': 'Welcome back, {name}!',
+  'portal.backToHome': 'Back to Home',
+  'portal.logout.button': 'Logout',
+  'portal.logout.success': 'Logged Out',
+  'portal.logout.goodbye': 'See you soon!',
   'portal.header.title': 'Member Portal',
   'portal.header.welcome': 'Welcome back, {name}!',
   'portal.header.backHome': 'Back to Home',

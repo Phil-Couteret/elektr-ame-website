@@ -60,13 +60,18 @@ try {
         throw new Exception('Invalid phone format. Use international format (e.g., +1234567890). Received: ' . $input['phone']);
     }
     
+    // Generate a temporary password for new member
+    $tempPassword = bin2hex(random_bytes(4)); // 8 character random password
+    $passwordHash = password_hash($tempPassword, PASSWORD_DEFAULT);
+    
     // Prepare SQL statement
     $sql = "INSERT INTO members (
         first_name, 
         last_name, 
         second_name,
         artist_name,
-        email, 
+        email,
+        password_hash,
         phone, 
         street, 
         zip_code, 
@@ -83,7 +88,8 @@ try {
         :lastName, 
         :secondName,
         :artistName,
-        :email, 
+        :email,
+        :passwordHash,
         :phone, 
         :street, 
         :zipCode, 
@@ -107,6 +113,7 @@ try {
     $artistName = $input['artistName'] ?? null;
     $stmt->bindParam(':artistName', $artistName);
     $stmt->bindParam(':email', $input['email']);
+    $stmt->bindParam(':passwordHash', $passwordHash);
     $stmt->bindParam(':phone', $input['phone']);
     $street = $input['street'] ?? null;
     $stmt->bindParam(':street', $street);
@@ -151,6 +158,7 @@ try {
         'success' => true,
         'message' => 'Member registration successful',
         'member_id' => $memberId,
+        'temporary_password' => $tempPassword, // Send to frontend to display to user
         'debug' => [
             'received_data' => $input,
             'php_version' => phpversion(),
