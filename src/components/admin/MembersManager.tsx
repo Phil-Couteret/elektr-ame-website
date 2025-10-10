@@ -4,11 +4,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus, Trash2 } from "lucide-react";
+import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus, Trash2, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MembershipDialog from "./MembershipDialog";
 import AddMemberDialog from "./AddMemberDialog";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 interface Member {
   id: number;
@@ -51,6 +52,8 @@ const MembersManager = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState<Member | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [settingPasswordFor, setSettingPasswordFor] = useState<number | null>(null);
+  const [generatedPassword, setGeneratedPassword] = useState<{memberId: number, password: string, memberName: string, memberEmail: string} | null>(null);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -237,6 +240,43 @@ const MembersManager = () => {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleSetPassword = async (member: Member) => {
+    setSettingPasswordFor(member.id);
+    try {
+      const response = await fetch('/api/admin-set-member-password.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          member_id: member.id
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setGeneratedPassword({
+          memberId: member.id,
+          password: data.new_password,
+          memberName: member.first_name + ' ' + member.second_name,
+          memberEmail: member.email
+        });
+      } else {
+        throw new Error(data.message || 'Failed to set password');
+      }
+    } catch (error) {
+      toast({
+        title: t('admin.message.error'),
+        description: error instanceof Error ? error.message : 'Failed to set password',
+        variant: 'destructive',
+      });
+    } finally {
+      setSettingPasswordFor(null);
     }
   };
 
@@ -482,6 +522,21 @@ const MembersManager = () => {
                             <Edit className="h-3 w-3 mr-1" />
                             {t('admin.status.manage')}
                           </Button>
+
+                          <Button
+                            size="sm"
+                            onClick={() => handleSetPassword(member)}
+                            disabled={settingPasswordFor === member.id}
+                            variant="outline"
+                            className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/20"
+                            title={t('admin.members.setPassword')}
+                          >
+                            {settingPasswordFor === member.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Key className="h-3 w-3" />
+                            )}
+                          </Button>
                           
                           {memberToDelete?.id === member.id ? (
                             <Button
@@ -581,6 +636,56 @@ const MembersManager = () => {
         onOpenChange={setIsAddDialogOpen}
         onSuccess={fetchMembers}
       />
+
+      <AlertDialog open={generatedPassword !== null} onOpenChange={() => setGeneratedPassword(null)}>
+        <AlertDialogContent className="bg-black/95 border-electric-blue/50">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl text-electric-blue">
+              {t('admin.members.passwordGenerated')}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-white/80 space-y-4">
+              <p>{t('admin.members.passwordGeneratedFor', { name: generatedPassword?.memberName || '' })}</p>
+              
+              <div className="bg-black/60 p-4 rounded-lg border border-electric-blue/30">
+                <p className="text-sm text-white/60 mb-2">{t('admin.members.emailLabel')}</p>
+                <p className="text-lg font-medium text-white mb-4">{generatedPassword?.memberEmail}</p>
+                
+                <p className="text-sm text-white/60 mb-2">{t('admin.members.temporaryPassword')}</p>
+                <p className="text-2xl font-mono font-bold text-electric-blue tracking-wider">
+                  {generatedPassword?.password}
+                </p>
+              </div>
+
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                <p className="text-yellow-400 text-sm">
+                  ⚠️ {t('admin.members.passwordWarning')}
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              onClick={() => {
+                navigator.clipboard.writeText(generatedPassword?.password || '');
+                toast({
+                  title: t('admin.message.success'),
+                  description: t('admin.members.passwordCopied'),
+                });
+              }}
+              className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+            >
+              {t('admin.members.copyPassword')}
+            </Button>
+            <Button
+              onClick={() => setGeneratedPassword(null)}
+              variant="outline"
+              className="border-white/20 text-white hover:bg-white/10"
+            >
+              {t('common.close')}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

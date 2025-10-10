@@ -185,6 +185,14 @@ export default {
   'admin.members.confirmDelete': 'Confirmar Eliminació?',
   'admin.members.deleted': 'Membre eliminat exitosament',
   'admin.members.deleteError': 'Error en eliminar membre',
+  'admin.members.setPassword': 'Establir Contrasenya',
+  'admin.members.passwordGenerated': 'Contrasenya Generada',
+  'admin.members.passwordGeneratedFor': 'Nova contrasenya generada per a {name}',
+  'admin.members.emailLabel': 'Correu Electrònic',
+  'admin.members.temporaryPassword': 'Contrasenya Temporal',
+  'admin.members.passwordWarning': 'Desa aquesta contrasenya! Comparteix-la de forma segura amb el membre. Poden utilitzar-la per iniciar sessió.',
+  'admin.members.copyPassword': 'Copiar Contrasenya',
+  'admin.members.passwordCopied': 'Contrasenya copiada al porta-retalls',
   
   // Admin - Members Table
   'admin.members.table.name': 'Nom',
@@ -534,5 +542,6 @@ export default {
   
   // Comú
   'common.cancel': 'Cancel·lar',
-  'common.loading': 'Carregant...'
+  'common.loading': 'Carregant...',
+  'common.close': 'Tancar'
 };

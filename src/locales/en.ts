@@ -188,6 +188,14 @@ export default {
   'admin.members.confirmDelete': 'Confirm Delete?',
   'admin.members.deleted': 'Member deleted successfully',
   'admin.members.deleteError': 'Failed to delete member',
+  'admin.members.setPassword': 'Set Password',
+  'admin.members.passwordGenerated': 'Password Generated',
+  'admin.members.passwordGeneratedFor': 'New password generated for {name}',
+  'admin.members.emailLabel': 'Email',
+  'admin.members.temporaryPassword': 'Temporary Password',
+  'admin.members.passwordWarning': 'Save this password! Share it securely with the member. They can use it to log in.',
+  'admin.members.copyPassword': 'Copy Password',
+  'admin.members.passwordCopied': 'Password copied to clipboard',
   
   // Admin - Members Table
   'admin.members.table.name': 'Name',
@@ -537,5 +545,6 @@ export default {
   
   // Common
   'common.cancel': 'Cancel',
-  'common.loading': 'Loading...'
+  'common.loading': 'Loading...',
+  'common.close': 'Close'
 };
