@@ -112,7 +112,7 @@ export default function EmailAutomationManager() {
       setError(null);
       setSuccess(null);
 
-      const res = await fetch('/api/cron-email-automation.php?manual_trigger=1', {
+      const res = await fetch('/api/test-manual-trigger.php', {
         credentials: 'include'
       });
 
@@ -123,7 +123,9 @@ export default function EmailAutomationManager() {
       const data = await res.json();
       
       if (data.success) {
-        setSuccess(t('emailAutomation.cronRunSuccess', `Processed ${data.queue_processing.sent} emails, ${data.expiring_memberships['7d']} expiration reminders sent`));
+        const sent = data.queue_processing?.sent || 0;
+        const reminders = data.expiring_memberships?.['7d'] || 0;
+        setSuccess(t('emailAutomation.cronRunSuccess', `Processed ${sent} emails, ${reminders} expiration reminders sent`));
         await fetchData();
       } else {
         throw new Error(data.error || 'Unknown error');
