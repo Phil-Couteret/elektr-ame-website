@@ -444,7 +444,27 @@ export default {
   'portal.profile.updateSuccessMessage': '¡Tu perfil ha sido actualizado correctamente!',
   'portal.profile.updateError': 'Error en la Actualización',
   'portal.profile.updateErrorMessage': 'Error al actualizar el perfil. Por favor, inténtalo de nuevo.',
-  
+
+  // Cambiar Contraseña
+  'portal.changePassword.title': 'Cambiar Contraseña',
+  'portal.changePassword.description': 'Actualiza tu contraseña para mantener tu cuenta segura',
+  'portal.changePassword.button': 'Cambiar Contraseña',
+  'portal.changePassword.currentPassword': 'Contraseña Actual',
+  'portal.changePassword.currentPasswordPlaceholder': 'Ingresa tu contraseña actual',
+  'portal.changePassword.newPassword': 'Nueva Contraseña',
+  'portal.changePassword.newPasswordPlaceholder': 'Ingresa nueva contraseña',
+  'portal.changePassword.confirmPassword': 'Confirmar Nueva Contraseña',
+  'portal.changePassword.confirmPasswordPlaceholder': 'Vuelve a ingresar la nueva contraseña',
+  'portal.changePassword.passwordRequirement': 'Debe tener al menos 8 caracteres',
+  'portal.changePassword.saveButton': 'Cambiar Contraseña',
+  'portal.changePassword.success': 'Contraseña Cambiada',
+  'portal.changePassword.successMessage': '¡Tu contraseña ha sido cambiada exitosamente!',
+  'portal.changePassword.error': 'Error',
+  'portal.changePassword.errorMessage': 'Error al cambiar la contraseña. Por favor, inténtalo de nuevo.',
+  'portal.changePassword.allFieldsRequired': 'Todos los campos son obligatorios',
+  'portal.changePassword.passwordsMustMatch': 'Las nuevas contraseñas deben coincidir',
+  'portal.changePassword.passwordTooShort': 'La contraseña debe tener al menos 8 caracteres',
+
   // Renovación
   'portal.renewal.title': 'Renovar Membresía',
   'portal.renewal.message': 'Tu membresía expira el {date}. ¡Renueva ahora para seguir disfrutando de los beneficios!',

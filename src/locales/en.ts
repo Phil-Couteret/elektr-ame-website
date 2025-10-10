@@ -448,6 +448,26 @@ export default {
   'portal.profile.updateError': 'Update Failed',
   'portal.profile.updateErrorMessage': 'Failed to update profile. Please try again.',
   
+  // Change Password
+  'portal.changePassword.title': 'Change Password',
+  'portal.changePassword.description': 'Update your password to keep your account secure',
+  'portal.changePassword.button': 'Change Password',
+  'portal.changePassword.currentPassword': 'Current Password',
+  'portal.changePassword.currentPasswordPlaceholder': 'Enter your current password',
+  'portal.changePassword.newPassword': 'New Password',
+  'portal.changePassword.newPasswordPlaceholder': 'Enter new password',
+  'portal.changePassword.confirmPassword': 'Confirm New Password',
+  'portal.changePassword.confirmPasswordPlaceholder': 'Re-enter new password',
+  'portal.changePassword.passwordRequirement': 'Must be at least 8 characters long',
+  'portal.changePassword.saveButton': 'Change Password',
+  'portal.changePassword.success': 'Password Changed',
+  'portal.changePassword.successMessage': 'Your password has been changed successfully!',
+  'portal.changePassword.error': 'Error',
+  'portal.changePassword.errorMessage': 'Failed to change password. Please try again.',
+  'portal.changePassword.allFieldsRequired': 'All fields are required',
+  'portal.changePassword.passwordsMustMatch': 'New passwords must match',
+  'portal.changePassword.passwordTooShort': 'Password must be at least 8 characters long',
+  
   // Renewal
   'portal.renewal.title': 'Renew Membership',
   'portal.renewal.message': 'Your membership expires on {date}. Renew now to continue enjoying member benefits!',

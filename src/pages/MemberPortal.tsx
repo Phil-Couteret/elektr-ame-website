@@ -23,7 +23,8 @@ import {
   Save,
   X as CloseIcon,
   RefreshCw,
-  LogOut
+  LogOut,
+  Lock
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -69,6 +70,12 @@ const MemberPortal = () => {
     city: '',
     postal_code: '',
     country: ''
+  });
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
   });
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -262,6 +269,77 @@ const MemberPortal = () => {
       console.error('Logout error:', error);
       // Even if logout API fails, redirect to home
       navigate('/');
+    }
+  };
+
+  const handleChangePassword = async () => {
+    // Validation
+    if (!passwordData.current_password || !passwordData.new_password || !passwordData.confirm_password) {
+      toast({
+        title: t('portal.changePassword.error'),
+        description: t('portal.changePassword.allFieldsRequired'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast({
+        title: t('portal.changePassword.error'),
+        description: t('portal.changePassword.passwordsMustMatch'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (passwordData.new_password.length < 8) {
+      toast({
+        title: t('portal.changePassword.error'),
+        description: t('portal.changePassword.passwordTooShort'),
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const response = await fetch('/api/member-change-password.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          current_password: passwordData.current_password,
+          new_password: passwordData.new_password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('portal.changePassword.success'),
+          description: t('portal.changePassword.successMessage'),
+        });
+        // Clear form
+        setPasswordData({
+          current_password: '',
+          new_password: '',
+          confirm_password: ''
+        });
+        setIsChangingPassword(false);
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      toast({
+        title: t('portal.changePassword.error'),
+        description: error instanceof Error ? error.message : t('portal.changePassword.errorMessage'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -708,6 +786,108 @@ const MemberPortal = () => {
                       >
                         <CloseIcon className="h-4 w-4 mr-2" />
                         {t('portal.profile.cancel')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Change Password Section */}
+            <Card className="bg-black/40 border-white/10 mt-6">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Lock className="h-5 w-5 text-yellow-500" />
+                  {t('portal.changePassword.title')}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {!isChangingPassword ? (
+                  <div className="space-y-4">
+                    <p className="text-white/70 text-sm">{t('portal.changePassword.description')}</p>
+                    <Button
+                      onClick={() => setIsChangingPassword(true)}
+                      variant="outline"
+                      className="border-yellow-500 text-yellow-500 hover:bg-yellow-500/10"
+                    >
+                      <Lock className="h-4 w-4 mr-2" />
+                      {t('portal.changePassword.button')}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="current_password" className="text-white">
+                        {t('portal.changePassword.currentPassword')} *
+                      </Label>
+                      <Input
+                        id="current_password"
+                        type="password"
+                        value={passwordData.current_password}
+                        onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white"
+                        placeholder={t('portal.changePassword.currentPasswordPlaceholder')}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="new_password" className="text-white">
+                        {t('portal.changePassword.newPassword')} *
+                      </Label>
+                      <Input
+                        id="new_password"
+                        type="password"
+                        value={passwordData.new_password}
+                        onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white"
+                        placeholder={t('portal.changePassword.newPasswordPlaceholder')}
+                      />
+                      <p className="text-white/50 text-xs">{t('portal.changePassword.passwordRequirement')}</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirm_password" className="text-white">
+                        {t('portal.changePassword.confirmPassword')} *
+                      </Label>
+                      <Input
+                        id="confirm_password"
+                        type="password"
+                        value={passwordData.confirm_password}
+                        onChange={(e) => setPasswordData({...passwordData, confirm_password: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white"
+                        placeholder={t('portal.changePassword.confirmPasswordPlaceholder')}
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        onClick={handleChangePassword}
+                        disabled={isSaving}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-black"
+                      >
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            {t('common.loading')}
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            {t('portal.changePassword.saveButton')}
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setIsChangingPassword(false);
+                          setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
+                        }}
+                        variant="outline"
+                        disabled={isSaving}
+                        className="border-white/20 text-white hover:bg-white/10"
+                      >
+                        <CloseIcon className="h-4 w-4 mr-2" />
+                        {t('common.cancel')}
                       </Button>
                     </div>
                   </div>

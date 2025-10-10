@@ -444,7 +444,27 @@ export default {
   'portal.profile.updateSuccessMessage': 'El teu perfil s\'ha actualitzat correctament!',
   'portal.profile.updateError': 'Error en l\'Actualització',
   'portal.profile.updateErrorMessage': 'Error en actualitzar el perfil. Si us plau, torna-ho a intentar.',
-  
+
+  // Canviar Contrasenya
+  'portal.changePassword.title': 'Canviar Contrasenya',
+  'portal.changePassword.description': 'Actualitza la teva contrasenya per mantenir el teu compte segur',
+  'portal.changePassword.button': 'Canviar Contrasenya',
+  'portal.changePassword.currentPassword': 'Contrasenya Actual',
+  'portal.changePassword.currentPasswordPlaceholder': 'Introdueix la teva contrasenya actual',
+  'portal.changePassword.newPassword': 'Nova Contrasenya',
+  'portal.changePassword.newPasswordPlaceholder': 'Introdueix nova contrasenya',
+  'portal.changePassword.confirmPassword': 'Confirmar Nova Contrasenya',
+  'portal.changePassword.confirmPasswordPlaceholder': 'Torna a introduir la nova contrasenya',
+  'portal.changePassword.passwordRequirement': 'Ha de tenir almenys 8 caràcters',
+  'portal.changePassword.saveButton': 'Canviar Contrasenya',
+  'portal.changePassword.success': 'Contrasenya Canviada',
+  'portal.changePassword.successMessage': 'La teva contrasenya s\'ha canviat correctament!',
+  'portal.changePassword.error': 'Error',
+  'portal.changePassword.errorMessage': 'Error en canviar la contrasenya. Si us plau, torna-ho a intentar.',
+  'portal.changePassword.allFieldsRequired': 'Tots els camps són obligatoris',
+  'portal.changePassword.passwordsMustMatch': 'Les noves contrasenyes han de coincidir',
+  'portal.changePassword.passwordTooShort': 'La contrasenya ha de tenir almenys 8 caràcters',
+
   // Renovació
   'portal.renewal.title': 'Renovar Membresa',
   'portal.renewal.message': 'La teva membresa expira el {date}. Renova ara per seguir gaudint dels beneficis!',
