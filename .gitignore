@@ -15,6 +15,9 @@ build/
 .env.test.local
 .env.production.local
 
+# Database config with credentials (never commit!)
+api/config.php
+
 # IDE files
 .vscode/
 .idea/

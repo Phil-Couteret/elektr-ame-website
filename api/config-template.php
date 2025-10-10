@@ -1,6 +1,7 @@
 <?php
-// Database configuration for Elektr-Âme
-// Update these settings according to your environment
+// Database configuration TEMPLATE for Elektr-Âme
+// Copy this to config.php and update with your real credentials
+// NEVER commit config.php to git!
 
 return [
     'database' => [
@@ -16,25 +17,18 @@ return [
         ]
     ],
     'api' => [
-        'cors_origins' => ['http://localhost:8080', 'http://localhost:5173'], // Add your frontend URLs
+        'cors_origins' => ['http://localhost:8080', 'http://localhost:5173'],
         'rate_limit' => [
             'enabled' => true,
             'max_requests' => 10,
-            'time_window' => 300 // 5 minutes
+            'time_window' => 300
         ]
     ],
     'security' => [
-        'encrypt_sensitive_data' => false, // Set to true in production
-        'hash_passwords' => false, // Not needed for this simple form
+        'encrypt_sensitive_data' => false,
+        'hash_passwords' => false,
         'validate_input' => true
     ]
 ];
 ?>
-
-
-
-
-
-
-
 
