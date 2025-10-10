@@ -363,13 +363,24 @@ class EmailAutomation {
      * Update queue status
      */
     private function updateQueueStatus($queueId, $status, $errorMessage = null) {
-        $stmt = $this->db->prepare("
-            UPDATE email_queue 
-            SET status = :status, 
-                error_message = :error,
-                sent_at = CASE WHEN :status = 'sent' THEN NOW() ELSE sent_at END
-            WHERE id = :id
-        ");
+        // If status is 'sent', also update sent_at timestamp
+        if ($status === 'sent') {
+            $stmt = $this->db->prepare("
+                UPDATE email_queue 
+                SET status = :status, 
+                    error_message = :error,
+                    sent_at = NOW()
+                WHERE id = :id
+            ");
+        } else {
+            $stmt = $this->db->prepare("
+                UPDATE email_queue 
+                SET status = :status, 
+                    error_message = :error
+                WHERE id = :id
+            ");
+        }
+        
         $stmt->execute([
             ':status' => $status,
             ':error' => $errorMessage,
