@@ -62,11 +62,10 @@ try {
             artist_name = ?,
             email = ?,
             phone = ?,
-            address = ?,
+            street = ?,
             city = ?,
-            postal_code = ?,
-            country = ?,
-            updated_at = NOW()
+            zip_code = ?,
+            country = ?
         WHERE id = ?
     ");
 

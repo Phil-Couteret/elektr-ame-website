@@ -40,16 +40,15 @@ try {
             second_name,
             artist_name,
             phone,
-            address,
+            street as address,
             city,
-            postal_code,
+            zip_code as postal_code,
             country,
             status,
             membership_type,
             membership_start_date,
             membership_end_date,
             payment_status,
-            last_payment_date,
             payment_amount,
             is_dj,
             is_producer,
@@ -57,8 +56,7 @@ try {
             is_visual_artist,
             is_fan,
             notes,
-            created_at,
-            updated_at
+            created_at
         FROM members 
         WHERE id = ?
     ");
