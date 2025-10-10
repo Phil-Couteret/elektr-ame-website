@@ -508,5 +508,9 @@ export default {
   // Test Dialog
   'emailAutomation.testDialogTitle': 'Send Test Email',
   'emailAutomation.testDialogDesc': 'Choose a template to send a test email to your admin email address',
-  'emailAutomation.selectTemplatePlaceholder': 'Choose a template...'
+  'emailAutomation.selectTemplatePlaceholder': 'Choose a template...',
+  
+  // Common
+  'common.cancel': 'Cancel',
+  'common.loading': 'Loading...'
 };

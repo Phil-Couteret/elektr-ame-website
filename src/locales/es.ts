@@ -505,5 +505,9 @@ export default {
   // Diálogo de Prueba
   'emailAutomation.testDialogTitle': 'Enviar Correo de Prueba',
   'emailAutomation.testDialogDesc': 'Elige una plantilla para enviar un correo de prueba a tu dirección de correo de administrador',
-  'emailAutomation.selectTemplatePlaceholder': 'Elige una plantilla...'
+  'emailAutomation.selectTemplatePlaceholder': 'Elige una plantilla...',
+  
+  // Común
+  'common.cancel': 'Cancelar',
+  'common.loading': 'Cargando...'
 };
