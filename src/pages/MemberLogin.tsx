@@ -143,14 +143,15 @@ const MemberLogin = () => {
                       {t('memberLogin.joinNow')}
                     </button>
                   </p>
-                  {/* Future: Add Forgot Password link here */}
-                  {/* <button
-                    type="button"
-                    onClick={() => navigate("/forgot-password")}
-                    className="text-sm text-electric-blue hover:underline"
-                  >
-                    {t('memberLogin.forgotPassword')}
-                  </button> */}
+                  <p>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/forgot-password")}
+                      className="text-electric-blue hover:underline"
+                    >
+                      {t('memberLogin.forgotPassword')}
+                    </button>
+                  </p>
                 </div>
               </form>
             </CardContent>

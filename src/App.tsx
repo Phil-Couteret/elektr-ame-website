@@ -11,6 +11,10 @@ import Initiatives from "./pages/Initiatives";
 import Contact from "./pages/Contact";
 import JoinUs from "./pages/JoinUs";
 import MemberLogin from "./pages/MemberLogin";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import VerifyEmail from "./pages/VerifyEmail";
+import ResendVerification from "./pages/ResendVerification";
 import Admin from "./pages/Admin";
 import MemberPortal from "./pages/MemberPortal";
 import NotFound from "./pages/NotFound";
@@ -32,6 +36,10 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/join-us" element={<JoinUs />} />
               <Route path="/member-login" element={<MemberLogin />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/resend-verification" element={<ResendVerification />} />
               <Route path="/member-portal" element={<MemberPortal />} />
               <Route path="/admin" element={
                 <ProtectedRoute>

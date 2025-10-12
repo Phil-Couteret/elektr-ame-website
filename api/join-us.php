@@ -64,6 +64,9 @@ try {
     $tempPassword = bin2hex(random_bytes(4)); // 8 character random password
     $passwordHash = password_hash($tempPassword, PASSWORD_DEFAULT);
     
+    // Generate email verification token
+    $verificationToken = bin2hex(random_bytes(32)); // 64 character token
+    
     // Prepare SQL statement
     $sql = "INSERT INTO members (
         first_name, 
@@ -71,6 +74,8 @@ try {
         second_name,
         artist_name,
         email,
+        email_verified,
+        email_verification_token,
         password_hash,
         phone, 
         street, 
@@ -89,6 +94,8 @@ try {
         :secondName,
         :artistName,
         :email,
+        0,
+        :verificationToken,
         :passwordHash,
         :phone, 
         :street, 
@@ -113,6 +120,7 @@ try {
     $artistName = $input['artistName'] ?? null;
     $stmt->bindParam(':artistName', $artistName);
     $stmt->bindParam(':email', $input['email']);
+    $stmt->bindParam(':verificationToken', $verificationToken);
     $stmt->bindParam(':passwordHash', $passwordHash);
     $stmt->bindParam(':phone', $input['phone']);
     $street = $input['street'] ?? null;
@@ -151,6 +159,33 @@ try {
     } catch (Exception $e) {
         error_log("Welcome email automation failed: " . $e->getMessage());
         // Don't fail the registration if email fails
+    }
+    
+    // Send email verification
+    try {
+        $verificationLink = "https://www.elektr-ame.com/verify-email?token=" . $verificationToken;
+        
+        $subject = "Verify Your Email - Elektr-Âme";
+        $message = "Hello {$input['firstName']},\n\n";
+        $message .= "Thank you for registering with Elektr-Âme!\n\n";
+        $message .= "Please click the link below to verify your email address:\n";
+        $message .= $verificationLink . "\n\n";
+        $message .= "Your temporary login password is: {$tempPassword}\n\n";
+        $message .= "Once your email is verified and your membership is approved, you can log in at:\n";
+        $message .= "https://www.elektr-ame.com/member-login\n\n";
+        $message .= "If you didn't create an account with us, please ignore this email.\n\n";
+        $message .= "Best regards,\n";
+        $message .= "The Elektr-Âme Team";
+        
+        $headers = "From: noreply@elektr-ame.com\r\n";
+        $headers .= "Reply-To: info@elektr-ame.com\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion();
+        
+        mail($input['email'], $subject, $message, $headers);
+        error_log("Verification email sent to: {$input['email']}");
+    } catch (Exception $e) {
+        error_log("Failed to send verification email: " . $e->getMessage());
+        // Don't fail registration if email fails
     }
     
     // Return success response
