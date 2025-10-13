@@ -11,9 +11,15 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # RewriteCond %{HTTP_HOST} !^www\.
 # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Allow API calls
+# Allow API calls to pass through
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^(.*)$ - [L]
+
+# React Router - Serve index.html for all other routes
+# Don't rewrite if the file/directory exists
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [L]
 </IfModule>
 
 # Security Headers
