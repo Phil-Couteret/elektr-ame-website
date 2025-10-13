@@ -12,15 +12,24 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    // Custom plugin to copy .htaccess (hidden files aren't copied by default)
+    // Custom plugin to copy .htaccess files (hidden files aren't copied by default)
     {
       name: 'copy-htaccess',
       closeBundle() {
+        // Copy .htaccess
         try {
           copyFileSync('public/.htaccess', 'dist/.htaccess');
           console.log('✓ .htaccess copied to dist/');
         } catch (err) {
           console.warn('⚠ .htaccess not found, skipping...');
+        }
+        
+        // Copy .htaccess.minimal
+        try {
+          copyFileSync('public/.htaccess.minimal', 'dist/.htaccess.minimal');
+          console.log('✓ .htaccess.minimal copied to dist/');
+        } catch (err) {
+          console.warn('⚠ .htaccess.minimal not found, skipping...');
         }
       }
     }
