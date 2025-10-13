@@ -33,7 +33,7 @@ const ArtistCard = ({ artist }: { artist: Artist }) => {
           <img 
             src={artist.picture} 
             alt={artist.name}
-            className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-electric-blue/20 to-neon-pink/20 flex items-center justify-center">
