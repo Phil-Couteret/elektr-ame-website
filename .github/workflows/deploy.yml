@@ -125,27 +125,49 @@ jobs:
         ═══════════════════════════════════════════════════════════════
         EOF
 
+    - name: Create deployment zip
+      run: |
+        cd deployment-package
+        # Create zip that includes hidden files
+        zip -r ../elektr-ame-deployment.zip . -x "*.git*"
+        cd ..
+        echo "📦 Deployment zip created"
+        echo ""
+        echo "🔍 Verifying zip contents:"
+        unzip -l elektr-ame-deployment.zip | head -30
+        echo ""
+        echo "🔍 Looking for .htaccess in zip:"
+        if unzip -l elektr-ame-deployment.zip | grep -q "\.htaccess$"; then
+          echo "✅ .htaccess IS in the zip file!"
+        else
+          echo "❌ .htaccess NOT in the zip file!"
+        fi
+        
     - name: Upload deployment artifact
       uses: actions/upload-artifact@v3
       with:
         name: deployment
-        path: deployment-package/
+        path: elektr-ame-deployment.zip
         retention-days: 30
 
     - name: Show artifact info
       run: |
         echo "✅ Deployment package created successfully!"
         echo ""
-        echo "📦 Root files in package:"
-        ls -la deployment-package/
+        echo "📦 Zip file size:"
+        ls -lh elektr-ame-deployment.zip
         echo ""
-        echo "🔍 Checking for .htaccess in package:"
-        if [ -f deployment-package/.htaccess ]; then
-          echo "✅ .htaccess is in the package!"
-        else
-          echo "❌ .htaccess is MISSING from package!"
-        fi
+        echo "📥 DOWNLOAD INSTRUCTIONS:"
+        echo "1. Go to: https://github.com/${{ github.repository }}/actions"
+        echo "2. Click on this workflow run"
+        echo "3. Download: 'deployment' artifact"
+        echo "4. Extract: elektr-ame-deployment.zip"
+        echo "5. Upload all contents to OVH (including .htaccess)"
         echo ""
-        echo "📥 Download from GitHub Actions artifacts"
-        echo "🔗 https://github.com/${{ github.repository }}/actions"
+        echo "🔍 The zip includes:"
+        echo "   ✓ .htaccess (HTTPS redirect)"
+        echo "   ✓ .htaccess.minimal (backup)"
+        echo "   ✓ All frontend files"
+        echo "   ✓ All API files"
+        echo "   ✓ Database migrations"
 
