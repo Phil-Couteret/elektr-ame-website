@@ -28,23 +28,18 @@ const ArtistCard = ({ artist }: { artist: Artist }) => {
 
   return (
     <div className="flex flex-col items-center p-6 rounded-xl bg-gradient-to-br from-black/80 to-gray-800/60 backdrop-blur border border-white/5 group">
-      <div className="w-40 h-40 rounded-full overflow-hidden mb-6 border-2 border-blue-medium/50 group-hover:border-blue-medium transition-all bg-gradient-to-br from-electric-blue/10 to-neon-pink/10">
+      <div className="w-40 h-40 rounded-full overflow-hidden mb-6 border-2 border-blue-medium/50 group-hover:border-blue-medium transition-all">
         {artist.picture ? (
           <img 
             src={artist.picture} 
             alt={artist.name}
             className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-500"
-            onError={(e) => {
-              // Fallback if image fails to load
-              e.currentTarget.style.display = 'none';
-              const fallback = e.currentTarget.nextElementSibling;
-              if (fallback) fallback.classList.remove('hidden');
-            }}
           />
-        ) : null}
-        <div className={`w-full h-full bg-gradient-to-br from-electric-blue/20 to-neon-pink/20 flex items-center justify-center ${artist.picture ? 'hidden' : ''}`}>
-          <User className="h-16 w-16 text-white/30" />
-        </div>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-electric-blue/20 to-neon-pink/20 flex items-center justify-center">
+            <User className="h-16 w-16 text-white/30" />
+          </div>
+        )}
       </div>
       <h3 className="text-xl font-bold text-white mb-1">{artist.name}</h3>
       <p className="text-blue-light mb-4">{getRoleDisplay()}</p>
