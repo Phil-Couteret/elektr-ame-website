@@ -620,5 +620,12 @@ export default {
   // Común
   'common.cancel': 'Cancelar',
   'common.loading': 'Cargando...',
-  'common.close': 'Cerrar'
+  'common.close': 'Cerrar',
+  
+  // PWA Instalación
+  'pwa.install.title': 'Instalar Elektr-Âme',
+  'pwa.install.description': '¡Instala nuestra app para acceso rápido a tu tarjeta de miembro, eventos y más!',
+  'pwa.install.button': 'Instalar',
+  'pwa.install.later': 'Quizás Más Tarde',
+  'pwa.install.benefits': 'Acceso offline • Carga más rápida • Icono en pantalla de inicio'
 };

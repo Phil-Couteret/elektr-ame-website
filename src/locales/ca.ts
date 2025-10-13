@@ -620,5 +620,12 @@ export default {
   // Comú
   'common.cancel': 'Cancel·lar',
   'common.loading': 'Carregant...',
-  'common.close': 'Tancar'
+  'common.close': 'Tancar',
+  
+  // PWA Instal·lació
+  'pwa.install.title': 'Instal·lar Elektr-Âme',
+  'pwa.install.description': 'Instal·la la nostra app per accés ràpid a la teva targeta de membre, esdeveniments i més!',
+  'pwa.install.button': 'Instal·lar',
+  'pwa.install.later': 'Potser Més Tard',
+  'pwa.install.benefits': 'Accés offline • Càrrega més ràpida • Icona a la pantalla d\'inici'
 };
