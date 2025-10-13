@@ -54,7 +54,8 @@ try {
             first_name, 
             second_name,
             status,
-            membership_type
+            membership_type,
+            email_verified
         FROM members 
         WHERE email = :email
     ");
@@ -77,6 +78,11 @@ try {
         // Log failed attempt
         error_log("Failed login attempt for member email: " . $email);
         throw new Exception('Invalid email or password');
+    }
+    
+    // Check if email is verified
+    if (!$member['email_verified'] || $member['email_verified'] == 0) {
+        throw new Exception('Please verify your email address. Check your inbox for the verification link, or request a new one.');
     }
     
     // Check if member is approved
