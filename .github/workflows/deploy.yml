@@ -31,8 +31,9 @@ jobs:
       run: |
         mkdir -p deployment-package
         
-        # Copy frontend build
-        cp -r dist/* deployment-package/
+        # Copy frontend build (including hidden files like .htaccess)
+        cp -r dist/* deployment-package/ 2>/dev/null || true
+        cp -r dist/.* deployment-package/ 2>/dev/null || true
         
         # Copy API files (excluding config.php - must be maintained on server!)
         mkdir -p deployment-package/api
@@ -54,9 +55,15 @@ jobs:
         Upload everything from the root to: /home/elektry/www/
         
         Files to upload:
+        - .htaccess (IMPORTANT! For HTTPS redirect & PWA)
+        - .htaccess.minimal (backup version)
         - index.html
+        - manifest.json (for PWA)
+        - service-worker.js (for PWA)
+        - offline.html (for PWA)
         - assets/ (entire folder)
         - elektr-ame-media/ (entire folder)
+        - pwa-icons/ (entire folder - for PWA)
         - favicon.ico
         - placeholder.svg
         - robots.txt
@@ -76,11 +83,15 @@ jobs:
         
         STEP 4: Test
         --------------
+        ✅ HTTPS working (padlock in address bar)
         ✅ Admin panel works
         ✅ Email automation shows templates
         ✅ Members can set passwords
         ✅ Members can log in
         ✅ Member portal loads
+        ✅ PWA install prompt appears (wait 5 seconds)
+        ✅ DevTools → Application → Service Worker registered
+        ✅ DevTools → Application → Manifest loads correctly
         
         ═══════════════════════════════════════════════════════════════
         ✅ DEPLOYMENT COMPLETE!
