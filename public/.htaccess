@@ -1,6 +1,7 @@
 # Force HTTPS - Required for PWA
 <IfModule mod_rewrite.c>
 RewriteEngine On
+RewriteBase /
 
 # Redirect HTTP to HTTPS
 RewriteCond %{HTTPS} off
@@ -9,6 +10,10 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # Force www (optional - uncomment if you want www)
 # RewriteCond %{HTTP_HOST} !^www\.
 # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Allow API calls
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^(.*)$ - [L]
 </IfModule>
 
 # Security Headers
