@@ -1,173 +1,118 @@
-name: Build and Deploy
+name: 🎵 Deploy Elekr-Âme Website
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
+    - name: 🚚 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '18'
         cache: 'npm'
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Build project
-      run: npm run build
-
-    - name: Verify build output
+        
+    - name: 📦 Install dependencies
       run: |
-        echo "📁 Checking dist/ folder contents:"
-        ls -la dist/
-        echo ""
-        echo "🔍 Looking for .htaccess:"
-        if [ -f dist/.htaccess ]; then
-          echo "✅ .htaccess found!"
-          cat dist/.htaccess
-        else
-          echo "❌ .htaccess NOT found!"
-        fi
-
-    - name: Create deployment package
+        npm install
+        
+    - name: 🏗️ Build React frontend
+      run: |
+        npm run build
+        
+    - name: 📁 Create deployment package
       run: |
         mkdir -p deployment-package
         
-        # Copy frontend build
+        # Copy built frontend files
         cp -r dist/* deployment-package/
         
-        # Explicitly copy hidden files (.htaccess)
-        if [ -f dist/.htaccess ]; then
-          cp dist/.htaccess deployment-package/.htaccess
-          echo "✓ Copied .htaccess"
-        else
-          echo "⚠ WARNING: .htaccess not found in dist/"
-        fi
+        # Copy PHP backend
+        cp -r api deployment-package/
         
-        if [ -f dist/.htaccess.minimal ]; then
-          cp dist/.htaccess.minimal deployment-package/.htaccess.minimal
-          echo "✓ Copied .htaccess.minimal"
-        else
-          echo "⚠ WARNING: .htaccess.minimal not found in dist/"
-        fi
+        # Copy database files
+        cp -r database deployment-package/
         
-        # Copy API files (excluding config.php - must be maintained on server!)
-        mkdir -p deployment-package/api
-        cp -r api/* deployment-package/api/
-        rm -f deployment-package/api/config.php  # Never deploy config.php!
+        # Copy public assets
+        cp -r public deployment-package/
         
-        # Copy database migrations
-        mkdir -p deployment-package/database
-        cp -r database/* deployment-package/database/
+        # Copy configuration files
+        cp .htaccess deployment-package/
+        cp .ovhconfig deployment-package/
+        cp index.html deployment-package/
         
-        # Create deployment instructions
-        cat > deployment-package/DEPLOY_INSTRUCTIONS.txt << 'EOF'
-        ═══════════════════════════════════════════════════════════════
-        🚀 DEPLOYMENT INSTRUCTIONS
-        ═══════════════════════════════════════════════════════════════
+        # Create deployment info
+        echo "Elekr-Âme Website Deployment" > deployment-package/DEPLOYMENT_INFO.txt
+        echo "Deployed on: $(date)" >> deployment-package/DEPLOYMENT_INFO.txt
+        echo "Commit: ${{ github.sha }}" >> deployment-package/DEPLOYMENT_INFO.txt
+        echo "Branch: ${{ github.ref_name }}" >> deployment-package/DEPLOYMENT_INFO.txt
+        echo "Repository: ${{ github.repository }}" >> deployment-package/DEPLOYMENT_INFO.txt
         
-        STEP 1: Upload Frontend Files
-        -------------------------------
-        Upload everything from the root to: /home/elektry/www/
-        
-        Files to upload:
-        - .htaccess (IMPORTANT! For HTTPS redirect & PWA)
-        - .htaccess.minimal (backup version)
-        - index.html
-        - manifest.json (for PWA)
-        - service-worker.js (for PWA)
-        - offline.html (for PWA)
-        - assets/ (entire folder)
-        - elektr-ame-media/ (entire folder)
-        - pwa-icons/ (entire folder - for PWA)
-        - favicon.ico
-        - placeholder.svg
-        - robots.txt
-        
-        STEP 2: Upload Backend Files  
-        -------------------------------
-        Upload api/ folder contents to: /home/elektry/www/api/
-        
-        ⚠️ IMPORTANT: Do NOT upload api/config.php!
-        Your existing config.php on the server has the correct database
-        credentials and must NOT be overwritten.
-        
-        STEP 3: Run Database Migrations (if needed)
-        ---------------------------------------------
-        Check database/ folder for any new .sql files
-        Run them in phpMyAdmin if you haven't already
-        
-        STEP 4: Test
-        --------------
-        ✅ HTTPS working (padlock in address bar)
-        ✅ Admin panel works
-        ✅ Email automation shows templates
-        ✅ Members can set passwords
-        ✅ Members can log in
-        ✅ Member portal loads
-        ✅ PWA install prompt appears (wait 5 seconds)
-        ✅ DevTools → Application → Service Worker registered
-        ✅ DevTools → Application → Manifest loads correctly
-        
-        ═══════════════════════════════════════════════════════════════
-        ✅ DEPLOYMENT COMPLETE!
-        ═══════════════════════════════════════════════════════════════
-        EOF
-
-    - name: Create deployment zip
-      run: |
-        cd deployment-package
-        # Create zip that includes hidden files
-        zip -r ../elektr-ame-deployment.zip . -x "*.git*"
-        cd ..
-        echo "📦 Deployment zip created"
-        echo ""
-        echo "🔍 Verifying zip contents:"
-        unzip -l elektr-ame-deployment.zip | head -30
-        echo ""
-        echo "🔍 Looking for .htaccess in zip:"
-        if unzip -l elektr-ame-deployment.zip | grep -q "\.htaccess$"; then
-          echo "✅ .htaccess IS in the zip file!"
-        else
-          echo "❌ .htaccess NOT in the zip file!"
-        fi
-        
-    - name: Upload deployment artifact
-      uses: actions/upload-artifact@v3
+    - name: 🌐 Deploy to FTP
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        name: deployment
-        path: elektr-ame-deployment.zip
-        retention-days: 30
-
-    - name: Show artifact info
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./deployment-package/
+        server-dir: ${{ secrets.FTP_SERVER_DIR || '/' }}
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.env*
+          **/README.md
+          **/package-lock.json
+          **/yarn.lock
+          **/.DS_Store
+          **/Thumbs.db
+          **/.vscode/**
+          **/.idea/**
+          **/coverage/**
+          **/test/**
+          **/tests/**
+          **/*.test.js
+          **/*.spec.js
+          **/jest.config.js
+          **/cypress/**
+          **/e2e/**
+          **/.nyc_output/**
+          **/logs/**
+          **/*.log
+          **/tmp/**
+          **/temp/**
+          **/*.tmp
+          **/*.bak
+          **/*.backup
+          **/.local/**
+          **/src/**
+          **/docs/**
+          **/deployment-package/**
+          **/test-deployment/**
+          **/member-login-deployment/**
+          **/elekr-ame-deployment.zip
+          **/test-deployment.zip
+        log-level: minimal
+        dry-run: false
+        
+    - name: 📤 Upload deployment artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: elekr-ame-deployment
+        path: deployment-package/
+        retention-days: 7
+        
+    - name: 🎉 Deployment complete
       run: |
-        echo "✅ Deployment package created successfully!"
-        echo ""
-        echo "📦 Zip file size:"
-        ls -lh elektr-ame-deployment.zip
-        echo ""
-        echo "📥 DOWNLOAD INSTRUCTIONS:"
-        echo "1. Go to: https://github.com/${{ github.repository }}/actions"
-        echo "2. Click on this workflow run"
-        echo "3. Download: 'deployment' artifact"
-        echo "4. Extract: elektr-ame-deployment.zip"
-        echo "5. Upload all contents to OVH (including .htaccess)"
-        echo ""
-        echo "🔍 The zip includes:"
-        echo "   ✓ .htaccess (HTTPS redirect)"
-        echo "   ✓ .htaccess.minimal (backup)"
-        echo "   ✓ All frontend files"
-        echo "   ✓ All API files"
-        echo "   ✓ Database migrations"
-
+        echo "🎵 Elekr-Âme website deployed successfully!"
+        echo "🌐 Check your website at: https://www.elektr-ame.com"
