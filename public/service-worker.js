@@ -1,7 +1,7 @@
 // Elektr-Âme PWA Service Worker
-// Version 1.0.0
+// Version 1.0.2 - Updated to clear cache for Events changes
 
-const CACHE_VERSION = 'elektr-ame-v1.0.0';
+const CACHE_VERSION = 'elektr-ame-v1.0.2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
