@@ -36,25 +36,21 @@ try {
     $uploadedCount = 0;
     $errors = [];
 
-    // Handle nested file structure from FormData (images[0][file], images[1][file], etc.)
+    // Handle file uploads - supports both single and multiple files
     $files = [];
     if (isset($_FILES['images'])) {
-        // Check if files are in nested structure (images[0][file])
-        if (isset($_FILES['images']['name'][0]) && is_array($_FILES['images']['name'][0])) {
-            // Nested structure: images[0][file], images[1][file], etc.
-            foreach ($_FILES['images']['name'] as $index => $fileData) {
-                if (isset($fileData['file']) && !empty($fileData['file'])) {
-                    $files[$index] = [
-                        'name' => $_FILES['images']['name'][$index]['file'],
-                        'type' => $_FILES['images']['type'][$index]['file'],
-                        'tmp_name' => $_FILES['images']['tmp_name'][$index]['file'],
-                        'error' => $_FILES['images']['error'][$index]['file'],
-                        'size' => $_FILES['images']['size'][$index]['file']
-                    ];
-                }
-            }
-        } else {
-            // Flat structure: images[0], images[1], etc. (fallback)
+        // Check if single file (when only one file is uploaded, PHP may structure it differently)
+        if (isset($_FILES['images']['name']) && is_string($_FILES['images']['name'])) {
+            // Single file upload
+            $files[0] = [
+                'name' => $_FILES['images']['name'],
+                'type' => $_FILES['images']['type'],
+                'tmp_name' => $_FILES['images']['tmp_name'],
+                'error' => $_FILES['images']['error'],
+                'size' => $_FILES['images']['size']
+            ];
+        } else if (isset($_FILES['images']['name']) && is_array($_FILES['images']['name'])) {
+            // Multiple file uploads
             foreach ($_FILES['images']['name'] as $index => $filename) {
                 if (!empty($filename)) {
                     $files[$index] = [
@@ -116,14 +112,9 @@ try {
         $width = $imageInfo[0] ?? 0;
         $height = $imageInfo[1] ?? 0;
 
-        // Get form data (handle both nested and flat structures)
-        $category = $_POST['images'][$index]['category'] ?? 'other';
-        $description = $_POST['images'][$index]['description'] ?? '';
-        
-        // Debug: Log received data for troubleshooting
-        if (empty($files)) {
-            error_log("No files received. FILES structure: " . print_r($_FILES, true));
-        }
+        // Get form data (categories and descriptions arrays)
+        $category = $_POST['categories'][$index] ?? 'other';
+        $description = $_POST['descriptions'][$index] ?? '';
 
         // Insert into database
         $stmt = $pdo->prepare("

@@ -92,10 +92,12 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
     setUploadStatus({}); // Clear previous status
     const formData = new FormData();
     
+    // Append files and metadata in a structure PHP can handle
     selectedFiles.forEach((fileData, index) => {
-      formData.append(`images[${index}][file]`, fileData.file);
-      formData.append(`images[${index}][category]`, fileData.category);
-      formData.append(`images[${index}][description]`, fileData.description || '');
+      // Use array notation that PHP handles natively
+      formData.append(`images[]`, fileData.file);
+      formData.append(`categories[]`, fileData.category);
+      formData.append(`descriptions[]`, fileData.description || '');
     });
 
     try {
