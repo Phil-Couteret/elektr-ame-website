@@ -88,7 +88,15 @@ jobs:
         else
           echo "✅ FTP_PASSWORD is set (value hidden)"
         fi
-        echo "FTP_SERVER_DIR: ${FTP_SERVER_DIR:-'/' (default)}"
+        if [ -z "${{ secrets.FTP_SERVER_DIR }}" ]; then
+          echo "FTP_SERVER_DIR: Not set (will use /public_html/ as default)"
+        else
+          echo "✅ FTP_SERVER_DIR is set: ${{ secrets.FTP_SERVER_DIR }}"
+          # Verify it ends with /
+          if [[ ! "${{ secrets.FTP_SERVER_DIR }}" == */ ]]; then
+            echo "⚠️  WARNING: FTP_SERVER_DIR should end with / (e.g., /public_html/ not /public_html)"
+          fi
+        fi
         
     - name: 🌐 Deploy to FTP
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
@@ -98,7 +106,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deployment-package/
-        server-dir: ${{ secrets.FTP_SERVER_DIR || '/' }}
+        server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
         protocol: ftp
         dangerous-clean-slate: false
         exclude: |
