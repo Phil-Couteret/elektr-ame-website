@@ -2,10 +2,17 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-react';
 
 const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
+  console.log('🔵 MultiImageUpload component loaded - version with logging');
+  
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
   const fileInputRef = useRef(null);
+  
+  // Log when component mounts
+  React.useEffect(() => {
+    console.log('🔵 MultiImageUpload mounted. Max files:', maxFiles);
+  }, []);
 
   const imageCategories = [
     { value: 'events', label: 'Events' },
