@@ -1,11 +1,10 @@
 name: Build React App
 
 on:
+  # Disabled - deploy.yml handles both build and deployment
+  # workflow_dispatch:  # Can manually trigger if needed for testing only
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  workflow_dispatch:  # Allows manual trigger from GitHub UI
+    branches: [ __disabled__ ]
 
 jobs:
   build:
