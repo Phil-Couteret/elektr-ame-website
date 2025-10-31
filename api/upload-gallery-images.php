@@ -37,20 +37,15 @@ try {
     $errors = [];
 
     // Handle file uploads - supports both single and multiple files
+    // When using images[] in FormData, PHP structures files as:
+    // - Single: $_FILES['images'] is direct file info
+    // - Multiple: $_FILES['images'] has ['name'] => array(0 => 'file1.jpg', 1 => 'file2.jpg')
     $files = [];
+    
     if (isset($_FILES['images'])) {
-        // Check if single file (when only one file is uploaded, PHP may structure it differently)
-        if (isset($_FILES['images']['name']) && is_string($_FILES['images']['name'])) {
-            // Single file upload
-            $files[0] = [
-                'name' => $_FILES['images']['name'],
-                'type' => $_FILES['images']['type'],
-                'tmp_name' => $_FILES['images']['tmp_name'],
-                'error' => $_FILES['images']['error'],
-                'size' => $_FILES['images']['size']
-            ];
-        } else if (isset($_FILES['images']['name']) && is_array($_FILES['images']['name'])) {
-            // Multiple file uploads
+        // Check if it's an array structure (multiple files or images[] with one file)
+        if (isset($_FILES['images']['name']) && is_array($_FILES['images']['name'])) {
+            // Array structure - could be one or multiple files
             foreach ($_FILES['images']['name'] as $index => $filename) {
                 if (!empty($filename)) {
                     $files[$index] = [
@@ -62,7 +57,27 @@ try {
                     ];
                 }
             }
+        } else if (isset($_FILES['images']['name']) && !is_array($_FILES['images']['name'])) {
+            // Direct file structure (single file not in array)
+            $files[0] = [
+                'name' => $_FILES['images']['name'],
+                'type' => $_FILES['images']['type'],
+                'tmp_name' => $_FILES['images']['tmp_name'],
+                'error' => $_FILES['images']['error'],
+                'size' => $_FILES['images']['size']
+            ];
         }
+    }
+    
+    // Debug: Log if no files found
+    if (empty($files)) {
+        error_log("Gallery upload: No files detected. FILES structure: " . print_r($_FILES, true));
+        echo json_encode([
+            'success' => false,
+            'message' => 'No files received. Check server logs for details.',
+            'debug' => isset($_FILES) ? 'FILES exists but no files parsed' : 'FILES not set'
+        ]);
+        exit();
     }
 
     // Process each uploaded image
