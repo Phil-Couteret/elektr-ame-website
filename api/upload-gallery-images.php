@@ -69,13 +69,15 @@ try {
         }
     }
     
-    // Debug: Log if no files found
+    // Debug: Log file detection
+    error_log("Gallery upload: Found " . count($files) . " file(s). FILES structure: " . print_r(array_keys($_FILES), true));
     if (empty($files)) {
-        error_log("Gallery upload: No files detected. FILES structure: " . print_r($_FILES, true));
+        error_log("Gallery upload: No files detected. Full FILES structure: " . print_r($_FILES, true));
         echo json_encode([
             'success' => false,
             'message' => 'No files received. Check server logs for details.',
-            'debug' => isset($_FILES) ? 'FILES exists but no files parsed' : 'FILES not set'
+            'debug' => isset($_FILES) ? 'FILES exists but no files parsed. Structure: ' . print_r(array_keys($_FILES), true) : 'FILES not set',
+            'files_debug' => isset($_FILES['images']) ? 'images key exists' : 'images key missing'
         ]);
         exit();
     }

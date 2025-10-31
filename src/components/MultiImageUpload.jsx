@@ -92,13 +92,15 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
     setUploadStatus({}); // Clear previous status
     const formData = new FormData();
     
-    // Append files and metadata in a structure PHP can handle
+    // Append files and metadata - PHP receives images[] as array
     selectedFiles.forEach((fileData, index) => {
-      // Use array notation that PHP handles natively
       formData.append(`images[]`, fileData.file);
       formData.append(`categories[]`, fileData.category);
       formData.append(`descriptions[]`, fileData.description || '');
     });
+    
+    // Debug: Log what we're sending
+    console.log(`Uploading ${selectedFiles.length} image(s):`, selectedFiles.map(f => f.file.name));
 
     try {
       const response = await fetch('/api/upload-gallery-images.php', {
@@ -107,15 +109,19 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       });
 
       const result = await response.json();
+      
+      console.log('Upload response:', result);
 
       if (result.success) {
-        setUploadStatus({ type: 'success', message: `${result.uploaded_count} images uploaded successfully!` });
+        setUploadStatus({ type: 'success', message: `${result.uploaded_count} image${result.uploaded_count !== 1 ? 's' : ''} uploaded successfully!` });
         setSelectedFiles([]);
         if (onImagesUploaded) {
           onImagesUploaded();
         }
       } else {
-        setUploadStatus({ type: 'error', message: result.message || 'Upload failed' });
+        const errorMsg = result.message || result.debug || 'Upload failed';
+        setUploadStatus({ type: 'error', message: errorMsg });
+        console.error('Upload error:', result);
       }
     } catch (error) {
       setUploadStatus({ type: 'error', message: 'Network error during upload' });
