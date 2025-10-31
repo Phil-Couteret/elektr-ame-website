@@ -28,6 +28,8 @@ jobs:
     - name: 🏗️ Build React frontend
       run: |
         npm run build
+        echo "Build completed. Checking dist folder..."
+        ls -la dist/ | head -10
         
     - name: 📁 Create deployment package
       run: |
@@ -57,6 +59,13 @@ jobs:
         echo "Branch: ${{ github.ref_name }}" >> deployment-package/DEPLOYMENT_INFO.txt
         echo "Repository: ${{ github.repository }}" >> deployment-package/DEPLOYMENT_INFO.txt
         
+    - name: 📋 Verify deployment package
+      run: |
+        echo "Checking deployment package..."
+        ls -la deployment-package/ | head -20
+        echo "Package size:"
+        du -sh deployment-package/
+        
     - name: 🌐 Deploy to FTP
       if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -66,6 +75,8 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deployment-package/
         server-dir: ${{ secrets.FTP_SERVER_DIR || '/' }}
+        protocol: ftp
+        dangerous-clean-slate: false
         exclude: |
           **/.git*
           **/.git*/**
@@ -102,7 +113,7 @@ jobs:
           **/member-login-deployment/**
           **/elekr-ame-deployment.zip
           **/test-deployment.zip
-        log-level: minimal
+        log-level: verbose
         dry-run: false
         
     - name: 📤 Upload deployment artifacts
