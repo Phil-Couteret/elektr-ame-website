@@ -36,17 +36,44 @@ try {
     $uploadedCount = 0;
     $errors = [];
 
-    // Process each uploaded image
-    foreach ($_FILES['images']['name'] as $index => $filename) {
-        if (empty($filename)) continue;
+    // Handle nested file structure from FormData (images[0][file], images[1][file], etc.)
+    $files = [];
+    if (isset($_FILES['images'])) {
+        // Check if files are in nested structure (images[0][file])
+        if (isset($_FILES['images']['name'][0]) && is_array($_FILES['images']['name'][0])) {
+            // Nested structure: images[0][file], images[1][file], etc.
+            foreach ($_FILES['images']['name'] as $index => $fileData) {
+                if (isset($fileData['file']) && !empty($fileData['file'])) {
+                    $files[$index] = [
+                        'name' => $_FILES['images']['name'][$index]['file'],
+                        'type' => $_FILES['images']['type'][$index]['file'],
+                        'tmp_name' => $_FILES['images']['tmp_name'][$index]['file'],
+                        'error' => $_FILES['images']['error'][$index]['file'],
+                        'size' => $_FILES['images']['size'][$index]['file']
+                    ];
+                }
+            }
+        } else {
+            // Flat structure: images[0], images[1], etc. (fallback)
+            foreach ($_FILES['images']['name'] as $index => $filename) {
+                if (!empty($filename)) {
+                    $files[$index] = [
+                        'name' => $_FILES['images']['name'][$index],
+                        'type' => $_FILES['images']['type'][$index],
+                        'tmp_name' => $_FILES['images']['tmp_name'][$index],
+                        'error' => $_FILES['images']['error'][$index],
+                        'size' => $_FILES['images']['size'][$index]
+                    ];
+                }
+            }
+        }
+    }
 
-        $file = [
-            'name' => $_FILES['images']['name'][$index],
-            'type' => $_FILES['images']['type'][$index],
-            'tmp_name' => $_FILES['images']['tmp_name'][$index],
-            'error' => $_FILES['images']['error'][$index],
-            'size' => $_FILES['images']['size'][$index]
-        ];
+    // Process each uploaded image
+    foreach ($files as $index => $file) {
+        if (empty($file['name'])) continue;
+        
+        $filename = $file['name'];
 
         // Validate file
         if ($file['error'] !== UPLOAD_ERR_OK) {
@@ -89,9 +116,14 @@ try {
         $width = $imageInfo[0] ?? 0;
         $height = $imageInfo[1] ?? 0;
 
-        // Get form data
+        // Get form data (handle both nested and flat structures)
         $category = $_POST['images'][$index]['category'] ?? 'other';
         $description = $_POST['images'][$index]['description'] ?? '';
+        
+        // Debug: Log received data for troubleshooting
+        if (empty($files)) {
+            error_log("No files received. FILES structure: " . print_r($_FILES, true));
+        }
 
         // Insert into database
         $stmt = $pdo->prepare("

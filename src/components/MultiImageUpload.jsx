@@ -83,15 +83,19 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
   };
 
   const uploadImages = async () => {
-    if (selectedFiles.length === 0) return;
+    if (selectedFiles.length === 0) {
+      setUploadStatus({ type: 'error', message: 'Please select at least one image to upload' });
+      return;
+    }
 
     setUploading(true);
+    setUploadStatus({}); // Clear previous status
     const formData = new FormData();
     
     selectedFiles.forEach((fileData, index) => {
       formData.append(`images[${index}][file]`, fileData.file);
       formData.append(`images[${index}][category]`, fileData.category);
-      formData.append(`images[${index}][description]`, fileData.description);
+      formData.append(`images[${index}][description]`, fileData.description || '');
     });
 
     try {
@@ -128,10 +132,10 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <p className="text-lg font-medium text-gray-700 mb-2">
-          Drop images here or click to select
+          Drop image(s) here or click to select
         </p>
         <p className="text-sm text-gray-500">
-          Support for multiple images at once (max {maxFiles} files)
+          Select one or more images (up to {maxFiles} files)
         </p>
         <input
           ref={fileInputRef}
@@ -219,7 +223,7 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  <span>Upload {selectedFiles.length} Images</span>
+                  <span>Upload {selectedFiles.length} Image{selectedFiles.length !== 1 ? 's' : ''}</span>
                 </>
               )}
             </button>
