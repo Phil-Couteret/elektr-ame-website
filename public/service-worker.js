@@ -142,10 +142,35 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // JS, CSS, Fonts - Cache First strategy (performance)
-  if (request.destination === 'script' || 
-      request.destination === 'style' || 
-      request.destination === 'font') {
+  // JavaScript - Network First strategy (to get updates quickly)
+  if (request.destination === 'script' || request.url.match(/\.js$/)) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // If network succeeds, cache it and return
+          if (response.status === 200) {
+            const responseClone = response.clone();
+            caches.open(STATIC_CACHE)
+              .then((cache) => {
+                cache.put(request, responseClone);
+              });
+            return response;
+          }
+          // If network fails (404, etc), try cache
+          return caches.match(request);
+        })
+        .catch(() => {
+          // Network failed, try cache
+          return caches.match(request);
+        })
+    );
+    return;
+  }
+  
+  // CSS, Fonts - Cache First strategy (performance)
+  if (request.destination === 'style' || 
+      request.destination === 'font' ||
+      request.url.match(/\.css$/)) {
     event.respondWith(
       caches.match(request)
         .then((cachedResponse) => {
