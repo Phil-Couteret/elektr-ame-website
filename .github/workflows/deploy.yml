@@ -89,7 +89,7 @@ jobs:
           echo "✅ FTP_PASSWORD is set (value hidden)"
         fi
         if [ -z "${{ secrets.FTP_SERVER_DIR }}" ]; then
-          echo "FTP_SERVER_DIR: Not set (will use /public_html/ as default)"
+          echo "FTP_SERVER_DIR: Not set (will use /home/elektry/www/ as default)"
         else
           echo "✅ FTP_SERVER_DIR is set: ${{ secrets.FTP_SERVER_DIR }}"
           # Verify it ends with /
@@ -106,7 +106,7 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./deployment-package/
-        server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+        server-dir: ${{ secrets.FTP_SERVER_DIR || '/home/elektry/www/' }}
         protocol: ftp
         dangerous-clean-slate: false
         exclude: |
