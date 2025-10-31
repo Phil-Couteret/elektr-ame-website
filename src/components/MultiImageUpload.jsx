@@ -17,7 +17,10 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
 
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
+    console.log('Files selected:', files.length, files.map(f => f.name));
+    
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    console.log('Image files filtered:', imageFiles.length);
     
     if (selectedFiles.length + imageFiles.length > maxFiles) {
       alert(`Maximum ${maxFiles} files allowed`);
@@ -32,6 +35,7 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       preview: URL.createObjectURL(file)
     }));
     
+    console.log('Adding files to selection. Total files now:', selectedFiles.length + newFiles.length);
     setSelectedFiles(prev => [...prev, ...newFiles]);
   };
 
@@ -124,7 +128,8 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
         console.error('Upload error:', result);
       }
     } catch (error) {
-      setUploadStatus({ type: 'error', message: 'Network error during upload' });
+      console.error('Upload error caught:', error);
+      setUploadStatus({ type: 'error', message: `Network error: ${error.message}` });
     } finally {
       setUploading(false);
     }
@@ -219,9 +224,13 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
               Clear All
             </button>
             <button
-              onClick={uploadImages}
-              disabled={uploading}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Upload button clicked. Files to upload:', selectedFiles.length);
+                uploadImages();
+              }}
+              disabled={uploading || selectedFiles.length === 0}
+              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {uploading ? (
                 <>
