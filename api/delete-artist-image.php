@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 try {
     $imageId = $_POST['image_id'] ?? $_GET['image_id'] ?? null;

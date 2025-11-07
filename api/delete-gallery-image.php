@@ -1,19 +1,20 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: DELETE, POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once __DIR__ . '/config-helper.php';
+setCorsHeaders();
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 try {
-    $imageId = $_POST['image_id'] ?? $_GET['image_id'] ?? null;
-    $imageIds = $_POST['image_ids'] ?? null;
+    // Handle both JSON and form data
+    $input = json_decode(file_get_contents('php://input'), true);
+    $imageId = $input['image_id'] ?? $_POST['image_id'] ?? $_GET['image_id'] ?? null;
+    $imageIds = $input['image_ids'] ?? $_POST['image_ids'] ?? null;
     
     if (!$imageId && !$imageIds) {
         throw new Exception('Image ID(s) required');
@@ -46,7 +47,14 @@ try {
 
         $deletedFiles = [];
 
-        $mainFilePath = '../public/' . $image['filepath'];
+        // Use config helper for environment-aware paths
+        require_once __DIR__ . '/config-helper.php';
+        $uploadBaseDir = getUploadDirectory('gallery-images/');
+        
+        // Extract filename from filepath (filepath is like 'gallery-images/filename.jpg')
+        $mainFilename = basename($image['filepath']);
+        $mainFilePath = $uploadBaseDir . $mainFilename;
+        
         if (file_exists($mainFilePath)) {
             if (unlink($mainFilePath)) {
                 $deletedFiles[] = 'Main image file deleted';
@@ -55,7 +63,12 @@ try {
             }
         }
 
-        $thumbnailFilePath = '../public/' . $image['thumbnail_filepath'];
+        // Extract filename from thumbnail_filepath (thumbnail_filepath is like 'gallery-images/thumbnails/thumb_filename.jpg')
+        // The path is stored as 'gallery-images/thumbnails/thumb_filename.jpg', so we need to extract just the filename
+        $thumbnailPathParts = explode('/', $image['thumbnail_filepath']);
+        $thumbnailFilename = end($thumbnailPathParts); // Get the last part (filename)
+        $thumbnailFilePath = $uploadBaseDir . 'thumbnails/' . $thumbnailFilename;
+        
         if (file_exists($thumbnailFilePath)) {
             if (unlink($thumbnailFilePath)) {
                 $deletedFiles[] = 'Thumbnail file deleted';

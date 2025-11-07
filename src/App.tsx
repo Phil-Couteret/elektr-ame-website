@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContextNew";
 import Index from "./pages/Index";
@@ -20,6 +20,9 @@ import MemberPortal from "./pages/MemberPortal";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import PortalLayout from "./components/portal/PortalLayout";
+import ConsultancyPage from "./pages/portal/ConsultancyPage";
+import CompanyCreationPage from "./pages/portal/CompanyCreationPage";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +51,12 @@ const App = () => (
                   <Admin />
                 </ProtectedRoute>
               } />
+              {/* Portal Routes */}
+              <Route path="/portal" element={<PortalLayout />}>
+                <Route index element={<Navigate to="/portal/consultancy" replace />} />
+                <Route path="consultancy" element={<ConsultancyPage />} />
+                <Route path="company-creation" element={<CompanyCreationPage />} />
+              </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

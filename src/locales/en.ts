@@ -2,6 +2,7 @@
 export default {
   // Header
   'nav.events': 'Events',
+  'nav.gallery': 'Gallery',
   'nav.about': 'About',
   'nav.artists': 'Artists',
   'nav.joinUs': 'Join Us',

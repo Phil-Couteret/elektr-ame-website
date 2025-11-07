@@ -29,9 +29,11 @@ A modern, multilingual website for Barcelona's vibrant electronic music communit
 
 ## 📦 Installation
 
+### Local Development
+
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/elektr-ame-website.git
+   git clone https://github.com/Phil-Couteret/elektr-ame-website.git
    cd elektr-ame-website
    ```
 
@@ -40,29 +42,39 @@ A modern, multilingual website for Barcelona's vibrant electronic music communit
    npm install
    ```
 
-3. **Start development server:**
+3. **Set up database configuration:**
    ```bash
-   npm run dev
+   cp api/config-template.php api/config.php
+   # Edit api/config.php with your local MySQL credentials
    ```
 
-4. **Set up PHP backend (optional):**
+4. **Start development servers:**
    ```bash
-   php setup-database.php
-   php -S localhost:8000
+   ./start-local.sh
    ```
+
+5. **Access the website:**
+   - Frontend: http://localhost:8080
+   - Admin Panel: http://localhost:8080/admin
+   - API: http://localhost:8000/api
+
+**For detailed local setup, see:** [`LOCAL_SETUP_GUIDE.md`](LOCAL_SETUP_GUIDE.md)
 
 ## 🌐 Deployment
 
-### Quick Deploy (Frontend Only)
-- **Vercel**: Connect your GitHub repo to Vercel
-- **Netlify**: Connect your GitHub repo to Netlify
+### OVH Production Deployment
 
-### Full Stack Deploy
-- Upload `dist/` contents to your web host
-- Upload `api/` folder to your PHP-enabled host
-- Set up MySQL database using `database/schema.sql`
+The codebase is **environment-aware** and automatically adapts to local or production.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+**Quick Reference:** See [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
+
+**Full Guide:** See [`OVH_DEPLOYMENT_GUIDE.md`](OVH_DEPLOYMENT_GUIDE.md)
+
+**Key Points:**
+- `api/config.php` must be manually uploaded to OVH (not in git)
+- Use `api/config-ovh-template.php` as a template
+- Environment is auto-detected - no manual switching needed
+- CORS and file paths adapt automatically
 
 ## 📁 Project Structure
 

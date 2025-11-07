@@ -5,9 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Edit2, Trash2, User, Music, ExternalLink } from "lucide-react";
+import { Plus, Edit2, Trash2, User, Music, ExternalLink, Languages, Loader2, Image as ImageIcon } from "lucide-react";
 import { useAdminData } from "@/hooks/useAdminData";
 import { Artist, SocialLinks } from "@/types/admin";
+import ArtistImageUpload from "@/components/ArtistImageUpload";
 
 const SOCIAL_PLATFORMS = [
   { key: 'soundcloud', label: 'SoundCloud', icon: '🎵' },
@@ -23,16 +24,25 @@ const SOCIAL_PLATFORMS = [
 ];
 
 const ArtistsManager = () => {
-  const { artists, addArtist, updateArtist, deleteArtist, validateArtist } = useAdminData();
+  const { artists, addArtist, updateArtist, deleteArtist, validateArtist, isLoading, error } = useAdminData();
   const [isEditing, setIsEditing] = useState(false);
   const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [showImageUpload, setShowImageUpload] = useState<{ [key: string]: boolean }>({});
 
   const [formData, setFormData] = useState({
     name: "",
     nickname: "",
     bio: "",
+    bioKey: "",
+    bioTranslations: {
+      en: "",
+      es: "",
+      ca: ""
+    },
     picture: "",
     socialLinks: {} as SocialLinks
   });
@@ -42,6 +52,12 @@ const ArtistsManager = () => {
       name: "",
       nickname: "",
       bio: "",
+      bioKey: "",
+      bioTranslations: {
+        en: "",
+        es: "",
+        ca: ""
+      },
       picture: "",
       socialLinks: {}
     });
@@ -56,6 +72,12 @@ const ArtistsManager = () => {
       name: artist.name,
       nickname: artist.nickname || "",
       bio: artist.bio,
+      bioKey: artist.bioKey || "",
+      bioTranslations: artist.bioTranslations || {
+        en: "",
+        es: "",
+        ca: ""
+      },
       picture: artist.picture || "",
       socialLinks: { ...artist.socialLinks }
     });
@@ -64,27 +86,39 @@ const ArtistsManager = () => {
     setShowForm(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors([]);
+    setIsSubmitting(true);
     
-    const validationErrors = validateArtist(formData);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
+    try {
+      const validationErrors = validateArtist(formData);
+      if (validationErrors.length > 0) {
+        setErrors(validationErrors);
+        return;
+      }
 
-    if (isEditing && editingArtist) {
-      updateArtist(editingArtist.id, formData);
-    } else {
-      addArtist(formData);
-    }
+      if (isEditing && editingArtist) {
+        await updateArtist(editingArtist.id, formData);
+      } else {
+        await addArtist(formData);
+      }
 
-    resetForm();
+      resetForm();
+    } catch (err) {
+      setErrors([err instanceof Error ? err.message : 'Failed to save artist']);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this artist?")) {
-      deleteArtist(id);
+      try {
+        await deleteArtist(id);
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'Failed to delete artist');
+      }
     }
   };
 
@@ -102,6 +136,63 @@ const ArtistsManager = () => {
     }
   };
 
+  const handleAutoTranslate = async () => {
+    const englishBio = formData.bioTranslations.en || formData.bio;
+    
+    if (!englishBio.trim()) {
+      setErrors(['Please enter the English biography first']);
+      return;
+    }
+
+    setTranslating(true);
+    setErrors([]);
+
+    try {
+      // Use LibreTranslate free API endpoint
+      // This is a free service with no API key required
+      const translateText = async (text: string, targetLang: string) => {
+        const response = await fetch('https://libretranslate.de/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            q: text,
+            source: 'en',
+            target: targetLang,
+            format: 'text'
+          })
+        });
+        
+        if (!response.ok) throw new Error('Translation failed');
+        const data = await response.json();
+        return data.translatedText;
+      };
+
+      // Translate to Spanish and Catalan in parallel
+      const [spanish, catalan] = await Promise.all([
+        translateText(englishBio, 'es'),
+        translateText(englishBio, 'ca')
+      ]);
+
+      // Update form with translations
+      setFormData(prev => ({
+        ...prev,
+        bioTranslations: {
+          en: englishBio,
+          es: spanish,
+          ca: catalan
+        }
+      }));
+
+      alert('Translations completed! Please review and edit as needed.');
+
+    } catch (error) {
+      console.error('Translation error:', error);
+      setErrors(['Translation failed. Please enter translations manually or try again later.']);
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleSocialLinkChange = (platform: string, value: string) => {
     setFormData(prev => ({
       ...prev,
@@ -115,6 +206,24 @@ const ArtistsManager = () => {
   const getSocialLinkCount = (socialLinks: SocialLinks) => {
     return Object.values(socialLinks).filter(link => link?.trim()).length;
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-white">Loading artists...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <Alert variant="destructive">
+          <AlertDescription>Error loading artists: {error}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -182,19 +291,69 @@ const ArtistsManager = () => {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="bio" className="text-white">
+              <div className="space-y-4">
+                <Label className="text-white text-lg font-semibold">
                   Biography *
                 </Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
-                  placeholder="Enter artist biography"
-                  rows={4}
-                  required
-                />
+                <p className="text-xs text-white/60 mb-4">
+                  Enter the artist biography in all three languages. The English version is required, 
+                  Spanish and Catalan versions are optional but recommended for better user experience.
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="bio_en" className="text-white">
+                      English (Required) *
+                    </Label>
+                    <Textarea
+                      id="bio_en"
+                      value={formData.bioTranslations.en || formData.bio}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        bio: e.target.value,
+                        bioTranslations: { ...prev.bioTranslations, en: e.target.value }
+                      }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="Enter artist biography in English"
+                      rows={3}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio_es" className="text-white">
+                      Spanish (Optional)
+                    </Label>
+                    <Textarea
+                      id="bio_es"
+                      value={formData.bioTranslations.es}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        bioTranslations: { ...prev.bioTranslations, es: e.target.value }
+                      }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="Enter artist biography in Spanish"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bio_ca" className="text-white">
+                      Catalan (Optional)
+                    </Label>
+                    <Textarea
+                      id="bio_ca"
+                      value={formData.bioTranslations.ca}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        bioTranslations: { ...prev.bioTranslations, ca: e.target.value }
+                      }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="Enter artist biography in Catalan"
+                      rows={3}
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -352,6 +511,15 @@ const ArtistsManager = () => {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => setShowImageUpload(prev => ({ ...prev, [artist.id]: !prev[artist.id] }))}
+                      className="border-electric-blue text-electric-blue hover:bg-electric-blue/20"
+                    >
+                      <ImageIcon className="h-4 w-4 mr-1" />
+                      {showImageUpload[artist.id] ? 'Hide' : 'Add'} Images
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleEdit(artist)}
                       className="border-electric-blue text-electric-blue hover:bg-electric-blue/20"
                     >
@@ -367,6 +535,23 @@ const ArtistsManager = () => {
                     </Button>
                   </div>
                 </div>
+                
+                {/* Multi-Image Upload Section */}
+                {showImageUpload[artist.id] && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                      <ImageIcon className="h-5 w-5 text-electric-blue" />
+                      Upload Images for {artist.name}
+                    </h4>
+                    <ArtistImageUpload
+                      artistId={artist.id}
+                      onImagesUploaded={() => {
+                        // Optionally refresh artist data or show success message
+                        console.log('Images uploaded successfully');
+                      }}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))

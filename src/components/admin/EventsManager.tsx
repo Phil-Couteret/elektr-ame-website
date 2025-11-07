@@ -5,16 +5,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image, CheckCircle, XCircle } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdminData } from "@/hooks/useAdminData";
 import { MusicEvent } from "@/types/admin";
 
 const EventsManager = () => {
-  const { events, addEvent, updateEvent, deleteEvent, validateEvent } = useAdminData();
+  const { events, addEvent, updateEvent, deleteEvent, validateEvent, isLoading, error } = useAdminData();
   const [isEditing, setIsEditing] = useState(false);
   const [editingEvent, setEditingEvent] = useState<MusicEvent | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -22,7 +24,8 @@ const EventsManager = () => {
     date: "",
     time: "",
     location: "",
-    picture: ""
+    picture: "",
+    status: "published" as "draft" | "published" | "cancelled"
   });
 
   const resetForm = () => {
@@ -32,7 +35,8 @@ const EventsManager = () => {
       date: "",
       time: "",
       location: "",
-      picture: ""
+      picture: "",
+      status: "published"
     });
     setIsEditing(false);
     setEditingEvent(null);
@@ -47,57 +51,159 @@ const EventsManager = () => {
       date: event.date.split('T')[0], // Extract date part
       time: event.time,
       location: event.location,
-      picture: event.picture || ""
+      picture: event.picture || "",
+      status: (event as any).status || "published"
     });
     setEditingEvent(event);
     setIsEditing(true);
     setShowForm(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors([]);
+    setIsSubmitting(true);
     
-    // Create ISO date string
-    const dateTime = new Date(formData.date + 'T' + formData.time);
-    const eventData = {
-      ...formData,
-      date: dateTime.toISOString()
-    };
+    try {
+      // Validate date format - should be YYYY-MM-DD from date input
+      if (!formData.date || !/^\d{4}-\d{2}-\d{2}$/.test(formData.date)) {
+        setErrors(['Please enter a valid date in YYYY-MM-DD format']);
+        setIsSubmitting(false);
+        return;
+      }
 
-    const validationErrors = validateEvent(eventData);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      return;
+      // Validate time format - should be HH:MM from time input
+      if (!formData.time || !/^\d{2}:\d{2}$/.test(formData.time)) {
+        setErrors(['Please enter a valid time in HH:MM format']);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Send date and time separately to backend (backend expects YYYY-MM-DD and HH:MM)
+      const eventData = {
+        ...formData,
+        // Keep date as YYYY-MM-DD format
+        date: formData.date,
+        // Keep time as HH:MM format
+        time: formData.time
+      };
+
+      const validationErrors = validateEvent(eventData);
+      if (validationErrors.length > 0) {
+        setErrors(validationErrors);
+        setIsSubmitting(false);
+        return;
+      }
+
+      let createdEventId: string | null = null;
+      
+      if (isEditing && editingEvent) {
+        await updateEvent(editingEvent.id, eventData);
+      } else {
+        const result = await addEvent(eventData);
+        // Get the created event ID from the result
+        createdEventId = result?.id || null;
+      }
+
+      // Upload image for new events after creation
+      if (!isEditing && createdEventId && (formData as any).pictureFile) {
+        const imageFormData = new FormData();
+        imageFormData.append('image', (formData as any).pictureFile);
+        imageFormData.append('event_id', createdEventId);
+
+        try {
+          const imageResponse = await fetch('/api/upload-event-image.php', {
+            method: 'POST',
+            credentials: 'include',
+            body: imageFormData
+          });
+          const imageResult = await imageResponse.json();
+          if (!imageResult.success) {
+            console.error('Failed to upload event image:', imageResult.message);
+          }
+        } catch (error) {
+          console.error('Error uploading event image:', error);
+        }
+      }
+
+      resetForm();
+    } catch (err) {
+      setErrors([err instanceof Error ? err.message : 'Failed to save event']);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    if (isEditing && editingEvent) {
-      updateEvent(editingEvent.id, eventData);
-    } else {
-      addEvent(eventData);
-    }
-
-    resetForm();
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this event?")) {
-      deleteEvent(id);
+      try {
+        await deleteEvent(id);
+      } catch (err) {
+        alert(err instanceof Error ? err.message : 'Failed to delete event');
+      }
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
+    if (!file) return;
+
+    // For new events, we'll upload after creation
+    // For existing events, upload immediately
+    if (isEditing && editingEvent) {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('event_id', editingEvent.id);
+
+      try {
+        const response = await fetch('/api/upload-event-image.php', {
+          method: 'POST',
+          credentials: 'include',
+          body: formData
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          setFormData(prev => ({ ...prev, picture: result.picture }));
+          // Refresh events to get updated picture
+          window.dispatchEvent(new Event('adminDataUpdated'));
+        } else {
+          setErrors([result.message || 'Failed to upload image']);
+        }
+      } catch (error) {
+        setErrors(['Failed to upload image']);
+      }
+    } else {
+      // For new events, store file for upload after event creation
       const reader = new FileReader();
       reader.onload = (e) => {
         setFormData(prev => ({
           ...prev,
-          picture: e.target?.result as string
+          picture: e.target?.result as string,
+          pictureFile: file // Store file reference
         }));
       };
       reader.readAsDataURL(file);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <p className="text-white">Loading events...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4">
+        <Alert variant="destructive">
+          <AlertDescription>Error loading events: {error}</AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -214,27 +320,71 @@ const EventsManager = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="picture" className="text-white">
-                  Event Picture
-                </Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Input
-                    id="picture"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="bg-white/10 border-white/20 text-white file:bg-electric-blue file:text-deep-purple file:border-0 file:rounded-md file:px-3 file:py-1"
-                  />
-                  {formData.picture && (
-                    <div className="mt-2">
-                      <img 
-                        src={formData.picture} 
-                        alt="Preview" 
-                        className="h-32 w-auto rounded-md border border-white/20"
-                      />
-                    </div>
-                  )}
+                  <Label htmlFor="picture" className="text-white">
+                    Event Picture (Poster) *
+                  </Label>
+                  <div className="space-y-2">
+                    <Input
+                      id="picture"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="bg-white/10 border-white/20 text-white file:bg-electric-blue file:text-deep-purple file:border-0 file:rounded-md file:px-3 file:py-1"
+                    />
+                    {formData.picture && (
+                      <div className="mt-2">
+                        <img 
+                          src={formData.picture.startsWith('data:') || formData.picture.startsWith('/') ? formData.picture : '/' + formData.picture} 
+                          alt="Preview" 
+                          className="h-32 w-auto rounded-md border border-white/20"
+                        />
+                      </div>
+                    )}
+                    <p className="text-xs text-white/60">This image will be displayed as the event poster on the public page</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-white">
+                    Status *
+                  </Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value: "draft" | "published" | "cancelled") => 
+                      setFormData(prev => ({ ...prev, status: value }))
+                    }
+                  >
+                    <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">
+                        <div className="flex items-center gap-2">
+                          <XCircle className="h-4 w-4 text-yellow-400" />
+                          Draft (Hidden)
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="published">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-400" />
+                          Published (Visible)
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="cancelled">
+                        <div className="flex items-center gap-2">
+                          <XCircle className="h-4 w-4 text-red-400" />
+                          Cancelled
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-white/60">
+                    {formData.status === 'published' && '✓ Event will be visible on the public page'}
+                    {formData.status === 'draft' && '⚠ Event will be hidden from the public page'}
+                    {formData.status === 'cancelled' && '✗ Event is cancelled'}
+                  </p>
                 </div>
               </div>
 

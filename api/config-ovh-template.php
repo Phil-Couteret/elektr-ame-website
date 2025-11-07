@@ -2,38 +2,32 @@
 // OVH Database Configuration for Elektr-Âme
 // 
 // INSTRUCTIONS:
-// 1. Get your database credentials from OVH Control Panel > Databases
-// 2. Replace the placeholder values below with your actual credentials
-// 3. Rename this file to config.php (or copy these values to api/config.php)
-// 4. Commit and push to GitHub to deploy
+// 1. Copy this file to config.php: cp config-ovh-template.php config.php
+// 2. Update the credentials below with your OVH database credentials
+// 3. NEVER commit config.php to git! (it's in .gitignore)
+//
+// OVH Database Credentials (from previous deployments):
+// - Host: elektry2025.mysql.db
+// - Database: elektry2025
+// - Username: elektry2025
+// - Password: (set in OVH control panel)
 
-return [
-    'database' => [
-        'host' => 'YOUR_MYSQL_HOST.ovh.net',     // e.g., mysql.cluster0XX.hosting.ovh.net
-        'dbname' => 'YOUR_DATABASE_NAME',         // Your OVH database name
-        'username' => 'YOUR_DATABASE_USERNAME',   // Your OVH database username
-        'password' => 'YOUR_DATABASE_PASSWORD',   // Your OVH database password
-        'charset' => 'utf8mb4',
-        'options' => [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    ],
-    'api' => [
-        'cors_origins' => ['https://www.elektr-ame.com', 'https://elektr-ame.com'], 
-        'rate_limit' => [
-            'enabled' => true,
-            'max_requests' => 10,
-            'time_window' => 300 // 5 minutes
-        ]
-    ],
-    'security' => [
-        'encrypt_sensitive_data' => false,
-        'hash_passwords' => false,
-        'validate_input' => true
-    ]
-];
+// Database configuration
+$host = 'elektry2025.mysql.db';        // OVH MySQL host
+$dbname = 'elektry2025';                // OVH database name
+$username = 'elektry2025';              // OVH database username
+$password = 'YOUR_OVH_PASSWORD';        // ⚠️ UPDATE THIS with your OVH database password
+
+try {
+    // Create PDO connection
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
+    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
+}
 ?>
 
 

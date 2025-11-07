@@ -37,6 +37,9 @@ const Header = () => {
             <a href="#events" className="text-white/80 hover:text-blue-light transition-colors">
               {t('nav.events')}
             </a>
+            <a href="#gallery" className="text-white/80 hover:text-blue-light transition-colors">
+              {t('nav.gallery')}
+            </a>
             <a href="#about" className="text-white/80 hover:text-blue-light transition-colors">
               {t('nav.about')}
             </a>
@@ -96,6 +99,13 @@ const Header = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.events')}
+            </a>
+            <a
+              href="#gallery"
+              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              {t('nav.gallery')}
             </a>
             <a
               href="#about"

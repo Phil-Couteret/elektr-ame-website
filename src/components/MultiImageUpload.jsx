@@ -104,10 +104,11 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
     const formData = new FormData();
     
     // Append files and metadata - PHP receives images[] as array
+    // Using images[] notation ensures PHP receives files as an array
     selectedFiles.forEach((fileData, index) => {
-      formData.append(`images[]`, fileData.file);
-      formData.append(`categories[]`, fileData.category);
-      formData.append(`descriptions[]`, fileData.description || '');
+      formData.append('images[]', fileData.file);
+      formData.append('categories[]', fileData.category);
+      formData.append('descriptions[]', fileData.description || '');
     });
     
     // Debug: Log what we're sending
