@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+// Use config helper for environment-aware CORS
+require_once __DIR__ . '/config-helper.php';
+setCorsHeaders();
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -18,11 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Include database configuration
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 // Create upload directory if it doesn't exist
-$uploadDir = '../public/gallery-images/';
-$thumbnailDir = '../public/gallery-images/thumbnails/';
+// Use environment-aware path (works for both local and OVH)
+$uploadDir = getUploadDirectory('gallery-images/');
+$thumbnailDir = getUploadDirectory('gallery-images/thumbnails/');
 
 if (!file_exists($uploadDir)) {
     mkdir($uploadDir, 0755, true);
@@ -132,12 +133,13 @@ try {
         // Get form data (categories and descriptions arrays)
         $category = $_POST['categories'][$index] ?? 'other';
         $description = $_POST['descriptions'][$index] ?? '';
+        $galleryId = isset($_POST['gallery_id']) ? (int)$_POST['gallery_id'] : null;
 
         // Insert into database
         $stmt = $pdo->prepare("
             INSERT INTO gallery_images 
-            (filename, filepath, thumbnail_filepath, alt_text, description, category, width, height, file_size, uploaded_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (gallery_id, filename, filepath, thumbnail_filepath, alt_text, description, category, width, height, file_size, uploaded_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
 
         $altText = $description ?: "Gallery image - {$category}";
@@ -145,6 +147,7 @@ try {
         $relativeThumbnailPath = 'gallery-images/thumbnails/thumb_' . $uniqueFilename;
 
         $stmt->execute([
+            $galleryId,
             $filename,
             $relativeFilePath,
             $relativeThumbnailPath,

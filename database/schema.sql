@@ -72,8 +72,8 @@ CREATE TABLE IF NOT EXISTS member_events (
     INDEX idx_event_id (event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Insert sample data (optional)
-INSERT INTO members (first_name, last_name, email, phone, city, country, status) VALUES
+-- Insert sample data (optional - will skip if already exists)
+INSERT IGNORE INTO members (first_name, last_name, email, phone, city, country, status) VALUES
 ('John', 'Doe', 'john.doe@example.com', '+1234567890', 'Barcelona', 'Spain', 'approved'),
 ('Jane', 'Smith', 'jane.smith@example.com', '+34123456789', 'Barcelona', 'Spain', 'pending');
 

@@ -8,7 +8,7 @@ import { Artist } from "@/types/admin";
 
 const ArtistCard = ({ artist }: { artist: Artist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Get role display text
   const getRoleDisplay = () => {
@@ -18,11 +18,22 @@ const ArtistCard = ({ artist }: { artist: Artist }) => {
     return "DJ / Producer"; // Default role
   };
 
-  // Get bio text - use translation if bioKey exists, otherwise fallback to bio
+  // Get bio text - use bioTranslations first, then bioKey, then fallback to bio
   const getBioText = () => {
+    // First try direct translations by language
+    if (artist.bioTranslations) {
+      const langBio = artist.bioTranslations[language as keyof typeof artist.bioTranslations];
+      if (langBio && langBio.trim()) {
+        return langBio;
+      }
+    }
+    
+    // Then try translation key
     if (artist.bioKey) {
       return t(artist.bioKey);
     }
+    
+    // Finally fallback to main bio field
     return artist.bio;
   };
 

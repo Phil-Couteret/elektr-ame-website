@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 try {
     $artistId = $_GET['artist_id'] ?? null;

@@ -1,19 +1,19 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+require_once __DIR__ . '/config-helper.php';
+setCorsHeaders();
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-require_once 'config.php';
+require_once __DIR__ . '/config.php';
 
 try {
     $search = $_GET['search'] ?? '';
     $category = $_GET['category'] ?? 'all';
+    $galleryId = isset($_GET['gallery_id']) ? (int)$_GET['gallery_id'] : null;
     $limit = (int)($_GET['limit'] ?? 50);
     $offset = (int)($_GET['offset'] ?? 0);
 
@@ -31,6 +31,11 @@ try {
     if ($category !== 'all') {
         $sql .= " AND category = ?";
         $params[] = $category;
+    }
+    
+    if ($galleryId !== null) {
+        $sql .= " AND gallery_id = ?";
+        $params[] = $galleryId;
     }
 
     $sql .= " ORDER BY uploaded_at DESC";
@@ -59,6 +64,11 @@ try {
     if ($category !== 'all') {
         $countSql .= " AND category = ?";
         $countParams[] = $category;
+    }
+    
+    if ($galleryId !== null) {
+        $countSql .= " AND gallery_id = ?";
+        $countParams[] = $galleryId;
     }
 
     $countStmt = $pdo->prepare($countSql);
