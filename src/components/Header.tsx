@@ -18,17 +18,6 @@ const Header = () => {
     <header className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo - Updated with new cropped logo */}
-          <div className="flex items-center">
-            <Link to="/" onClick={handleHomeClick} className="cursor-pointer">
-              <img 
-                src="/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
-                alt="Elektr-Âme" 
-                className="h-8 sm:h-10 w-auto hover:opacity-80 transition-opacity"
-              />
-            </Link>
-          </div>
-
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#artists" className="text-white/80 hover:text-blue-light transition-colors">
