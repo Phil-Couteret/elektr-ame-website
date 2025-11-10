@@ -56,18 +56,24 @@ try {
 } catch (PDOException $e) {
     error_log("Database error in events-list: " . $e->getMessage());
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred',
-        'error' => $e->getMessage()
+        'error' => $e->getMessage(),
+        'events' => []
     ]);
+    exit();
 } catch (Exception $e) {
     error_log("Error in events-list: " . $e->getMessage());
     http_response_code(500);
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
-        'message' => $e->getMessage()
+        'message' => $e->getMessage(),
+        'events' => []
     ]);
+    exit();
 }
 ?>
 
