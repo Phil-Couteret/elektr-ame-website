@@ -9,13 +9,13 @@
 // OVH Database Credentials (from previous deployments):
 // - Host: elektry2025.mysql.db
 // - Database: elektry2025
-// - Username: elektry2025
+// - Username: elektry
 // - Password: (set in OVH control panel)
 
 // Database configuration
 $host = 'elektry2025.mysql.db';        // OVH MySQL host
 $dbname = 'elektry2025';                // OVH database name
-$username = 'elektry2025';              // OVH database username
+$username = 'elektry';                  // OVH database username (NOT elektry2025)
 $password = 'YOUR_OVH_PASSWORD';        // ⚠️ UPDATE THIS with your OVH database password
 
 try {
