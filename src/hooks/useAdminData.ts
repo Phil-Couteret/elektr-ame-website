@@ -23,21 +23,30 @@ export const useAdminData = () => {
         const [eventsResponse, artistsResponse] = await Promise.all([
           fetch('/api/events-list.php', {
             credentials: 'include'
+          }).catch(err => {
+            console.error('Events fetch error:', err);
+            return { ok: false, status: 0, json: async () => ({ success: false, message: 'Network error', events: [] }) };
           }),
           fetch('/api/artists-list.php', {
             credentials: 'include'
+          }).catch(err => {
+            console.error('Artists fetch error:', err);
+            return { ok: false, status: 0, json: async () => ({ success: false, message: 'Network error', artists: [] }) };
           })
         ]);
 
-        if (!eventsResponse.ok) {
-          throw new Error('Failed to load events');
-        }
-        if (!artistsResponse.ok) {
-          throw new Error('Failed to load artists');
-        }
+        const eventsData = await eventsResponse.json().catch(() => ({ success: false, message: 'Invalid JSON response', events: [] }));
+        const artistsData = await artistsResponse.json().catch(() => ({ success: false, message: 'Invalid JSON response', artists: [] }));
 
-        const eventsData = await eventsResponse.json();
-        const artistsData = await artistsResponse.json();
+        // Check if API returned success
+        if (!eventsData.success) {
+          console.error('Events API error:', eventsData.message || eventsData.error);
+          // Continue with empty array instead of throwing
+        }
+        if (!artistsData.success) {
+          console.error('Artists API error:', artistsData.message || artistsData.error);
+          // Continue with empty array instead of throwing
+        }
 
         // Transform API data to match frontend format
         const events: MusicEvent[] = (eventsData.events || []).map((event: any) => {
