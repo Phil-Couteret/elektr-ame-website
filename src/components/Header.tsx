@@ -17,7 +17,7 @@ const Header = () => {
   return (
     <header className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-center relative">
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#artists" className="text-white/80 hover:text-blue-light transition-colors">
@@ -53,7 +53,7 @@ const Header = () => {
           </nav>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden">
+          <div className="flex md:hidden absolute right-0">
             <button
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}

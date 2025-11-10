@@ -34,11 +34,6 @@ const Admin = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <img 
-                src="/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png" 
-                alt="Elektr-Âme" 
-                className="h-8 w-auto"
-              />
               <h1 className="text-xl font-bold text-white">{t('admin.header.title')}</h1>
               {user && (
                 <span className="text-electric-blue text-sm">

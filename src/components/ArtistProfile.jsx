@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera } from 'lucide-react';
+import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera, Video } from 'lucide-react';
 import ArtistImageUpload from './ArtistImageUpload';
 
 const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
@@ -182,14 +182,27 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {getFilteredImages().map((image) => {
             const Icon = categoryIcons[image.category];
+            const isVideo = image.media_type === 'video';
             return (
               <div key={image.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-                  <img
-                    src={`/${image.filepath}`}
-                    alt={image.alt_text}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
+                  {isVideo ? (
+                    <video
+                      src={`/${image.filepath}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      controls={false}
+                      muted
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={`/${image.filepath}`}
+                      alt={image.alt_text}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
+                  )}
                 </div>
                 
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
@@ -208,15 +221,27 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
 
                 <div className="absolute top-2 left-2">
                   <div className="flex items-center space-x-1 bg-black bg-opacity-70 text-white px-2 py-1 rounded-full text-xs">
-                    <Icon className="h-3 w-3" />
+                    {isVideo ? (
+                      <Video className="h-3 w-3" />
+                    ) : (
+                      <Icon className="h-3 w-3" />
+                    )}
                     <span>{categoryLabels[image.category]}</span>
                   </div>
                 </div>
-
+                
                 {image.is_profile_picture && (
                   <div className="absolute top-2 right-2">
                     <div className="bg-blue-600 text-white p-1 rounded-full">
                       <Star className="h-3 w-3" />
+                    </div>
+                  </div>
+                )}
+                
+                {isVideo && (
+                  <div className={`absolute ${image.is_profile_picture ? 'top-10 right-2' : 'top-2 right-2'}`}>
+                    <div className="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                      VIDEO
                     </div>
                   </div>
                 )}

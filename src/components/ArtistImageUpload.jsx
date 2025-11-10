@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, Video, CheckCircle, AlertCircle } from 'lucide-react';
 
 const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
-  const fileInputRef = useRef(null);
+  const imageInputRef = useRef(null);
+  const videoInputRef = useRef(null);
 
   const imageCategories = [
     { value: 'profile', label: 'Profile Picture' },
@@ -16,18 +17,24 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
     { value: 'other', label: 'Other' }
   ];
 
-  const handleFileSelect = (event) => {
+  const handleFileSelect = (event, isVideo = false) => {
     const files = Array.from(event.target.files);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const mediaFiles = isVideo 
+      ? files.filter(file => file.type.startsWith('video/'))
+      : files.filter(file => file.type.startsWith('image/'));
     
-    const newFiles = imageFiles.map(file => ({
-      id: Date.now() + Math.random(),
-      file,
-      category: 'profile',
-      description: '',
-      isProfilePicture: false,
-      preview: URL.createObjectURL(file)
-    }));
+    const newFiles = mediaFiles.map(file => {
+      const isVideoFile = file.type.startsWith('video/');
+      return {
+        id: Date.now() + Math.random(),
+        file,
+        isVideo: isVideoFile,
+        category: 'other',
+        description: '',
+        isProfilePicture: false,
+        preview: isVideoFile ? null : URL.createObjectURL(file) // Videos don't have preview URLs easily
+      };
+    });
     
     setSelectedFiles(prev => [...prev, ...newFiles]);
   };
@@ -40,15 +47,28 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    const videoFiles = files.filter(file => file.type.startsWith('video/'));
     
-    const newFiles = imageFiles.map(file => ({
-      id: Date.now() + Math.random(),
-      file,
-      category: 'profile',
-      description: '',
-      isProfilePicture: false,
-      preview: URL.createObjectURL(file)
-    }));
+    const newFiles = [
+      ...imageFiles.map(file => ({
+        id: Date.now() + Math.random(),
+        file,
+        isVideo: false,
+        category: 'other',
+        description: '',
+        isProfilePicture: false,
+        preview: URL.createObjectURL(file)
+      })),
+      ...videoFiles.map(file => ({
+        id: Date.now() + Math.random() + 1000,
+        file,
+        isVideo: true,
+        category: 'other',
+        description: '',
+        isProfilePicture: false,
+        preview: null
+      }))
+    ];
     
     setSelectedFiles(prev => [...prev, ...newFiles]);
   };
@@ -90,11 +110,24 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
     setUploading(true);
     const formData = new FormData();
     
-    selectedFiles.forEach((fileData, index) => {
-      formData.append(`images[${index}][file]`, fileData.file);
+    // Separate images and videos
+    const imageFiles = selectedFiles.filter(f => !f.isVideo);
+    const videoFiles = selectedFiles.filter(f => f.isVideo);
+    
+    // Add images
+    imageFiles.forEach((fileData, index) => {
+      formData.append(`images[]`, fileData.file);
       formData.append(`images[${index}][category]`, fileData.category);
       formData.append(`images[${index}][description]`, fileData.description);
       formData.append(`images[${index}][is_profile_picture]`, fileData.isProfilePicture ? '1' : '0');
+    });
+    
+    // Add videos
+    videoFiles.forEach((fileData, index) => {
+      formData.append(`videos[]`, fileData.file);
+      formData.append(`videos[${index}][category]`, fileData.category);
+      formData.append(`videos[${index}][description]`, fileData.description);
+      formData.append(`videos[${index}][is_profile_picture]`, '0'); // Videos can't be profile pictures
     });
     
     formData.append('artist_id', artistId);
@@ -108,7 +141,7 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
       const result = await response.json();
 
       if (result.success) {
-        setUploadStatus({ type: 'success', message: `${result.uploaded_count} images uploaded successfully!` });
+        setUploadStatus({ type: 'success', message: `${result.uploaded_count} file(s) uploaded successfully!` });
         setSelectedFiles([]);
         if (onImagesUploaded) {
           onImagesUploaded();
@@ -126,24 +159,47 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
   return (
     <div className="space-y-6">
       <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
       >
         <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
         <p className="text-lg font-medium text-gray-700 mb-2">
-          Drop images here or click to select
+          Drop images and videos here or click to select
         </p>
-        <p className="text-sm text-gray-500">
-          Support for multiple images at once
+        <p className="text-sm text-gray-500 mb-4">
+          Support for multiple images and videos at once
         </p>
+        <div className="flex gap-4 justify-center">
+          <button
+            onClick={() => imageInputRef.current?.click()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
+          >
+            <ImageIcon className="h-4 w-4" />
+            Select Images
+          </button>
+          <button
+            onClick={() => videoInputRef.current?.click()}
+            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center gap-2"
+          >
+            <Video className="h-4 w-4" />
+            Select Videos
+          </button>
+        </div>
         <input
-          ref={fileInputRef}
+          ref={imageInputRef}
           type="file"
           multiple
           accept="image/*"
-          onChange={handleFileSelect}
+          onChange={(e) => handleFileSelect(e, false)}
+          className="hidden"
+        />
+        <input
+          ref={videoInputRef}
+          type="file"
+          multiple
+          accept="video/*"
+          onChange={(e) => handleFileSelect(e, true)}
           className="hidden"
         />
       </div>
@@ -151,24 +207,36 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
       {selectedFiles.length > 0 && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-gray-800">
-            Selected Images ({selectedFiles.length})
+            Selected Files ({selectedFiles.length})
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {selectedFiles.map((fileData) => (
               <div key={fileData.id} className="border rounded-lg p-4 space-y-3">
                 <div className="relative">
-                  <img
-                    src={fileData.preview}
-                    alt="Preview"
-                    className="w-full h-32 object-cover rounded"
-                  />
+                  {fileData.isVideo ? (
+                    <div className="w-full h-32 bg-gray-200 rounded flex items-center justify-center">
+                      <Video className="h-12 w-12 text-gray-400" />
+                      <span className="ml-2 text-sm text-gray-600">{fileData.file.name}</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={fileData.preview}
+                      alt="Preview"
+                      className="w-full h-32 object-cover rounded"
+                    />
+                  )}
                   <button
                     onClick={() => removeFile(fileData.id)}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                   >
                     <X className="h-4 w-4" />
                   </button>
+                  {fileData.isVideo && (
+                    <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                      VIDEO
+                    </span>
+                  )}
                 </div>
 
                 <div>
@@ -201,18 +269,20 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
                   />
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={`profile-${fileData.id}`}
-                    checked={fileData.isProfilePicture}
-                    onChange={() => toggleProfilePicture(fileData.id)}
-                    className="rounded"
-                  />
-                  <label htmlFor={`profile-${fileData.id}`} className="text-sm text-gray-700">
-                    Set as profile picture
-                  </label>
-                </div>
+                {!fileData.isVideo && (
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id={`profile-${fileData.id}`}
+                      checked={fileData.isProfilePicture}
+                      onChange={() => toggleProfilePicture(fileData.id)}
+                      className="rounded"
+                    />
+                    <label htmlFor={`profile-${fileData.id}`} className="text-sm text-gray-700">
+                      Set as profile picture
+                    </label>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -237,7 +307,7 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  <span>Upload {selectedFiles.length} Images</span>
+                  <span>Upload {selectedFiles.length} File(s)</span>
                 </>
               )}
             </button>

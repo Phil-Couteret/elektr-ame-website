@@ -14,12 +14,15 @@ export const usePublicData = () => {
       setIsLoading(true);
       
       try {
-        // Fetch events and artists from API
-        const [eventsResponse, artistsResponse] = await Promise.all([
+        // Fetch events, artists, and galleries from API
+        const [eventsResponse, artistsResponse, galleriesResponse] = await Promise.all([
           fetch('/api/events-list.php?status=published', {
             credentials: 'include'
           }),
           fetch('/api/artists-list.php?status=active', {
+            credentials: 'include'
+          }),
+          fetch('/api/galleries-list.php', {
             credentials: 'include'
           })
         ]);
@@ -30,9 +33,13 @@ export const usePublicData = () => {
         if (!artistsResponse.ok) {
           throw new Error('Failed to load artists');
         }
+        if (!galleriesResponse.ok) {
+          throw new Error('Failed to load galleries');
+        }
 
         const eventsData = await eventsResponse.json();
         const artistsData = await artistsResponse.json();
+        const galleriesData = await galleriesResponse.json();
 
         // Transform API data to match frontend format
         const events: MusicEvent[] = (eventsData.events || []).map((event: any) => {
@@ -66,13 +73,29 @@ export const usePublicData = () => {
           updatedAt: artist.updatedAt || new Date().toISOString()
         }));
 
+        // Transform gallery data to match GalleryItem type
+        const galleries: GalleryItem[] = (galleriesData.galleries || []).map((gallery: any) => ({
+          id: gallery.id.toString(),
+          title: gallery.title || 'Untitled Gallery',
+          description: gallery.description || '',
+          image: gallery.cover_image_path 
+            ? `/${gallery.cover_image_path}` 
+            : '', // Format cover image path
+          picture: gallery.cover_image_path 
+            ? `/${gallery.cover_image_path}` 
+            : '', // Also include picture for GallerySection compatibility
+          createdAt: gallery.created_at || new Date().toISOString(),
+          updatedAt: gallery.updated_at || new Date().toISOString()
+        }));
+
         setEvents(events);
         setArtists(artists);
-        setGallery([]); // Gallery is managed separately via API
+        setGallery(galleries);
 
         console.log('Loaded data from API:', { 
           events: events.length, 
-          artists: artists.length
+          artists: artists.length,
+          galleries: galleries.length
         });
       } catch (error) {
         console.error('Failed to load public data:', error);

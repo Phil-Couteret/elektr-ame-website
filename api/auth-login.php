@@ -59,7 +59,7 @@ try {
     }
     
     // Get user from database
-    $stmt = $pdo->prepare("SELECT id, email, password_hash, name, role, is_active FROM admin_users WHERE email = :email");
+    $stmt = $pdo->prepare("SELECT id, email, password_hash, full_name, role, is_active FROM admin_users WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -87,7 +87,7 @@ try {
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_id'] = $user['id'];
     $_SESSION['admin_email'] = $user['email'];
-    $_SESSION['admin_name'] = $user['name'];
+    $_SESSION['admin_name'] = $user['full_name'];
     $_SESSION['admin_role'] = $user['role'];
     $_SESSION['login_time'] = time();
     
@@ -100,7 +100,7 @@ try {
         'message' => 'Login successful',
         'user' => [
             'email' => $user['email'],
-            'name' => $user['name'],
+            'name' => $user['full_name'],
             'role' => $user['role']
         ]
     ]);

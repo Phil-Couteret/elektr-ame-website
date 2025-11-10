@@ -16,17 +16,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/config-helper.php';
 
-$uploadDir = '../public/artist-images/';
-$thumbnailDir = '../public/artist-images/thumbnails/';
-
-if (!file_exists($uploadDir)) {
-    mkdir($uploadDir, 0755, true);
-}
-
-if (!file_exists($thumbnailDir)) {
-    mkdir($thumbnailDir, 0755, true);
-}
+$uploadDir = getUploadDirectory('artist-images/');
+$thumbnailDir = getUploadDirectory('artist-images/thumbnails/');
 
 try {
     $artistId = $_POST['artist_id'] ?? null;
@@ -44,81 +37,153 @@ try {
     $uploadedCount = 0;
     $errors = [];
 
-    foreach ($_FILES['images']['name'] as $index => $filename) {
-        if (empty($filename)) continue;
+    // Handle both 'images' and 'videos' file arrays
+    $fileArrays = [];
+    if (isset($_FILES['images']) && is_array($_FILES['images']['name'])) {
+        foreach ($_FILES['images']['name'] as $index => $filename) {
+            if (!empty($filename)) {
+                $fileArrays[] = [
+                    'name' => $_FILES['images']['name'][$index],
+                    'type' => $_FILES['images']['type'][$index],
+                    'tmp_name' => $_FILES['images']['tmp_name'][$index],
+                    'error' => $_FILES['images']['error'][$index],
+                    'size' => $_FILES['images']['size'][$index],
+                    'index' => $index,
+                    'source' => 'images'
+                ];
+            }
+        }
+    }
+    
+    if (isset($_FILES['videos']) && is_array($_FILES['videos']['name'])) {
+        foreach ($_FILES['videos']['name'] as $index => $filename) {
+            if (!empty($filename)) {
+                $fileArrays[] = [
+                    'name' => $_FILES['videos']['name'][$index],
+                    'type' => $_FILES['videos']['type'][$index],
+                    'tmp_name' => $_FILES['videos']['tmp_name'][$index],
+                    'error' => $_FILES['videos']['error'][$index],
+                    'size' => $_FILES['videos']['size'][$index],
+                    'index' => $index,
+                    'source' => 'videos'
+                ];
+            }
+        }
+    }
 
+    foreach ($fileArrays as $fileData) {
         $file = [
-            'name' => $_FILES['images']['name'][$index],
-            'type' => $_FILES['images']['type'][$index],
-            'tmp_name' => $_FILES['images']['tmp_name'][$index],
-            'error' => $_FILES['images']['error'][$index],
-            'size' => $_FILES['images']['size'][$index]
+            'name' => $fileData['name'],
+            'type' => $fileData['type'],
+            'tmp_name' => $fileData['tmp_name'],
+            'error' => $fileData['error'],
+            'size' => $fileData['size']
         ];
+        $index = $fileData['index'];
+        $source = $fileData['source'];
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = "Error uploading {$filename}";
+            $errors[] = "Error uploading {$file['name']}";
             continue;
         }
 
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            $errors[] = "Invalid file type for {$filename}";
+        // Determine media type and allowed types
+        $isVideo = false;
+        $allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+        
+        if (in_array($file['type'], $allowedVideoTypes) || $source === 'videos') {
+            $isVideo = true;
+            $maxSize = 100 * 1024 * 1024; // 100MB for videos
+        } else if (in_array($file['type'], $allowedImageTypes)) {
+            $maxSize = 10 * 1024 * 1024; // 10MB for images
+        } else {
+            $errors[] = "Invalid file type for {$file['name']}";
             continue;
         }
 
-        if ($file['size'] > 5 * 1024 * 1024) {
-            $errors[] = "File too large for {$filename}";
+        if ($file['size'] > $maxSize) {
+            $errors[] = "File too large for {$file['name']} (max: " . round($maxSize / 1024 / 1024) . "MB)";
             continue;
         }
 
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $uniqueFilename = uniqid() . '_' . time() . '.' . $extension;
         $filePath = $uploadDir . $uniqueFilename;
 
         if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-            $errors[] = "Failed to save {$filename}";
+            $errors[] = "Failed to save {$file['name']}";
             continue;
         }
 
-        $thumbnailPath = $thumbnailDir . 'thumb_' . $uniqueFilename;
-        if (!createThumbnail($filePath, $thumbnailPath, 300, 300)) {
-            $errors[] = "Failed to create thumbnail for {$filename}";
+        $width = 0;
+        $height = 0;
+        $videoDuration = null;
+        $thumbnailPath = null;
+        $relativeThumbnailPath = null;
+
+        if ($isVideo) {
+            // For videos, try to extract thumbnail and duration
+            // Note: This requires ffmpeg to be installed on the server
+            $thumbnailPath = $thumbnailDir . 'thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
+            $videoInfo = getVideoInfo($filePath, $thumbnailPath);
+            if ($videoInfo) {
+                $width = $videoInfo['width'] ?? 0;
+                $height = $videoInfo['height'] ?? 0;
+                $videoDuration = $videoInfo['duration'] ?? null;
+                if (file_exists($thumbnailPath)) {
+                    $relativeThumbnailPath = 'artist-images/thumbnails/thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
+                }
+            }
+        } else {
+            // For images, create thumbnail
+            $thumbnailPath = $thumbnailDir . 'thumb_' . $uniqueFilename;
+            if (createThumbnail($filePath, $thumbnailPath, 300, 300)) {
+                $relativeThumbnailPath = 'artist-images/thumbnails/thumb_' . $uniqueFilename;
+            } else {
+                $errors[] = "Failed to create thumbnail for {$file['name']}";
+            }
+
+            $imageInfo = getimagesize($filePath);
+            $width = $imageInfo[0] ?? 0;
+            $height = $imageInfo[1] ?? 0;
         }
 
-        $imageInfo = getimagesize($filePath);
-        $width = $imageInfo[0] ?? 0;
-        $height = $imageInfo[1] ?? 0;
+        $category = $_POST[$source][$index]['category'] ?? 'other';
+        $description = $_POST[$source][$index]['description'] ?? '';
+        $isProfilePicture = ($_POST[$source][$index]['is_profile_picture'] ?? '0') === '1';
 
-        $category = $_POST['images'][$index]['category'] ?? 'other';
-        $description = $_POST['images'][$index]['description'] ?? '';
-        $isProfilePicture = ($_POST['images'][$index]['is_profile_picture'] ?? '0') === '1';
-
-        if ($isProfilePicture) {
+        // Only images can be profile pictures
+        if ($isProfilePicture && !$isVideo) {
             $stmt = $pdo->prepare("UPDATE artist_images SET is_profile_picture = 0 WHERE artist_id = ?");
             $stmt->execute([$artistId]);
+        } else if ($isProfilePicture && $isVideo) {
+            $isProfilePicture = false; // Videos cannot be profile pictures
         }
 
         $stmt = $pdo->prepare("
             INSERT INTO artist_images 
-            (artist_id, filename, filepath, thumbnail_filepath, alt_text, description, category, is_profile_picture, width, height, uploaded_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (artist_id, filename, filepath, thumbnail_filepath, alt_text, description, category, media_type, is_profile_picture, width, height, file_size, video_duration, uploaded_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
 
-        $altText = $description ?: "Artist image - {$category}";
+        $altText = $description ?: ($isVideo ? "Artist video - {$category}" : "Artist image - {$category}");
         $relativeFilePath = 'artist-images/' . $uniqueFilename;
-        $relativeThumbnailPath = 'artist-images/thumbnails/thumb_' . $uniqueFilename;
 
         $stmt->execute([
             $artistId,
-            $filename,
+            $file['name'],
             $relativeFilePath,
             $relativeThumbnailPath,
             $altText,
             $description,
             $category,
+            $isVideo ? 'video' : 'image',
             $isProfilePicture ? 1 : 0,
             $width,
-            $height
+            $height,
+            $file['size'],
+            $videoDuration
         ]);
 
         $uploadedCount++;
@@ -128,13 +193,13 @@ try {
         echo json_encode([
             'success' => true,
             'uploaded_count' => $uploadedCount,
-            'message' => "Successfully uploaded {$uploadedCount} images",
+            'message' => "Successfully uploaded {$uploadedCount} file(s)",
             'errors' => $errors
         ]);
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'No images were uploaded',
+            'message' => 'No files were uploaded',
             'errors' => $errors
         ]);
     }
@@ -214,5 +279,42 @@ function createThumbnail($sourcePath, $thumbnailPath, $maxWidth, $maxHeight) {
     imagedestroy($thumbnail);
 
     return $result;
+}
+
+function getVideoInfo($videoPath, $thumbnailPath) {
+    // Check if ffmpeg is available
+    $ffmpegPath = trim(shell_exec('which ffmpeg 2>/dev/null'));
+    
+    if (empty($ffmpegPath)) {
+        // ffmpeg not available, return basic info
+        return null;
+    }
+    
+    $info = [];
+    
+    // Get video dimensions and duration using ffprobe
+    $ffprobePath = trim(shell_exec('which ffprobe 2>/dev/null'));
+    if (!empty($ffprobePath)) {
+        // Get video dimensions
+        $widthCmd = "{$ffprobePath} -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 \"{$videoPath}\"";
+        $heightCmd = "{$ffprobePath} -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 \"{$videoPath}\"";
+        $durationCmd = "{$ffprobePath} -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{$videoPath}\"";
+        
+        $width = trim(shell_exec($widthCmd));
+        $height = trim(shell_exec($heightCmd));
+        $duration = trim(shell_exec($durationCmd));
+        
+        $info['width'] = (int)$width;
+        $info['height'] = (int)$height;
+        $info['duration'] = $duration ? (int)round((float)$duration) : null;
+    }
+    
+    // Extract thumbnail from video (first frame at 1 second)
+    if (!empty($ffmpegPath) && !empty($thumbnailPath)) {
+        $thumbnailCmd = "{$ffmpegPath} -i \"{$videoPath}\" -ss 00:00:01 -vframes 1 -q:v 2 \"{$thumbnailPath}\" 2>&1";
+        shell_exec($thumbnailCmd);
+    }
+    
+    return $info;
 }
 ?>
