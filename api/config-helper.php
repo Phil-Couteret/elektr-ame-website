@@ -15,7 +15,7 @@ function isLocalEnvironment() {
         $scriptPath = __DIR__;
         return (
             strpos($scriptPath, '/Users/') !== false ||
-            strpos($scriptPath, '/home/') !== false && strpos($scriptPath, '/www/') === false
+            (strpos($scriptPath, '/home/') !== false && strpos($scriptPath, '/elektry/www') === false)
         );
     }
     
@@ -71,13 +71,18 @@ function getUploadDirectory($subdirectory = '') {
         $baseDir = __DIR__ . '/../public/';
     } else {
         // OVH Production: use document root
-        // OVH structure: www/ is the document root
-        // So public/ is at www/public/
+        // OVH structure: /home/elektry/www is the document root
+        // So public/ is at /home/elektry/www/public/
         $baseDir = $_SERVER['DOCUMENT_ROOT'] . '/public/';
         
-        // Fallback: if DOCUMENT_ROOT doesn't work, try relative
-        if (!file_exists($baseDir) && file_exists(dirname(__DIR__) . '/public/')) {
-            $baseDir = dirname(__DIR__) . '/public/';
+        // Fallback: if DOCUMENT_ROOT doesn't work, try known OVH path
+        if (!file_exists($baseDir)) {
+            // Try OVH specific path
+            if (file_exists('/home/elektry/www/public/')) {
+                $baseDir = '/home/elektry/www/public/';
+            } else if (file_exists(dirname(__DIR__) . '/public/')) {
+                $baseDir = dirname(__DIR__) . '/public/';
+            }
         }
     }
     
