@@ -1,0 +1,117 @@
+<?php
+session_start();
+
+header('Content-Type: application/json');
+// Allow both production and local development
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, ['https://www.elektr-ame.com', 'http://localhost:8080', 'http://127.0.0.1:8080'])) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+}
+header('Access-Control-Allow-Methods: POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Credentials: true');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// Check if user is authenticated
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    exit();
+}
+
+require_once __DIR__ . '/config.php';
+
+try {
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input) {
+        throw new Exception('Invalid JSON input');
+    }
+
+    // Validate required fields
+    if (empty($input['name'])) {
+        throw new Exception('Name is required');
+    }
+    if (empty($input['bio'])) {
+        throw new Exception('Bio is required');
+    }
+
+    // Validate social links (at least one should be provided)
+    $socialLinks = $input['socialLinks'] ?? [];
+    $hasAnySocialLink = false;
+    foreach ($socialLinks as $link) {
+        if (!empty($link) && $link !== '#') {
+            $hasAnySocialLink = true;
+            break;
+        }
+    }
+    
+    if (!$hasAnySocialLink) {
+        throw new Exception('At least one social media link is required');
+    }
+
+    // Convert socialLinks to JSON
+    $socialMediaJson = json_encode($socialLinks);
+
+    $stmt = $pdo->prepare("
+        INSERT INTO artists (name, nickname, bio, bio_key, picture, genre, website, social_media, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ");
+
+    $stmt->execute([
+        $input['name'],
+        $input['nickname'] ?? '',
+        $input['bio'],
+        $input['bioKey'] ?? $input['bio_key'] ?? '',
+        $input['picture'] ?? '',
+        $input['genre'] ?? null,
+        $input['website'] ?? null,
+        $socialMediaJson,
+        $input['status'] ?? 'active'
+    ]);
+
+    $artistId = $pdo->lastInsertId();
+
+    // Fetch the created artist
+    $stmt = $pdo->prepare("SELECT * FROM artists WHERE id = ?");
+    $stmt->execute([$artistId]);
+    $artist = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Format for frontend
+    $socialMedia = json_decode($artist['social_media'] ?? '{}', true);
+    if (!is_array($socialMedia)) {
+        $socialMedia = [];
+    }
+    
+    $artist['socialLinks'] = $socialMedia;
+    $artist['bioKey'] = $artist['bio_key'] ?? '';
+    $artist['bioTranslations'] = []; // Not stored in DB yet
+    $artist['createdAt'] = $artist['created_at'];
+    $artist['updatedAt'] = $artist['updated_at'];
+    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key']);
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Artist created successfully',
+        'artist' => $artist
+    ]);
+
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error: ' . $e->getMessage()
+    ]);
+} catch (Exception $e) {
+    http_response_code(400);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
+}
+?>
+

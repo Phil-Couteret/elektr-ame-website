@@ -1,0 +1,62 @@
+═══════════════════════════════════════════════════════════════
+✅ UPLOAD CHECKLIST
+═══════════════════════════════════════════════════════════════
+
+FTP Connection:
+- Host: ftp.cluster129.hosting.ovh.net
+- Username: elektry
+- Password: 92Alcolea2025
+- Path: /home/elektry/www/
+
+═══════════════════════════════════════════════════════════════
+
+📤 FILES TO UPLOAD (from ovh-deployment/ folder):
+
+✅ Root Files:
+   [ ] .htaccess
+   [ ] index.html
+   [ ] manifest.json
+   [ ] favicon.ico
+
+✅ Directories:
+   [ ] assets/ (entire folder)
+   [ ] api/ (entire folder - 74 PHP files)
+   [ ] gallery-images/ (if exists)
+   [ ] artist-images/ (if exists)
+   [ ] event-images/ (if exists)
+   [ ] elektr-ame-media/ (if exists)
+
+⚠️ DO NOT UPLOAD:
+   [ ] CREATE_CONFIG_PHP.txt (instructions only)
+   [ ] README_DEPLOYMENT.txt (instructions only)
+   [ ] UPLOAD_CHECKLIST.txt (this file)
+
+═══════════════════════════════════════════════════════════════
+
+🔧 AFTER UPLOADING:
+
+1. Create config.php manually:
+   - Location: /home/elektry/www/api/config.php
+   - See CREATE_CONFIG_PHP.txt for content
+   - Set permissions: chmod 600
+
+2. Set file permissions:
+   chmod 755 /home/elektry/www/api
+   chmod 644 /home/elektry/www/api/*.php
+   chmod 644 /home/elektry/www/.htaccess
+
+═══════════════════════════════════════════════════════════════
+
+✅ TEST AFTER UPLOAD:
+
+1. https://www.elektr-ame.com/api/test-api-access.php
+   → Should return JSON
+
+2. https://www.elektr-ame.com/api/events-list.php
+   → Should return JSON
+
+3. https://www.elektr-ame.com/admin
+   → Should load admin portal
+
+═══════════════════════════════════════════════════════════════
+
