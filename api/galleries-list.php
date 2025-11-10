@@ -27,6 +27,26 @@ try {
     $stmt->execute();
     $galleries = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
+    // Use first image as fallback if no cover image
+    foreach ($galleries as &$gallery) {
+        if (empty($gallery['cover_image_path']) && $gallery['image_count'] > 0) {
+            // Get the first image from this gallery
+            $firstImageStmt = $pdo->prepare("
+                SELECT filepath 
+                FROM gallery_images 
+                WHERE gallery_id = ? 
+                ORDER BY uploaded_at ASC 
+                LIMIT 1
+            ");
+            $firstImageStmt->execute([$gallery['id']]);
+            $firstImage = $firstImageStmt->fetch(PDO::FETCH_ASSOC);
+            if ($firstImage) {
+                $gallery['cover_image_path'] = $firstImage['filepath'];
+            }
+        }
+    }
+    unset($gallery);
+    
     echo json_encode([
         'success' => true,
         'galleries' => $galleries

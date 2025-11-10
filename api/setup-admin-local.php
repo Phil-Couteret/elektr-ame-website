@@ -34,7 +34,7 @@ try {
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(255) NOT NULL UNIQUE,
                 password_hash VARCHAR(255) NOT NULL,
-                name VARCHAR(255) NOT NULL,
+                full_name VARCHAR(255) NOT NULL,
                 role ENUM('superadmin', 'admin') DEFAULT 'admin',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_login TIMESTAMP NULL,
@@ -52,6 +52,7 @@ try {
     
     // Create/update admin user
     $email = 'admin@elektr-ame.com';
+    $username = 'admin';
     $password = 'admin123'; // Default local dev password
     $hash = password_hash($password, PASSWORD_DEFAULT);
     
@@ -67,8 +68,8 @@ try {
         echo "<p class='success'>✅ Admin user password updated</p>";
     } else {
         // Create user
-        $stmt = $pdo->prepare("INSERT INTO admin_users (email, password_hash, name, role, is_active) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$email, $hash, 'Local Admin', 'superadmin', 1]);
+        $stmt = $pdo->prepare("INSERT INTO admin_users (username, email, password_hash, full_name, role, is_active) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$username, $email, $hash, 'Local Admin', 'superadmin', 1]);
         echo "<p class='success'>✅ Admin user created</p>";
     }
     

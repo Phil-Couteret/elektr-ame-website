@@ -14,7 +14,7 @@ const GalleryCard = ({ item }: { item: GalleryItem }) => {
       <div className="aspect-square relative overflow-hidden">
         {!imageError ? (
           <img 
-            src={item.picture} 
+            src={item.picture || item.image} 
             alt={item.title}
             className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
               imageLoading ? 'opacity-0' : 'opacity-100'
