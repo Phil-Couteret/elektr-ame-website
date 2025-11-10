@@ -1,0 +1,101 @@
+═══════════════════════════════════════════════════════════════
+🔍 FINDING THE CORRECT DOCUMENT ROOT
+═══════════════════════════════════════════════════════════════
+
+Since test.html returns "Not Found", the files are likely in the
+wrong location. Follow these steps to find the correct path:
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Upload Diagnostic File
+-------------------------------
+1. Upload DIAGNOSE_FILE_LOCATION.php to these locations (one at a time):
+
+   Location A: /home/elektry/www/DIAGNOSE_FILE_LOCATION.php
+   → Visit: https://www.elektr-ame.com/DIAGNOSE_FILE_LOCATION.php
+
+   Location B: /home/elektry/DIAGNOSE_FILE_LOCATION.php
+   → Visit: https://www.elektr-ame.com/DIAGNOSE_FILE_LOCATION.php
+
+   Location C: /home/elektry/public_html/DIAGNOSE_FILE_LOCATION.php
+   → Visit: https://www.elektr-ame.com/DIAGNOSE_FILE_LOCATION.php
+
+2. Try each location until one works
+3. The working location shows you the correct document root
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: Check OVH Control Panel
+--------------------------------
+1. Log into OVH Control Panel
+2. Go to "Web" or "Hosting" section
+3. Find "Document Root" or "Root Directory" setting
+4. Note the exact path shown
+
+Common paths:
+- /home/elektry/www
+- /home/elektry/public_html
+- /home/elektry/www/public
+- /home/elektry
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: Check FTP Root Directory
+---------------------------------
+When you connect via FTP:
+1. What is the default directory you see?
+2. Is it /home/elektry/ or /home/elektry/www/?
+3. Can you see any existing files (like index.html)?
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: Try Different Paths
+-----------------------------
+Upload test.html to each of these locations and test:
+
+1. /home/elektry/www/test.html
+   → https://www.elektr-ame.com/test.html
+
+2. /home/elektry/public_html/test.html
+   → https://www.elektr-ame.com/test.html
+
+3. /home/elektry/www/public/test.html
+   → https://www.elektr-ame.com/test.html
+
+4. /home/elektry/test.html
+   → https://www.elektr-ame.com/test.html
+
+═══════════════════════════════════════════════════════════════
+
+STEP 5: Check Existing Files
+------------------------------
+Via FTP, check if there are ANY existing files:
+- Look for index.html, .htaccess, or any PHP files
+- Note where they are located
+- That location is likely your document root
+
+═══════════════════════════════════════════════════════════════
+
+COMMON ISSUES:
+--------------
+
+Issue 1: Files in /home/elektry/ instead of /home/elektry/www/
+Fix: Move all files to /home/elektry/www/
+
+Issue 2: Document root is /home/elektry/public_html/
+Fix: Upload files to /home/elektry/public_html/
+
+Issue 3: Domain not pointing to correct directory
+Fix: Check OVH control panel domain settings
+
+═══════════════════════════════════════════════════════════════
+
+NEXT STEPS:
+-----------
+1. Upload DIAGNOSE_FILE_LOCATION.php to /home/elektry/www/
+2. Visit: https://www.elektr-ame.com/DIAGNOSE_FILE_LOCATION.php
+3. Share the output - it will show the correct document root
+4. Upload all files to that location
+
+═══════════════════════════════════════════════════════════════
+
