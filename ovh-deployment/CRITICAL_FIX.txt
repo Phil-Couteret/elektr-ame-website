@@ -1,0 +1,119 @@
+═══════════════════════════════════════════════════════════════
+🚨 CRITICAL: FINDING WHERE FILES NEED TO BE
+═══════════════════════════════════════════════════════════════
+
+Since both test.html and DIAGNOSE_FILE_LOCATION.php return "Not Found",
+the files are definitely in the WRONG location.
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Check What's Actually on the Server
+--------------------------------------------
+Via FTP, when you connect to:
+- Host: ftp.cluster129.hosting.ovh.net
+- Username: elektry
+- Password: 92Alcolea2025
+
+1. What directory do you see FIRST when you connect?
+   - Is it /home/elektry/ ?
+   - Is it /home/elektry/www/ ?
+   - Is it something else?
+
+2. What files/folders do you see in that directory?
+   - List ALL files and folders you can see
+   - Are there any existing files (old index.html, etc.)?
+
+3. Where did you upload the files TO?
+   - What exact path did you upload to?
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: Check OVH Control Panel
+--------------------------------
+1. Log into OVH Control Panel
+2. Go to "Web" → "Hosting" or "Multisite"
+3. Find your domain: www.elektr-ame.com
+4. Look for:
+   - "Document Root" or "Root Directory"
+   - "Physical Path" or "Directory"
+   - Note the EXACT path shown
+
+Common paths on OVH:
+- /home/elektry/www
+- /home/elektry/public_html
+- /home/elektry/www/public
+- /home/elektry/www/www
+- /home/elektry/htdocs
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: Try Uploading to FTP Root
+-----------------------------------
+When you connect via FTP, try uploading a simple file to the
+FIRST directory you see:
+
+1. Create a file: info.php
+   Content:
+   <?php phpinfo(); ?>
+
+2. Upload it to the ROOT of your FTP connection
+   (wherever you land when you first connect)
+
+3. Try accessing it:
+   - https://www.elektr-ame.com/info.php
+   - https://elektr-ame.com/info.php
+   - https://www.elektr-ame.com/www/info.php
+   - https://www.elektr-ame.com/public_html/info.php
+
+4. If ANY of these work, that's your document root!
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: Check Domain Configuration
+-----------------------------------
+In OVH Control Panel:
+1. Go to "Domain" → "DNS Zone"
+2. Check the A record for www.elektr-ame.com
+3. Verify it points to the correct IP
+4. Check if there's a "Multisite" configuration
+5. See if the domain has a specific "Root" directory set
+
+═══════════════════════════════════════════════════════════════
+
+STEP 5: Contact OVH Support (if needed)
+-----------------------------------------
+If you can't find the document root:
+1. Contact OVH Support
+2. Ask: "What is the document root for www.elektr-ame.com?"
+3. Ask: "Where should I upload files for www.elektr-ame.com?"
+
+═══════════════════════════════════════════════════════════════
+
+MOST LIKELY SCENARIOS:
+----------------------
+
+Scenario 1: Files in /home/elektry/ but need to be in /home/elektry/www/
+Fix: Move all files from /home/elektry/ to /home/elektry/www/
+
+Scenario 2: Document root is /home/elektry/public_html/
+Fix: Upload files to /home/elektry/public_html/
+
+Scenario 3: Domain has a subdirectory configured
+Fix: Check OVH Multisite settings - domain might need files in a subdirectory
+
+Scenario 4: Files uploaded but domain not configured
+Fix: Check OVH domain/hosting configuration
+
+═══════════════════════════════════════════════════════════════
+
+IMMEDIATE ACTION:
+-----------------
+1. Check OVH Control Panel for "Document Root" path
+2. Upload info.php (see Step 3) to test
+3. Share:
+   - What directory you see when connecting via FTP
+   - What the OVH Control Panel shows as document root
+   - Whether info.php works and from which URL
+
+═══════════════════════════════════════════════════════════════
+
