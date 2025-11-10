@@ -1,0 +1,81 @@
+═══════════════════════════════════════════════════════════════
+🔧 OVH MULTISITE CONFIGURATION
+═══════════════════════════════════════════════════════════════
+
+Your DNS shows: www.elektr-ame.com → www
+
+This means the domain is configured, but we need to check the
+Multisite settings to find the document root.
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Check OVH Multisite
+----------------------------
+1. Log into OVH Control Panel
+2. Go to "Web" → "Multisite"
+3. Look for: www.elektr-ame.com
+4. Check the "Root folder" column
+
+Common root folders on OVH:
+- /www
+- /
+- /public_html
+- /www/www
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: If Domain Not in Multisite
+------------------------------------
+If www.elektr-ame.com is NOT listed:
+
+1. Click "Add a domain or subdomain"
+2. Domain: www.elektr-ame.com
+3. Root folder: /www (or whatever OVH suggests)
+4. Save
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: Upload Files to Root Folder
+------------------------------------
+Once you know the root folder (e.g., /www):
+
+1. Connect via FTP
+2. Navigate to: /home/elektry/
+3. Go into the root folder directory (e.g., www/)
+4. Upload ALL files from ovh-deployment/ to that directory
+
+Example:
+- If root folder is "/www"
+- Upload to: /home/elektry/www/
+- Files should be directly in /home/elektry/www/ (not in a subdirectory)
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: Verify Upload
+---------------------
+After uploading to the root folder:
+
+1. Upload test.html to the root folder
+2. Visit: https://www.elektr-ame.com/test.html
+3. If it works → Correct location!
+4. If not → Try different root folder
+
+═══════════════════════════════════════════════════════════════
+
+COMMON OVH ROOT FOLDERS:
+-------------------------
+- /www → Files go in /home/elektry/www/
+- / → Files go in /home/elektry/
+- /public_html → Files go in /home/elektry/public_html/
+- /www/www → Files go in /home/elektry/www/www/
+
+═══════════════════════════════════════════════════════════════
+
+WHAT TO DO NOW:
+---------------
+1. Check OVH Multisite for the "Root folder" setting
+2. Upload files to that directory
+3. Test with test.html
+
+═══════════════════════════════════════════════════════════════
+
