@@ -1,0 +1,163 @@
+═══════════════════════════════════════════════════════════════
+🚨 CRITICAL: VERIFY FILE UPLOAD
+═══════════════════════════════════════════════════════════════
+
+If ALL URLs return "Not Found", the files are either:
+1. Not being uploaded at all
+2. Being uploaded to the wrong location
+3. Domain not pointing to the server
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Verify Files Are Actually Uploaded
+--------------------------------------------
+Via FTP, after uploading info.php:
+
+1. Navigate to where you uploaded the file
+2. Can you SEE info.php in the file list?
+   - If NO → Upload didn't work, check FTP connection
+   - If YES → File is in wrong location
+
+3. What is the FULL PATH where you see info.php?
+   - Example: /home/elektry/www/info.php
+   - Example: /home/elektry/info.php
+   - Write down the EXACT path
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: Check OVH Control Panel - Domain Configuration
+-------------------------------------------------------
+1. Log into OVH Control Panel
+2. Go to "Web" → "Multisite" or "Domain"
+3. Find: www.elektr-ame.com
+4. Check:
+   - Is the domain ACTIVE?
+   - What is the "Root folder" or "Document root"?
+   - Is it pointing to the correct directory?
+
+5. If domain is NOT configured:
+   - You need to ADD the domain in Multisite
+   - Set the root folder to where your files are
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: Check FTP Connection Details
+--------------------------------------
+Verify you're connecting to the RIGHT server:
+
+FTP Details:
+- Host: ftp.cluster129.hosting.ovh.net
+- Username: elektry
+- Password: 92Alcolea2025
+- Port: 21 (FTP) or 22 (SFTP)
+
+When you connect:
+1. What directory do you see FIRST?
+   - Write down the EXACT path
+   
+2. Can you see ANY files?
+   - List what you see
+   - Are there old files from a previous website?
+
+3. Try creating a test file via FTP:
+   - Create: test-upload.txt
+   - Content: "This is a test"
+   - Upload it
+   - Can you see it in the file list?
+   - Can you download it back?
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: Check Domain DNS
+--------------------------
+1. Go to OVH Control Panel → "Domain" → "DNS Zone"
+2. Check the A record for www.elektr-ame.com
+3. Does it point to the correct IP?
+4. Is the domain actually pointing to this server?
+
+You can check DNS with:
+- https://www.whatsmydns.net/#A/www.elektr-ame.com
+- Or use: nslookup www.elektr-ame.com
+
+═══════════════════════════════════════════════════════════════
+
+STEP 5: Try OVH File Manager (Alternative to FTP)
+--------------------------------------------------
+1. Log into OVH Control Panel
+2. Go to "Web" → "File Manager" or "FTP - SSH"
+3. Use the web-based file manager
+4. Navigate to the document root
+5. Upload info.php via the web interface
+6. Test if it works
+
+This will help verify:
+- The correct directory path
+- That files can actually be uploaded
+- That the web server can access them
+
+═══════════════════════════════════════════════════════════════
+
+STEP 6: Check for Existing Website
+-----------------------------------
+1. Visit: https://www.elektr-ame.com
+2. What do you see?
+   - Blank page?
+   - "Not Found"?
+   - Old website?
+   - Default OVH page?
+
+3. If you see an OLD website:
+   - That means files ARE being served
+   - Find where those old files are
+   - Upload your files to the SAME location
+
+4. If you see a default OVH page:
+   - Domain is configured but no files
+   - Check OVH Multisite for the root directory
+
+═══════════════════════════════════════════════════════════════
+
+STEP 7: Contact OVH Support
+-----------------------------
+If nothing works, contact OVH Support and ask:
+
+1. "What is the document root for www.elektr-ame.com?"
+2. "Where should I upload files for www.elektr-ame.com?"
+3. "Is the domain www.elektr-ame.com configured in Multisite?"
+4. "What is the FTP path for www.elektr-ame.com?"
+
+═══════════════════════════════════════════════════════════════
+
+MOST LIKELY ISSUES:
+-------------------
+
+Issue 1: Domain Not Configured in Multisite
+- Domain exists but not added to hosting
+- Fix: Add domain in OVH Multisite with correct root folder
+
+Issue 2: Files Uploaded to Wrong Directory
+- Files in /home/elektry/ but domain points to /home/elektry/www/
+- Fix: Move files to correct directory OR change domain root
+
+Issue 3: FTP Connection to Wrong Server
+- Connected to wrong hosting account
+- Fix: Verify FTP credentials and server
+
+Issue 4: Domain DNS Not Pointing to Server
+- Domain points elsewhere
+- Fix: Check DNS A record
+
+═══════════════════════════════════════════════════════════════
+
+WHAT TO SHARE:
+--------------
+To help diagnose, please share:
+
+1. What directory do you see when connecting via FTP?
+2. Can you see info.php after uploading it?
+3. What does OVH Control Panel show for the domain root?
+4. What do you see when visiting https://www.elektr-ame.com?
+5. Is the domain configured in OVH Multisite?
+
+═══════════════════════════════════════════════════════════════
+

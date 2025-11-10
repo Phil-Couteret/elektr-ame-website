@@ -1,0 +1,4 @@
+This is a test file to verify FTP upload is working.
+If you can see this file on the server, uploads are working.
+The issue is just finding the correct directory.
+
