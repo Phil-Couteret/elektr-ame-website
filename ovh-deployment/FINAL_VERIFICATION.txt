@@ -1,0 +1,129 @@
+═══════════════════════════════════════════════════════════════
+✅ FINAL VERIFICATION - Files in /home/elektry/www
+═══════════════════════════════════════════════════════════════
+
+Document Root Confirmed: /home/elektry/www
+
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Verify Files Are Uploaded
+-----------------------------------
+Check via FTP that these exist in /home/elektry/www/:
+
+✅ Root Files:
+   [ ] index.html
+   [ ] .htaccess
+   [ ] manifest.json
+   [ ] favicon.ico
+
+✅ Directories:
+   [ ] assets/ (folder with JS/CSS files)
+   [ ] api/ (folder with PHP files)
+
+✅ API Files:
+   [ ] api/config-helper.php
+   [ ] api/events-list.php
+   [ ] api/artists-list.php
+   [ ] api/galleries-list.php
+   [ ] api/test-api-access.php
+
+⚠️ DO NOT have:
+   [ ] api/config.php (create manually - see below)
+
+═══════════════════════════════════════════════════════════════
+
+STEP 2: Create config.php
+---------------------------
+Location: /home/elektry/www/api/config.php
+
+Content:
+--------
+<?php
+$host = "elektry2025.mysql.db";
+$dbname = "elektry2025";
+$username = "elektry";
+$password = "92Alcolea2025";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
+    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
+}
+?>
+
+Set permissions:
+chmod 600 /home/elektry/www/api/config.php
+
+═══════════════════════════════════════════════════════════════
+
+STEP 3: Test the Site
+----------------------
+1. Main Site:
+   https://www.elektr-ame.com
+   → Should show the React app
+
+2. API Test:
+   https://www.elektr-ame.com/api/test-api-access.php
+   → Should return JSON
+
+3. Events API:
+   https://www.elektr-ame.com/api/events-list.php
+   → Should return JSON with events
+
+4. Artists API:
+   https://www.elektr-ame.com/api/artists-list.php
+   → Should return JSON with artists
+
+5. Admin Portal:
+   https://www.elektr-ame.com/admin
+   → Should load admin login page
+
+═══════════════════════════════════════════════════════════════
+
+STEP 4: Set File Permissions (if needed)
+-----------------------------------------
+If files don't work, set permissions:
+
+chmod 644 /home/elektry/www/index.html
+chmod 644 /home/elektry/www/.htaccess
+chmod 755 /home/elektry/www/api
+chmod 644 /home/elektry/www/api/*.php
+chmod 600 /home/elektry/www/api/config.php
+chmod 755 /home/elektry/www/assets
+
+═══════════════════════════════════════════════════════════════
+
+STEP 5: Troubleshooting
+-------------------------
+If site still doesn't work:
+
+1. Check .htaccess:
+   - Verify it exists at /home/elektry/www/.htaccess
+   - Should contain API passthrough rule
+
+2. Check OVH Multisite:
+   - Verify www.elektr-ame.com root folder is set to /www
+   - Domain should be active
+
+3. Test with simple file:
+   - Upload test.html to /home/elektry/www/
+   - Visit: https://www.elektr-ame.com/test.html
+   - If this works but index.html doesn't → .htaccess issue
+
+═══════════════════════════════════════════════════════════════
+
+✅ CHECKLIST:
+-------------
+[ ] All files uploaded to /home/elektry/www/
+[ ] config.php created in /home/elektry/www/api/
+[ ] File permissions set correctly
+[ ] Main site loads: https://www.elektr-ame.com
+[ ] API endpoints work: /api/test-api-access.php
+[ ] Admin portal loads: /admin
+
+═══════════════════════════════════════════════════════════════
+
