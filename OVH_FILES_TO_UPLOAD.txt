@@ -1,0 +1,113 @@
+# Files to Upload to OVH Server (/home/elektry/www/)
+
+## ROOT FILES
+.htaccess
+index.html
+manifest.json
+service-worker.js (if exists)
+
+## DIRECTORIES
+assets/          (entire directory - React build output)
+public/          (if exists - public assets)
+
+## API FILES (upload to /home/elektry/www/api/)
+api/admin-set-member-password.php
+api/admin-users-create.php
+api/admin-users-list.php
+api/admin-users-update.php
+api/artists-create.php
+api/artists-delete.php
+api/artists-list.php
+api/artists-update.php
+api/auth-check.php
+api/auth-login.php
+api/auth-logout.php
+api/company-creation.php
+api/config-helper.php
+api/config-ovh-template.php
+api/config-ovh-verification.php
+api/config-template.php
+api/consultancy-inquiry.php
+api/cron-email-automation.php
+api/delete-artist-image.php
+api/delete-gallery-image.php
+api/email-automation-stats.php
+api/email-automation-trigger.php
+api/email-resend-verification.php
+api/email-templates-list.php
+api/email-test-send.php
+api/email-verify.php
+api/events-create.php
+api/events-delete.php
+api/events-list.php
+api/events-update.php
+api/fix-admin-setup.php
+api/galleries-create.php
+api/galleries-delete.php
+api/galleries-list.php
+api/galleries-update.php
+api/generate-password-hash.php
+api/get-artist-images.php
+api/get-gallery-images.php
+api/join-us-debug.php
+api/join-us.php
+api/member-change-password.php
+api/member-login.php
+api/member-logout.php
+api/member-profile-update.php
+api/member-profile.php
+api/members-create.php
+api/members-delete.php
+api/members-export.php
+api/members-list.php
+api/members-update-membership.php
+api/members-update-status.php
+api/migrate-localstorage-data.php
+api/newsletter-campaigns-list.php
+api/newsletter-export.php
+api/newsletter-list.php
+api/newsletter-send.php
+api/newsletter-subscribe.php
+api/newsletter-unsubscribe.php
+api/password-reset-confirm.php
+api/password-reset-request.php
+api/setup-admin-local.php
+api/test-all-endpoints.php
+api/test-auth.php
+api/test-config.php
+api/test-db-connection.php
+api/test-join-us.php
+api/test-manual-trigger.php
+api/test-members-api.php
+api/test-pwa.php
+api/test-set-password.php
+api/test-simple.php
+api/upload-artist-images.php
+api/upload-event-image.php
+api/upload-gallery-images.php
+
+## API SUBDIRECTORIES (if they exist)
+api/classes/EmailAutomation.php
+api/classes/TaxCalculator.php
+
+## ⚠️ IMPORTANT: CREATE MANUALLY ON OVH
+api/config.php  (DO NOT upload from local - create manually with production credentials)
+
+## CONFIG.PHP CONTENT (create this file manually on OVH):
+<?php
+$host = "elektry2025.mysql.db";
+$dbname = "elektry2025";
+$username = "elektry";
+$password = "92Alcolea2025";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+} catch (PDOException $e) {
+    error_log("Database connection failed: " . $e->getMessage());
+    die(json_encode(['success' => false, 'message' => 'Database connection failed']));
+}
+?>
+
