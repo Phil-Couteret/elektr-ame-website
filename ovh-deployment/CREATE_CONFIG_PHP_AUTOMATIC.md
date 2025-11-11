@@ -47,7 +47,7 @@ But this requires updating all API files.
 <?php
 $host = "elektry2025.mysql.db";
 $dbname = "elektry2025";
-$username = "elektry";
+$username = "elektry2025";
 $password = "92Alcolea2025";
 
 try {
