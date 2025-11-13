@@ -71,10 +71,17 @@ try {
         $artist['picture'] = $profilePictures[$artist['id']] ?? ($artist['picture'] ?? '');
         $artist['nickname'] = $artist['nickname'] ?? '';
         $artist['bioKey'] = $artist['bio_key'] ?? '';
-        $artist['bioTranslations'] = []; // Not stored in DB yet
+        
+        // Parse bio translations from JSON
+        $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
+        if (!is_array($bioTranslations)) {
+            $bioTranslations = ['en' => '', 'es' => '', 'ca' => ''];
+        }
+        $artist['bioTranslations'] = $bioTranslations;
+        
         $artist['createdAt'] = $artist['created_at'];
         $artist['updatedAt'] = $artist['updated_at'];
-        unset($artist['created_at'], $artist['updated_at'], $artist['social_media']);
+        unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_translations']);
     }
 
     echo json_encode([

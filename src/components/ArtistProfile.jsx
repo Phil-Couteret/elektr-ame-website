@@ -107,7 +107,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Profile Picture</h3>
           <div className="relative inline-block">
             <img
-              src={`/${profilePicture.filepath}`}
+              src={profilePicture.filepath.startsWith('/') ? profilePicture.filepath : `/${profilePicture.filepath}`}
               alt={profilePicture.alt_text}
               className="w-32 h-32 rounded-full object-cover border-4 border-blue-200"
             />
@@ -188,7 +188,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   {isVideo ? (
                     <video
-                      src={`/${image.filepath}`}
+                      src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                       controls={false}
                       muted
@@ -198,7 +198,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                     </video>
                   ) : (
                     <img
-                      src={`/${image.filepath}`}
+                      src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
                       alt={image.alt_text}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />

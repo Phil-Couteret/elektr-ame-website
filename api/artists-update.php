@@ -61,7 +61,14 @@ try {
         $updateFields[] = "bio_key = ?";
         $params[] = $input['bioKey'] ?? $input['bio_key'] ?? '';
     }
-    if (isset($input['picture'])) {
+    if (isset($input['bioTranslations'])) {
+        $bioTranslationsJson = json_encode($input['bioTranslations']);
+        $updateFields[] = "bio_translations = ?";
+        $params[] = $bioTranslationsJson;
+    }
+    // Only update picture if a non-empty value is provided
+    // Profile pictures are managed via artist_images table
+    if (isset($input['picture']) && !empty(trim($input['picture']))) {
         $updateFields[] = "picture = ?";
         $params[] = $input['picture'];
     }
@@ -106,10 +113,17 @@ try {
     
     $artist['socialLinks'] = $socialMedia;
     $artist['bioKey'] = $artist['bio_key'] ?? '';
-    $artist['bioTranslations'] = []; // Not stored in DB yet
+    
+    // Parse bio translations from JSON
+    $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
+    if (!is_array($bioTranslations)) {
+        $bioTranslations = ['en' => '', 'es' => '', 'ca' => ''];
+    }
+    $artist['bioTranslations'] = $bioTranslations;
+    
     $artist['createdAt'] = $artist['created_at'];
     $artist['updatedAt'] = $artist['updated_at'];
-    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key']);
+    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations']);
 
     echo json_encode([
         'success' => true,

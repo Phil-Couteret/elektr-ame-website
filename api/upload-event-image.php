@@ -61,8 +61,8 @@ try {
         throw new Exception('Failed to save image file');
     }
 
-    // Relative path for database (from public directory)
-    $relativePath = 'event-images/' . $uniqueFilename;
+    // Relative path for database (include public/ for HTTP access)
+    $relativePath = 'public/event-images/' . $uniqueFilename;
 
     // Update event with picture path
     $stmt = $pdo->prepare("UPDATE events SET picture = ? WHERE id = ?");

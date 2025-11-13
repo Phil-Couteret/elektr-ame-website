@@ -1,17 +1,27 @@
 <?php
+// Prevent any output before headers
+ob_start();
+
 header('Content-Type: application/json');
+// Prevent caching of API responses
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // Use config helper for environment-aware CORS
 require_once __DIR__ . '/config-helper.php';
 setCorsHeaders();
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    ob_end_clean();
     http_response_code(200);
     exit();
 }
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_end_clean();
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);
     exit();
@@ -19,6 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Include database configuration
 require_once __DIR__ . '/config.php';
+
+// Clear any output buffer before processing
+ob_end_clean();
 
 // Create upload directory if it doesn't exist
 // Use environment-aware path (works for both local and OVH)
@@ -95,21 +108,35 @@ try {
             continue;
         }
 
-        // Validate file type
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (!in_array($file['type'], $allowedTypes)) {
-            $errors[] = "Invalid file type for {$filename}";
+        // Determine media type and validate
+        // Check both MIME type and file extension (browsers sometimes send wrong MIME types)
+        $isVideo = false;
+        $allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        $allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+        $allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowedVideoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'qt'];
+        
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        $mimeType = $file['type'];
+        
+        // Check MIME type first, then fallback to extension
+        if (in_array($mimeType, $allowedVideoTypes) || in_array($extension, $allowedVideoExtensions)) {
+            $isVideo = true;
+            $maxSize = 100 * 1024 * 1024; // 100MB for videos
+        } else if (in_array($mimeType, $allowedImageTypes) || in_array($extension, $allowedImageExtensions)) {
+            $maxSize = 10 * 1024 * 1024; // 10MB for images
+        } else {
+            $errors[] = "Invalid file type for {$filename} (type: {$mimeType}, ext: {$extension})";
             continue;
         }
 
-        // Validate file size (max 5MB)
-        if ($file['size'] > 5 * 1024 * 1024) {
-            $errors[] = "File too large for {$filename}";
+        // Validate file size
+        if ($file['size'] > $maxSize) {
+            $errors[] = "File too large for {$filename} (max: " . round($maxSize / 1024 / 1024) . "MB)";
             continue;
         }
 
-        // Generate unique filename
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        // Generate unique filename (extension already extracted above)
         $uniqueFilename = uniqid() . '_' . time() . '.' . $extension;
         $filePath = $uploadDir . $uniqueFilename;
 
@@ -119,16 +146,38 @@ try {
             continue;
         }
 
-        // Create thumbnail
-        $thumbnailPath = $thumbnailDir . 'thumb_' . $uniqueFilename;
-        if (!createThumbnail($filePath, $thumbnailPath, 300, 300)) {
-            $errors[] = "Failed to create thumbnail for {$filename}";
-        }
+        $width = 0;
+        $height = 0;
+        $videoDuration = null;
+        $thumbnailPath = null;
+        $relativeThumbnailPath = null;
 
-        // Get image metadata
-        $imageInfo = getimagesize($filePath);
-        $width = $imageInfo[0] ?? 0;
-        $height = $imageInfo[1] ?? 0;
+        if ($isVideo) {
+            // For videos, try to extract thumbnail and duration
+            $thumbnailPath = $thumbnailDir . 'thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
+            $videoInfo = getVideoInfo($filePath, $thumbnailPath);
+            if ($videoInfo) {
+                $width = $videoInfo['width'] ?? 0;
+                $height = $videoInfo['height'] ?? 0;
+                $videoDuration = $videoInfo['duration'] ?? null;
+                if (file_exists($thumbnailPath)) {
+                    $relativeThumbnailPath = 'public/gallery-images/thumbnails/thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
+                }
+            }
+        } else {
+            // For images, create thumbnail
+            $thumbnailPath = $thumbnailDir . 'thumb_' . $uniqueFilename;
+            if (createThumbnail($filePath, $thumbnailPath, 300, 300)) {
+                $relativeThumbnailPath = 'public/gallery-images/thumbnails/thumb_' . $uniqueFilename;
+            } else {
+                $errors[] = "Failed to create thumbnail for {$filename}";
+            }
+
+            // Get image metadata
+            $imageInfo = getimagesize($filePath);
+            $width = $imageInfo[0] ?? 0;
+            $height = $imageInfo[1] ?? 0;
+        }
 
         // Get form data (categories and descriptions arrays)
         $category = $_POST['categories'][$index] ?? 'other';
@@ -138,13 +187,23 @@ try {
         // Insert into database
         $stmt = $pdo->prepare("
             INSERT INTO gallery_images 
-            (gallery_id, filename, filepath, thumbnail_filepath, alt_text, description, category, width, height, file_size, uploaded_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+            (gallery_id, filename, filepath, thumbnail_filepath, alt_text, description, category, media_type, width, height, file_size, video_duration, uploaded_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
         ");
 
-        $altText = $description ?: "Gallery image - {$category}";
-        $relativeFilePath = 'gallery-images/' . $uniqueFilename;
-        $relativeThumbnailPath = 'gallery-images/thumbnails/thumb_' . $uniqueFilename;
+        $altText = $description ?: ($isVideo ? "Gallery video - {$category}" : "Gallery image - {$category}");
+        // Store path relative to public directory for HTTP access
+        $relativeFilePath = 'public/gallery-images/' . $uniqueFilename;
+        
+        // Use the thumbnail path that was set above (for videos or images)
+        // If no thumbnail was created, set to null for videos, or use default for images
+        if (empty($relativeThumbnailPath)) {
+            if ($isVideo) {
+                $relativeThumbnailPath = null; // Videos might not have thumbnails if ffmpeg isn't available
+            } else {
+                $relativeThumbnailPath = 'public/gallery-images/thumbnails/thumb_' . $uniqueFilename;
+            }
+        }
 
         $stmt->execute([
             $galleryId,
@@ -154,9 +213,11 @@ try {
             $altText,
             $description,
             $category,
+            $isVideo ? 'video' : 'image',
             $width,
             $height,
-            $file['size']
+            $file['size'],
+            $videoDuration
         ]);
 
         $uploadedCount++;
@@ -167,18 +228,31 @@ try {
         echo json_encode([
             'success' => true,
             'uploaded_count' => $uploadedCount,
-            'message' => "Successfully uploaded {$uploadedCount} images",
+            'message' => "Successfully uploaded {$uploadedCount} file(s)",
             'errors' => $errors
         ]);
     } else {
         echo json_encode([
             'success' => false,
-            'message' => 'No images were uploaded',
-            'errors' => $errors
+            'message' => 'No files were uploaded',
+            'errors' => $errors,
+            'debug' => [
+                'files_received' => count($files),
+                'file_types' => array_map(function($f) { return $f['type'] ?? 'unknown'; }, $files)
+            ]
         ]);
     }
 
+} catch (PDOException $e) {
+    error_log("Database error in upload-gallery-images: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error occurred',
+        'error' => $e->getMessage()
+    ]);
 } catch (Exception $e) {
+    error_log("Error in upload-gallery-images: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -263,5 +337,45 @@ function createThumbnail($sourcePath, $thumbnailPath, $maxWidth, $maxHeight) {
     imagedestroy($thumbnail);
 
     return $result;
+}
+
+/**
+ * Get video information and extract thumbnail
+ */
+function getVideoInfo($videoPath, $thumbnailPath) {
+    // Check if ffmpeg is available
+    $ffmpegPath = trim(shell_exec('which ffmpeg 2>/dev/null'));
+    
+    if (empty($ffmpegPath)) {
+        // ffmpeg not available, return basic info
+        return null;
+    }
+    
+    $info = [];
+    
+    // Get video dimensions and duration using ffprobe
+    $ffprobePath = trim(shell_exec('which ffprobe 2>/dev/null'));
+    if (!empty($ffprobePath)) {
+        // Get video dimensions
+        $widthCmd = "{$ffprobePath} -v error -select_streams v:0 -show_entries stream=width -of csv=p=0 \"{$videoPath}\"";
+        $heightCmd = "{$ffprobePath} -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 \"{$videoPath}\"";
+        $durationCmd = "{$ffprobePath} -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{$videoPath}\"";
+        
+        $width = trim(shell_exec($widthCmd));
+        $height = trim(shell_exec($heightCmd));
+        $duration = trim(shell_exec($durationCmd));
+        
+        $info['width'] = (int)$width;
+        $info['height'] = (int)$height;
+        $info['duration'] = $duration ? (int)round((float)$duration) : null;
+    }
+    
+    // Extract thumbnail from video (first frame at 1 second)
+    if (!empty($ffmpegPath) && !empty($thumbnailPath)) {
+        $thumbnailCmd = "{$ffmpegPath} -i \"{$videoPath}\" -ss 00:00:01 -vframes 1 -q:v 2 \"{$thumbnailPath}\" 2>&1";
+        shell_exec($thumbnailCmd);
+    }
+    
+    return $info;
 }
 ?>

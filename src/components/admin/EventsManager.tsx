@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image, CheckCircle, XCircle, Folder } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdminData } from "@/hooks/useAdminData";
 import { MusicEvent } from "@/types/admin";
+import EventGalleryManager from "@/components/admin/EventGalleryManager";
 
 const EventsManager = () => {
   const { events, addEvent, updateEvent, deleteEvent, validateEvent, isLoading, error } = useAdminData();
@@ -17,6 +18,7 @@ const EventsManager = () => {
   const [showForm, setShowForm] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showGalleries, setShowGalleries] = useState<{ [key: string]: boolean }>({});
 
   const [formData, setFormData] = useState({
     title: "",
@@ -475,6 +477,15 @@ const EventsManager = () => {
                     <Button
                       size="sm"
                       variant="outline"
+                      onClick={() => setShowGalleries(prev => ({ ...prev, [event.id]: !prev[event.id] }))}
+                      className="border-purple-400 text-purple-400 hover:bg-purple-400/20"
+                    >
+                      <Folder className="h-4 w-4 mr-1" />
+                      {showGalleries[event.id] ? 'Hide' : 'Gallery'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
                       onClick={() => handleDelete(event.id)}
                       className="border-red-400 text-red-400 hover:bg-red-400/20"
                     >
@@ -482,6 +493,16 @@ const EventsManager = () => {
                     </Button>
                   </div>
                 </div>
+                
+                {/* Event Galleries Section */}
+                {showGalleries[event.id] && (
+                  <div className="mt-4 pt-4 border-t border-white/10">
+                    <EventGalleryManager 
+                      eventId={parseInt(event.id)} 
+                      eventTitle={event.title}
+                    />
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))

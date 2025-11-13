@@ -15,14 +15,17 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    // Allow both images and videos
+    const mediaFiles = files.filter(file => 
+      file.type.startsWith('image/') || file.type.startsWith('video/')
+    );
     
-    if (selectedFiles.length + imageFiles.length > maxFiles) {
+    if (selectedFiles.length + mediaFiles.length > maxFiles) {
       alert(`Maximum ${maxFiles} files allowed`);
       return;
     }
     
-    setSelectedFiles(prev => [...prev, ...imageFiles]);
+    setSelectedFiles(prev => [...prev, ...mediaFiles]);
   };
 
   const handleDragOver = (event: React.DragEvent) => {
@@ -32,14 +35,17 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     const files = Array.from(event.dataTransfer.files);
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    // Allow both images and videos
+    const mediaFiles = files.filter(file => 
+      file.type.startsWith('image/') || file.type.startsWith('video/')
+    );
     
-    if (selectedFiles.length + imageFiles.length > maxFiles) {
+    if (selectedFiles.length + mediaFiles.length > maxFiles) {
       alert(`Maximum ${maxFiles} files allowed`);
       return;
     }
     
-    setSelectedFiles(prev => [...prev, ...imageFiles]);
+    setSelectedFiles(prev => [...prev, ...mediaFiles]);
   };
 
   const removeFile = (index: number) => {
@@ -48,7 +54,7 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
 
   const uploadImages = async () => {
     if (selectedFiles.length === 0) {
-      setUploadStatus({ type: 'error', message: 'Please select at least one image to upload' });
+      setUploadStatus({ type: 'error', message: 'Please select at least one file to upload' });
       return;
     }
 
@@ -80,7 +86,7 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
       if (result.success) {
         setUploadStatus({ 
           type: 'success', 
-          message: `${result.uploaded_count} image${result.uploaded_count !== 1 ? 's' : ''} uploaded successfully!` 
+          message: `${result.uploaded_count} file${result.uploaded_count !== 1 ? 's' : ''} uploaded successfully!` 
         });
         setSelectedFiles([]);
         if (onImagesUploaded) {
@@ -113,16 +119,16 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
       >
         <Upload className="mx-auto h-12 w-12 text-white/50 mb-4" />
         <p className="text-lg font-medium text-white mb-2">
-          Drop images here or click to select
+          Drop images and videos here or click to select
         </p>
         <p className="text-sm text-white/70">
-          Select multiple images (up to {maxFiles} files)
+          Select multiple images and videos (up to {maxFiles} files)
         </p>
         <input
           ref={fileInputRef}
           type="file"
           multiple
-          accept="image/*"
+          accept="image/*,video/*"
           onChange={handleFileSelect}
           className="hidden"
         />
@@ -133,7 +139,7 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-white">
-              Selected Images ({selectedFiles.length})
+              Selected Files ({selectedFiles.length})
             </h3>
             <button
               onClick={() => setSelectedFiles([])}
@@ -144,14 +150,27 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {selectedFiles.map((file, index) => (
+            {selectedFiles.map((file, index) => {
+              const isVideo = file.type.startsWith('video/');
+              return (
               <div key={index} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-800">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt={file.name}
-                    className="w-full h-full object-cover"
-                  />
+                  {isVideo ? (
+                    <>
+                      <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                        <span className="text-white/50 text-xs">VIDEO</span>
+                      </div>
+                      <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                        VIDEO
+                      </span>
+                    </>
+                  ) : (
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={file.name}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                 </div>
                 <button
                   onClick={(e) => {
@@ -166,7 +185,8 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
                   {file.name}
                 </p>
               </div>
-            ))}
+            );
+            })}
           </div>
 
           <div className="flex justify-end">
@@ -183,7 +203,7 @@ const SimpleGalleryUpload = ({ onImagesUploaded, maxFiles = 50, galleryId = null
               ) : (
                 <>
                   <Upload className="h-4 w-4" />
-                  <span>Upload {selectedFiles.length} Image{selectedFiles.length !== 1 ? 's' : ''}</span>
+                  <span>Upload {selectedFiles.length} File{selectedFiles.length !== 1 ? 's' : ''}</span>
                 </>
               )}
             </button>
