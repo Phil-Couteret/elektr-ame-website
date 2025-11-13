@@ -194,14 +194,14 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
         <div className="flex gap-4 justify-center">
           <button
             onClick={() => imageInputRef.current?.click()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center gap-2"
+            className="px-4 py-2 bg-electric-blue text-deep-purple font-semibold rounded hover:bg-electric-blue/80 flex items-center gap-2"
           >
             <ImageIcon className="h-4 w-4" />
             Select Images
           </button>
           <button
             onClick={() => videoInputRef.current?.click()}
-            className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 flex items-center gap-2"
+            className="px-4 py-2 bg-purple-600 text-white font-semibold rounded hover:bg-purple-700 flex items-center gap-2"
           >
             <Video className="h-4 w-4" />
             Select Videos
@@ -311,18 +311,22 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
           <div className="flex justify-end space-x-3">
             <button
               onClick={() => setSelectedFiles([])}
-              className="px-4 py-2 border border-gray-300 rounded text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border border-white/30 rounded text-white hover:bg-white/10 bg-black/40"
             >
               Clear All
             </button>
             <button
-              onClick={uploadImages}
-              disabled={uploading}
-              className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Upload button clicked, files:', selectedFiles.length);
+                uploadImages();
+              }}
+              disabled={uploading || selectedFiles.length === 0}
+              className="px-6 py-2 bg-electric-blue text-deep-purple font-semibold rounded hover:bg-electric-blue/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {uploading ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-deep-purple"></div>
                   <span>Uploading...</span>
                 </>
               ) : (
