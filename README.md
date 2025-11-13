@@ -1,134 +1,144 @@
-# 🎵 Elektr-Âme Website
+# Elektr-Âme Website
 
-A modern, multilingual website for Barcelona's vibrant electronic music community.
+Official website for **Elektr-Âme**, an electronic music community and association based in Barcelona.
 
-## 🌟 Features
-
-- **Multilingual Support** - English, Spanish, and Catalan
-- **Responsive Design** - Works on all devices
-- **Artist Showcase** - Featured artists with bios and social links
-- **Events Management** - Upcoming electronic music events
-- **Join Us Form** - Community registration with PHP backend
-- **Admin Panel** - Content management system
-- **Modern UI** - Built with React, TypeScript, and Tailwind CSS
-
-## 🚀 Tech Stack
-
-### Frontend
-- **React 18** with TypeScript
-- **Vite** for fast development and building
-- **Tailwind CSS** for styling
-- **Radix UI** for accessible components
-- **React Router** for navigation
-- **React Hook Form** with Zod validation
-
-### Backend
-- **PHP 8.4** for API endpoints
-- **MySQL** for data storage
-- **PDO** for database operations
-
-## 📦 Installation
-
-### Local Development
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/Phil-Couteret/elektr-ame-website.git
-   cd elektr-ame-website
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
-
-3. **Set up database configuration:**
-   ```bash
-   cp api/config-template.php api/config.php
-   # Edit api/config.php with your local MySQL credentials
-   ```
-
-4. **Start development servers:**
-   ```bash
-   ./start-local.sh
-   ```
-
-5. **Access the website:**
-   - Frontend: http://localhost:8080
-   - Admin Panel: http://localhost:8080/admin
-   - API: http://localhost:8000/api
-
-**For detailed local setup, see:** [`LOCAL_SETUP_GUIDE.md`](LOCAL_SETUP_GUIDE.md)
-
-## 🌐 Deployment
-
-### OVH Production Deployment
-
-The codebase is **environment-aware** and automatically adapts to local or production.
-
-**Quick Reference:** See [`DEPLOYMENT_QUICK_REFERENCE.md`](DEPLOYMENT_QUICK_REFERENCE.md)
-
-**Full Guide:** See [`OVH_DEPLOYMENT_GUIDE.md`](OVH_DEPLOYMENT_GUIDE.md)
-
-**Key Points:**
-- `api/config.php` must be manually uploaded to OVH (not in git)
-- Use `api/config-ovh-template.php` as a template
-- Environment is auto-detected - no manual switching needed
-- CORS and file paths adapt automatically
-
-## 📁 Project Structure
-
-```
-elektr-ame-website/
-├── src/
-│   ├── components/     # React components
-│   ├── pages/         # Page components
-│   ├── contexts/      # React contexts
-│   ├── hooks/         # Custom hooks
-│   ├── locales/       # Translation files
-│   └── types/         # TypeScript types
-├── api/               # PHP backend
-├── database/          # Database schema
-├── public/            # Static assets
-└── dist/              # Built files
-```
-
-## 🎨 Design Features
-
-- **Dark Theme** with electric blue accents
-- **Gradient Backgrounds** for visual appeal
-- **Smooth Animations** and transitions
-- **Mobile-First** responsive design
-- **Accessibility** compliant components
-
-## 🔧 Development
-
-### Available Scripts
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-### Adding New Languages
-1. Create new locale file in `src/locales/`
-2. Add language option to `LanguageContext.tsx`
-3. Update `LanguageSelector.tsx`
-
-## 📝 License
-
-This project is created for Elektr-Âme, a musical association based in Barcelona.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
-## 📞 Contact
-
-For questions about this project, contact the Elektr-Âme team.
+[![Tech Stack](https://img.shields.io/badge/React-TypeScript-blue)](https://reactjs.org/)
+[![Backend](https://img.shields.io/badge/PHP-8.4-purple)](https://www.php.net/)
+[![Build](https://img.shields.io/badge/Vite-5.x-yellow)](https://vitejs.dev/)
 
 ---
 
-**Built with ❤️ for the Barcelona electronic music community**
+## 🎵 About
+
+Elektr-Âme is a music association focused on developing electronic music projects, hosting events, and building a community of artists and enthusiasts in Barcelona.
+
+**Live Site:** [https://www.elektr-ame.com](https://www.elektr-ame.com)
+
+---
+
+## ✨ Features
+
+- **Multi-language Support** (English, Spanish, Catalan)
+- **Event Management** - Create and showcase upcoming events
+- **Artist Profiles** - Individual pages with galleries for each artist
+- **Gallery System** - Organized by events, artists, and general categories
+- **Member Portal** - Membership management and authentication
+- **Admin Dashboard** - Complete CMS for content management
+- **Newsletter System** - Subscriber management and campaigns
+- **Email Automation** - Automated member communications
+- **Progressive Web App** - Installable on mobile devices
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+ 
+- PHP 8.4+
+- MySQL 8.0+
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Phil-Couteret/elektr-ame-website.git
+cd elektr-ame-website
+
+# Install dependencies
+npm install
+
+# Configure database
+cp api/config-template.php api/config.php
+# Edit api/config.php with your database credentials
+
+# Start development server
+npm run dev
+```
+
+Visit `http://localhost:8080`
+
+---
+
+## 📚 Documentation
+
+- **[Project Structure](PROJECT_STRUCTURE.md)** - Detailed folder organization
+- **[Deployment Guide](deployment/FINAL_DEPLOYMENT_STEPS.md)** - Production deployment instructions
+- **[Database Migrations](database/)** - SQL scripts for schema setup
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React 18 with TypeScript
+- Vite for build tooling
+- Tailwind CSS for styling
+- shadcn/ui component library
+- React Router for navigation
+
+### Backend
+- PHP 8.4
+- MySQL 8.0
+- PDO for database access
+- RESTful API architecture
+
+### Deployment
+- OVH Shared Hosting
+- FTP deployment
+- PWA with service worker
+
+---
+
+## 📂 Project Structure
+
+```
+elektr-ame-website/
+├── src/              # React frontend source
+├── api/              # PHP backend endpoints
+├── database/         # SQL migration scripts
+├── deployment/       # Production-ready files
+├── public/           # Static assets & uploads
+└── dist/             # Build output (auto-generated)
+```
+
+See [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md) for detailed documentation.
+
+---
+
+## 🔨 Development Commands
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Check code quality
+```
+
+---
+
+## 🚢 Deployment
+
+Production files are in the `deployment/` folder. See [deployment/FINAL_DEPLOYMENT_STEPS.md](deployment/FINAL_DEPLOYMENT_STEPS.md) for complete deployment instructions.
+
+---
+
+## 👥 Contributing
+
+When contributing:
+1. Create a feature branch
+2. Make your changes
+3. Test locally
+4. Build and verify
+5. Create a pull request
+
+---
+
+## 📄 License
+
+© 2025 Elektr-Âme Association. All rights reserved.
+
+---
+
+## 💬 Contact
+
+For questions or collaboration opportunities, visit [www.elektr-ame.com](https://www.elektr-ame.com)
