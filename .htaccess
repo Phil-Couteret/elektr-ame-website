@@ -58,11 +58,24 @@ ExpiresByType image/jpeg "access plus 1 year"
 ExpiresByType image/png "access plus 1 year"
 ExpiresByType image/webp "access plus 1 year"
 
+# Videos
+ExpiresByType video/mp4 "access plus 1 month"
+ExpiresByType video/webm "access plus 1 month"
+ExpiresByType video/ogg "access plus 1 month"
+
 # CSS and JavaScript
 ExpiresByType text/css "access plus 1 month"
 ExpiresByType application/javascript "access plus 1 month"
 
 # HTML
 ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Ensure proper MIME types for video files
+<IfModule mod_mime.c>
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType video/ogg .ogg .ogv
+AddType video/quicktime .mov
 </IfModule>
 

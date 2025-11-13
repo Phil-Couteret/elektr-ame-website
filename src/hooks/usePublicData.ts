@@ -16,7 +16,7 @@ export const usePublicData = () => {
       try {
         // Fetch events, artists, and galleries from API
         const [eventsResponse, artistsResponse, galleriesResponse] = await Promise.all([
-          fetch('/api/events-list.php?status=published', {
+          fetch('/api/events-list.php?status=all', {
             credentials: 'include'
           }),
           fetch('/api/artists-list.php?status=active', {
@@ -42,23 +42,37 @@ export const usePublicData = () => {
         const galleriesData = await galleriesResponse.json();
 
         // Transform API data to match frontend format
-        const events: MusicEvent[] = (eventsData.events || []).map((event: any) => {
-          const dateTime = event.date && event.time 
-            ? new Date(event.date + 'T' + event.time + ':00').toISOString()
-            : new Date().toISOString();
-          
-          return {
-            id: event.id.toString(),
-            title: event.title,
-            description: event.description || '',
-            date: dateTime,
-            time: event.time || '20:00',
-            location: event.location || '',
-            picture: event.picture || '', // Picture path from API (already includes /)
-            createdAt: event.createdAt || new Date().toISOString(),
-            updatedAt: event.updatedAt || new Date().toISOString()
-          };
-        });
+        // Filter to only show upcoming events (not archived and date in future or today)
+        const now = new Date();
+        now.setHours(0, 0, 0, 0); // Start of today
+        
+        const events: MusicEvent[] = (eventsData.events || [])
+          .filter((event: any) => {
+            // Only show published events that are not archived
+            if (event.status === 'archived') return false;
+            
+            // Show events that are today or in the future
+            const eventDate = new Date(event.date);
+            eventDate.setHours(0, 0, 0, 0);
+            return eventDate >= now;
+          })
+          .map((event: any) => {
+            const dateTime = event.date && event.time 
+              ? new Date(event.date + 'T' + event.time + ':00').toISOString()
+              : new Date().toISOString();
+            
+            return {
+              id: event.id.toString(),
+              title: event.title,
+              description: event.description || '',
+              date: dateTime,
+              time: event.time || '20:00',
+              location: event.location || '',
+              picture: event.picture || '', // Picture path from API (already includes /)
+              createdAt: event.createdAt || new Date().toISOString(),
+              updatedAt: event.updatedAt || new Date().toISOString()
+            };
+          });
 
         const artists: Artist[] = (artistsData.artists || []).map((artist: any) => ({
           id: artist.id.toString(),

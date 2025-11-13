@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image, CheckCircle, XCircle, Folder } from "lucide-react";
+import { Plus, Edit2, Trash2, Calendar, MapPin, Clock, Image, CheckCircle, XCircle, Folder, Archive, ArchiveRestore } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAdminData } from "@/hooks/useAdminData";
 import { MusicEvent } from "@/types/admin";
@@ -19,6 +19,7 @@ const EventsManager = () => {
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGalleries, setShowGalleries] = useState<{ [key: string]: boolean }>({});
+  const [viewMode, setViewMode] = useState<'upcoming' | 'past' | 'all'>('upcoming');
 
   const [formData, setFormData] = useState({
     title: "",
@@ -146,6 +147,68 @@ const EventsManager = () => {
     }
   };
 
+  const handleArchive = async (event: MusicEvent) => {
+    if (!window.confirm(`Archive "${event.title}"? It will move to Past Events.`)) return;
+
+    try {
+      const response = await fetch('/api/archive-event.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ event_id: event.id })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        window.location.reload(); // Refresh to show updated list
+      } else {
+        alert('Failed to archive event: ' + result.message);
+      }
+    } catch (error) {
+      alert('Error archiving event');
+    }
+  };
+
+  const handleUnarchive = async (event: MusicEvent) => {
+    if (!window.confirm(`Restore "${event.title}" to Upcoming Events?`)) return;
+
+    try {
+      const response = await fetch('/api/unarchive-event.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ event_id: event.id })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        window.location.reload(); // Refresh to show updated list
+      } else {
+        alert('Failed to restore event: ' + result.message);
+      }
+    } catch (error) {
+      alert('Error restoring event');
+    }
+  };
+
+  // Filter events based on view mode and date
+  const getFilteredEvents = () => {
+    const now = new Date();
+    
+    return events.filter(event => {
+      const eventDate = new Date(event.date);
+      const isArchived = event.status === 'archived';
+      const isPast = eventDate < now;
+      
+      if (viewMode === 'upcoming') {
+        return !isArchived && !isPast;
+      } else if (viewMode === 'past') {
+        return isArchived || isPast;
+      }
+      return true; // 'all'
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -207,6 +270,8 @@ const EventsManager = () => {
     );
   }
 
+  const filteredEvents = getFilteredEvents();
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -218,6 +283,42 @@ const EventsManager = () => {
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Event
+        </Button>
+      </div>
+
+      {/* View Mode Toggle */}
+      <div className="flex gap-2">
+        <Button
+          onClick={() => setViewMode('upcoming')}
+          className={viewMode === 'upcoming' 
+            ? 'bg-electric-blue text-deep-purple font-semibold' 
+            : 'bg-black/40 border border-white/20 text-white hover:bg-white/10'}
+        >
+          <Calendar className="h-4 w-4 mr-2" />
+          Upcoming Events ({events.filter(e => {
+            const eventDate = new Date(e.date);
+            return e.status !== 'archived' && eventDate >= new Date();
+          }).length})
+        </Button>
+        <Button
+          onClick={() => setViewMode('past')}
+          className={viewMode === 'past' 
+            ? 'bg-electric-blue text-deep-purple font-semibold' 
+            : 'bg-black/40 border border-white/20 text-white hover:bg-white/10'}
+        >
+          <Archive className="h-4 w-4 mr-2" />
+          Past Events ({events.filter(e => {
+            const eventDate = new Date(e.date);
+            return e.status === 'archived' || eventDate < new Date();
+          }).length})
+        </Button>
+        <Button
+          onClick={() => setViewMode('all')}
+          className={viewMode === 'all' 
+            ? 'bg-electric-blue text-deep-purple font-semibold' 
+            : 'bg-black/40 border border-white/20 text-white hover:bg-white/10'}
+        >
+          All Events ({events.length})
         </Button>
       </div>
 
@@ -413,15 +514,24 @@ const EventsManager = () => {
 
       {/* Events List */}
       <div className="grid gap-4">
-        {events.length === 0 ? (
+        {filteredEvents.length === 0 ? (
           <Card className="bg-black/40 border-white/10">
             <CardContent className="p-8 text-center">
               <Calendar className="h-12 w-12 mx-auto mb-4 text-white/50" />
-              <p className="text-white/70">No events found. Add your first event to get started!</p>
+              <p className="text-white/70">
+                {viewMode === 'upcoming' ? 'No upcoming events. Add an event to get started!' : 
+                 viewMode === 'past' ? 'No past events yet.' :
+                 'No events found. Add your first event to get started!'}
+              </p>
             </CardContent>
           </Card>
         ) : (
-          events.map((event) => (
+          filteredEvents.map((event) => {
+            const eventDate = new Date(event.date);
+            const isPast = eventDate < new Date();
+            const isArchived = event.status === 'archived';
+            
+            return (
             <Card key={event.id} className="bg-black/40 border-white/10">
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
@@ -483,6 +593,27 @@ const EventsManager = () => {
                       <Folder className="h-4 w-4 mr-1" />
                       {showGalleries[event.id] ? 'Hide' : 'Gallery'}
                     </Button>
+                    {(isPast || isArchived) ? (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleUnarchive(event)}
+                        className="border-green-400 text-green-400 hover:bg-green-400/20"
+                        title="Restore to Upcoming Events"
+                      >
+                        <ArchiveRestore className="h-4 w-4" />
+                      </Button>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleArchive(event)}
+                        className="border-orange-400 text-orange-400 hover:bg-orange-400/20"
+                        title="Move to Past Events"
+                      >
+                        <Archive className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
@@ -498,14 +629,15 @@ const EventsManager = () => {
                 {showGalleries[event.id] && (
                   <div className="mt-4 pt-4 border-t border-white/10">
                     <EventGalleryManager 
-                      eventId={parseInt(event.id)} 
+                      eventId={parseInt(event.id)}
                       eventTitle={event.title}
                     />
                   </div>
                 )}
               </CardContent>
             </Card>
-          ))
+            );
+          })
         )}
       </div>
     </div>

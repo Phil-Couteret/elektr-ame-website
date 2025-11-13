@@ -1,4 +1,4 @@
-
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -91,6 +91,61 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
 const EventsSection = () => {
   const { t } = useLanguage();
   const { events } = usePublicData();
+  const [allEvents, setAllEvents] = React.useState<MusicEvent[]>([]);
+  
+  React.useEffect(() => {
+    // Fetch all events (both upcoming and past)
+    const fetchAllEvents = async () => {
+      try {
+        const response = await fetch('/api/events-list.php?status=all');
+        const result = await response.json();
+        
+        if (result.success) {
+          const formattedEvents = (result.events || []).map((event: any) => {
+            const dateTime = event.date && event.time 
+              ? new Date(event.date + 'T' + event.time + ':00').toISOString()
+              : new Date().toISOString();
+            
+            return {
+              id: event.id.toString(),
+              title: event.title,
+              description: event.description || '',
+              date: dateTime,
+              time: event.time || '20:00',
+              location: event.location || '',
+              picture: event.picture || '',
+              createdAt: event.createdAt || new Date().toISOString(),
+              updatedAt: event.updatedAt || new Date().toISOString(),
+              status: event.status
+            };
+          });
+          setAllEvents(formattedEvents);
+        }
+      } catch (error) {
+        console.error('Error fetching all events:', error);
+      }
+    };
+    
+    fetchAllEvents();
+  }, []);
+  
+  // Separate upcoming and past events
+  const now = new Date();
+  now.setHours(0, 0, 0, 0);
+  
+  const upcomingEvents = allEvents.filter(event => {
+    if (event.status === 'archived') return false;
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate >= now;
+  });
+  
+  const pastEvents = allEvents.filter(event => {
+    if (event.status === 'archived') return true;
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate < now;
+  });
   
   return (
     <section id="events" className="py-24 bg-gradient-to-b from-gray-900 to-black">
@@ -103,27 +158,43 @@ const EventsSection = () => {
           </div>
         </div>
 
-        {events.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <Calendar className="h-16 w-16 mx-auto mb-4 text-white/30" />
-            <p className="text-white/70 text-lg">No upcoming events at the moment.</p>
-            <p className="text-white/50 text-sm mt-2">Check back soon for exciting new events!</p>
+        {/* Upcoming Events */}
+        <div className="mb-16">
+          <h3 className="text-2xl font-bold text-white mb-6">Upcoming Events</h3>
+          {upcomingEvents.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {upcomingEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-black/30 rounded-lg border border-white/10">
+              <p className="text-white/70 text-lg">To be announced</p>
+              <p className="text-white/50 text-sm mt-2">Stay tuned for exciting new events!</p>
+            </div>
+          )}
+        </div>
+
+        {/* Past Events */}
+        {pastEvents.length > 0 && (
+          <div>
+            <h3 className="text-2xl font-bold text-white mb-6">Past Events</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 opacity-75">
+              {pastEvents.map((event) => (
+                <EventCard key={event.id} event={event} />
+              ))}
+            </div>
           </div>
         )}
 
-        <div className="mt-12 text-center">
-          <Button 
-            className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold"
-          >
-            {t('events.viewAll')}
-          </Button>
-        </div>
+        {/* Empty State (if no events at all) */}
+        {upcomingEvents.length === 0 && pastEvents.length === 0 && (
+          <div className="text-center py-12">
+            <Calendar className="h-16 w-16 mx-auto mb-4 text-white/30" />
+            <p className="text-white/70 text-lg">No events at the moment.</p>
+            <p className="text-white/50 text-sm mt-2">Check back soon for exciting new events!</p>
+          </div>
+        )}
       </div>
     </section>
   );
