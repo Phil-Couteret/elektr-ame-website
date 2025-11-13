@@ -57,9 +57,11 @@ try {
     // Convert socialLinks to JSON
     $socialMediaJson = json_encode($socialLinks);
 
+    $bioTranslationsJson = json_encode($input['bioTranslations'] ?? ['en' => '', 'es' => '', 'ca' => '']);
+    
     $stmt = $pdo->prepare("
-        INSERT INTO artists (name, nickname, bio, bio_key, picture, genre, website, social_media, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO artists (name, nickname, bio, bio_key, bio_translations, picture, genre, website, social_media, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->execute([
@@ -67,6 +69,7 @@ try {
         $input['nickname'] ?? '',
         $input['bio'],
         $input['bioKey'] ?? $input['bio_key'] ?? '',
+        $bioTranslationsJson,
         $input['picture'] ?? '',
         $input['genre'] ?? null,
         $input['website'] ?? null,
@@ -89,10 +92,17 @@ try {
     
     $artist['socialLinks'] = $socialMedia;
     $artist['bioKey'] = $artist['bio_key'] ?? '';
-    $artist['bioTranslations'] = []; // Not stored in DB yet
+    
+    // Parse bio translations from JSON
+    $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
+    if (!is_array($bioTranslations)) {
+        $bioTranslations = ['en' => '', 'es' => '', 'ca' => ''];
+    }
+    $artist['bioTranslations'] = $bioTranslations;
+    
     $artist['createdAt'] = $artist['created_at'];
     $artist['updatedAt'] = $artist['updated_at'];
-    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key']);
+    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations']);
 
     echo json_encode([
         'success' => true,

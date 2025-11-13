@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image as ImageIcon, Plus, Edit, Trash2, Search, Filter, Grid, List, Upload } from 'lucide-react';
+import { Image as ImageIcon, Plus, Edit, Trash2, Search, Filter, Grid, List, Upload, Video } from 'lucide-react';
 import MultiImageUpload from './MultiImageUpload';
 
 const Gallery = ({ isAdmin = false }) => {
@@ -275,12 +275,29 @@ const Gallery = ({ isAdmin = false }) => {
                 </div>
               )}
 
-              <div className={`${viewMode === 'list' ? 'w-24 h-24' : 'aspect-square'} rounded-lg overflow-hidden bg-gray-100`}>
-                <img
-                  src={`/${image.filepath}`}
-                  alt={image.alt_text}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
+              <div className={`${viewMode === 'list' ? 'w-24 h-24' : 'aspect-square'} rounded-lg overflow-hidden bg-gray-100 relative`}>
+                {image.media_type === 'video' ? (
+                  <>
+                    <video
+                      src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      controls={false}
+                      muted
+                      preload="metadata"
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                      VIDEO
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
+                    alt={image.alt_text}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
+                )}
               </div>
 
               {isAdmin && (

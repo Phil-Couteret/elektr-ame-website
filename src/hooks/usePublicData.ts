@@ -74,19 +74,25 @@ export const usePublicData = () => {
         }));
 
         // Transform gallery data to match GalleryItem type
-        const galleries: GalleryItem[] = (galleriesData.galleries || []).map((gallery: any) => ({
-          id: gallery.id.toString(),
-          title: gallery.title || 'Untitled Gallery',
-          description: gallery.description || '',
-          image: gallery.cover_image_path 
-            ? `/${gallery.cover_image_path}` 
-            : '', // Format cover image path
-          picture: gallery.cover_image_path 
-            ? `/${gallery.cover_image_path}` 
-            : '', // Also include picture for GallerySection compatibility
-          createdAt: gallery.created_at || new Date().toISOString(),
-          updatedAt: gallery.updated_at || new Date().toISOString()
-        }));
+        const galleries: GalleryItem[] = (galleriesData.galleries || []).map((gallery: any) => {
+          // Ensure path has leading slash and handle public/ prefix correctly
+          let imagePath = '';
+          if (gallery.cover_image_path) {
+            imagePath = gallery.cover_image_path.startsWith('/') 
+              ? gallery.cover_image_path 
+              : `/${gallery.cover_image_path}`;
+          }
+          
+          return {
+            id: gallery.id.toString(),
+            title: gallery.title || 'Untitled Gallery',
+            description: gallery.description || '',
+            image: imagePath,
+            picture: imagePath, // Also include picture for GallerySection compatibility
+            createdAt: gallery.created_at || new Date().toISOString(),
+            updatedAt: gallery.updated_at || new Date().toISOString()
+          };
+        });
 
         setEvents(events);
         setArtists(artists);

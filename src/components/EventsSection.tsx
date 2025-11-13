@@ -119,7 +119,7 @@ const EventsSection = () => {
 
         <div className="mt-12 text-center">
           <Button 
-            className="bg-black/30 hover:bg-black/50 text-blue-light border border-blue-light/50"
+            className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold"
           >
             {t('events.viewAll')}
           </Button>

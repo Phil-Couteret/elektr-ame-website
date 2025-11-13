@@ -9,6 +9,7 @@ import { Plus, Edit2, Trash2, User, Music, ExternalLink, Languages, Loader2, Ima
 import { useAdminData } from "@/hooks/useAdminData";
 import { Artist, SocialLinks } from "@/types/admin";
 import ArtistImageUpload from "@/components/ArtistImageUpload";
+import ArtistProfile from "@/components/ArtistProfile";
 
 const SOCIAL_PLATFORMS = [
   { key: 'soundcloud', label: 'SoundCloud', icon: '🎵' },
@@ -99,7 +100,13 @@ const ArtistsManager = () => {
       }
 
       if (isEditing && editingArtist) {
-        await updateArtist(editingArtist.id, formData);
+        // Don't send picture field if it's a base64 URL or empty
+        // Profile pictures should be managed via the upload section
+        const updateData = { ...formData };
+        if (!updateData.picture || !updateData.picture.startsWith('data:')) {
+          delete updateData.picture;
+        }
+        await updateArtist(editingArtist.id, updateData);
       } else {
         await addArtist(formData);
       }
@@ -122,19 +129,8 @@ const ArtistsManager = () => {
     }
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData(prev => ({
-          ...prev,
-          picture: e.target?.result as string
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  // Profile pictures are now managed via the ArtistImageUpload component
+  // This function is kept for backwards compatibility but no longer used in the form
 
   const handleAutoTranslate = async () => {
     const englishBio = formData.bioTranslations.en || formData.bio;
@@ -357,22 +353,20 @@ const ArtistsManager = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="picture" className="text-white">
-                  Artist Picture
+                <Label className="text-white">
+                  Artist Profile Picture
                 </Label>
-                <div className="space-y-2">
-                  <Input
-                    id="picture"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="bg-white/10 border-white/20 text-white file:bg-electric-blue file:text-deep-purple file:border-0 file:rounded-md file:px-3 file:py-1"
-                  />
+                <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
+                  <p className="text-sm text-white/70 mb-2">
+                    To set or change the profile picture, use the <strong className="text-electric-blue">"Add Images"</strong> button 
+                    on the artist card and check the <strong className="text-electric-blue">"Set as profile picture"</strong> checkbox when uploading.
+                  </p>
                   {formData.picture && (
                     <div className="mt-2">
+                      <p className="text-xs text-white/50 mb-2">Current profile picture:</p>
                       <img 
                         src={formData.picture} 
-                        alt="Preview" 
+                        alt="Current profile" 
                         className="h-32 w-32 rounded-full object-cover border border-white/20"
                       />
                     </div>
@@ -538,18 +532,32 @@ const ArtistsManager = () => {
                 
                 {/* Multi-Image Upload Section */}
                 {showImageUpload[artist.id] && (
-                  <div className="mt-4 pt-4 border-t border-white/10">
-                    <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <ImageIcon className="h-5 w-5 text-electric-blue" />
-                      Upload Images for {artist.name}
-                    </h4>
-                    <ArtistImageUpload
-                      artistId={artist.id}
-                      onImagesUploaded={() => {
-                        // Optionally refresh artist data or show success message
-                        console.log('Images uploaded successfully');
-                      }}
-                    />
+                  <div className="mt-4 pt-4 border-t border-white/10 space-y-6">
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                        <ImageIcon className="h-5 w-5 text-electric-blue" />
+                        Upload Images & Videos for {artist.name}
+                      </h4>
+                      <ArtistImageUpload
+                        artistId={artist.id}
+                        onImagesUploaded={() => {
+                          console.log('Images uploaded successfully');
+                          // Force re-render to show new images
+                          setShowImageUpload(prev => ({ ...prev, [artist.id]: true }));
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="border-t border-white/10 pt-6">
+                      <h4 className="text-lg font-semibold text-white mb-4">
+                        Uploaded Media for {artist.name}
+                      </h4>
+                      <ArtistProfile 
+                        artistId={artist.id} 
+                        artistName={artist.name} 
+                        isAdmin={true}
+                      />
+                    </div>
                   </div>
                 )}
               </CardContent>

@@ -12,7 +12,9 @@ interface GalleryImage {
   id: number;
   filename: string;
   filepath: string;
-  thumbnail_filepath: string;
+  thumbnail_filepath: string | null;
+  media_type?: 'image' | 'video';
+  video_duration?: number | null;
   alt_text: string;
   description: string;
   category: string;
@@ -491,16 +493,31 @@ const GalleryManager = () => {
                         <Card key={image.id} className="bg-black/60 border-white/10 group relative">
                           <CardContent className="p-0">
                             <div className="relative">
-                              <div className="aspect-square rounded-t-lg overflow-hidden bg-gray-800">
-                                <img
-                                  src={`/${image.thumbnail_filepath || image.filepath}`}
-                                  alt={image.alt_text}
-                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = `/${image.filepath}`;
-                                  }}
-                                />
+                              <div className="aspect-square rounded-t-lg overflow-hidden bg-gray-800 relative">
+                                {image.media_type === 'video' ? (
+                                  <>
+                                    <video
+                                      src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
+                                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                      controls={false}
+                                      muted
+                                      preload="metadata"
+                                    />
+                                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                                      VIDEO
+                                    </div>
+                                  </>
+                                ) : (
+                                  <img
+                                    src={image.thumbnail_filepath ? (image.thumbnail_filepath.startsWith('/') ? image.thumbnail_filepath : `/${image.thumbnail_filepath}`) : (image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`)}
+                                    alt={image.alt_text}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.src = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
+                                    }}
+                                  />
+                                )}
                               </div>
                               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-200 rounded-t-lg flex items-center justify-center">
                                 <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">

@@ -17,6 +17,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import ResendVerification from "./pages/ResendVerification";
 import Admin from "./pages/Admin";
 import MemberPortal from "./pages/MemberPortal";
+import ArtistDetail from "./pages/ArtistDetail";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/resend-verification" element={<ResendVerification />} />
               <Route path="/member-portal" element={<MemberPortal />} />
+              <Route path="/artist/:id" element={<ArtistDetail />} />
               <Route path="/admin" element={
                 <ProtectedRoute>
                   <Admin />

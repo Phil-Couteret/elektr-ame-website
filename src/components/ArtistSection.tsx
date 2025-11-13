@@ -3,12 +3,14 @@ import { Volume, ChevronDown, ChevronUp, User } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { usePublicData } from "@/hooks/usePublicData";
 import { Artist } from "@/types/admin";
 
 const ArtistCard = ({ artist }: { artist: Artist }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
   
   // Get role display text
   const getRoleDisplay = () => {
@@ -165,6 +167,16 @@ const ArtistCard = ({ artist }: { artist: Artist }) => {
           );
         })}
       </div>
+      
+      {/* View Profile Button */}
+      <div className="mt-6">
+        <Button
+          onClick={() => navigate(`/artist/${artist.id}`)}
+          className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-medium"
+        >
+          View Full Profile & Gallery
+        </Button>
+      </div>
     </div>
   );
 };
@@ -200,7 +212,7 @@ const ArtistSection = () => {
 
         <div className="mt-12 text-center">
           <Button 
-            className="bg-black/30 hover:bg-black/50 text-blue-light border border-blue-light/50"
+            className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold"
           >
             {t('artists.viewAll')}
           </Button>

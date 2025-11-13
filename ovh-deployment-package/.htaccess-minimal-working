@@ -1,0 +1,17 @@
+# Minimal .htaccess - Working Version
+# This is a minimal version that should work if PHP was executing before
+
+# Allow API to pass through (CRITICAL)
+RewriteEngine On
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule . - [L]
+
+# React Router - Serve index.html for routes
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.html [L]
+
+# HTTPS redirect (optional - if needed)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
