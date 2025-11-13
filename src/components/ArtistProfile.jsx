@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera, Video } from 'lucide-react';
+import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera, Video, Save, X } from 'lucide-react';
 import ArtistImageUpload from './ArtistImageUpload';
 
 const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
@@ -9,6 +9,13 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   const [loading, setLoading] = useState(true);
   const [showUpload, setShowUpload] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [editingImage, setEditingImage] = useState(null);
+  const [editForm, setEditForm] = useState({
+    alt_text: '',
+    description: '',
+    category: '',
+    is_profile_picture: false
+  });
 
   const categoryLabels = {
     profile: 'Profile Picture',
@@ -89,6 +96,54 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   const handleImagesUploaded = () => {
     setShowUpload(false);
     fetchImages();
+  };
+
+  const handleEditClick = (image) => {
+    setEditingImage(image.id);
+    setEditForm({
+      alt_text: image.alt_text || '',
+      description: image.description || '',
+      category: image.category || 'other',
+      is_profile_picture: image.is_profile_picture === 1
+    });
+  };
+
+  const handleEditCancel = () => {
+    setEditingImage(null);
+    setEditForm({
+      alt_text: '',
+      description: '',
+      category: '',
+      is_profile_picture: false
+    });
+  };
+
+  const handleEditSave = async (imageId) => {
+    try {
+      const response = await fetch('/api/update-artist-image.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          image_id: imageId,
+          ...editForm
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        console.log('Image updated successfully');
+        setEditingImage(null);
+        fetchImages();
+      } else {
+        alert('Failed to update image: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error updating image:', error);
+      alert('Error updating image');
+    }
   };
 
   const getFilteredImages = () => {
@@ -194,19 +249,23 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
           {getFilteredImages().map((image) => {
             const Icon = categoryIcons[image.category];
             const isVideo = image.media_type === 'video';
+            const isEditing = editingImage === image.id;
+            
             return (
               <div key={image.id} className="relative group">
                 <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
                   {isVideo ? (
-                    <video
-                      src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      controls={false}
-                      muted
-                      preload="metadata"
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+                    <div className="w-full h-full bg-black flex items-center justify-center">
+                      <video
+                        src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
+                        className="w-full h-full"
+                        controls
+                        preload="metadata"
+                        style={{ objectFit: 'contain' }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
                   ) : (
                     <img
                       src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
@@ -216,16 +275,32 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   )}
                 </div>
                 
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
+                {/* Overlay - don't block video controls */}
+                <div 
+                  className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center"
+                  style={{ pointerEvents: isVideo ? 'none' : 'auto' }}
+                >
+                  <div 
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2"
+                    style={{ pointerEvents: 'auto' }}
+                  >
                     {isAdmin && (
-                      <button
-                        onClick={() => handleImageDelete(image.id)}
-                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-                        title="Delete image"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                      <>
+                        <button
+                          onClick={() => handleEditClick(image)}
+                          className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
+                          title="Edit image"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleImageDelete(image.id)}
+                          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+                          title="Delete image"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -257,9 +332,83 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   </div>
                 )}
 
-                {image.description && (
+                {image.description && !isEditing && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-70 text-white p-2 rounded-b-lg">
                     <p className="text-xs truncate">{image.description}</p>
+                  </div>
+                )}
+
+                {/* Edit Form Overlay */}
+                {isEditing && (
+                  <div className="absolute inset-0 bg-black bg-opacity-95 p-3 rounded-lg overflow-y-auto">
+                    <div className="space-y-2">
+                      <div>
+                        <label className="text-xs text-white font-medium">Title:</label>
+                        <input
+                          type="text"
+                          value={editForm.alt_text}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, alt_text: e.target.value }))}
+                          className="w-full px-2 py-1 text-xs rounded border border-gray-300"
+                          placeholder="Image title"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs text-white font-medium">Description:</label>
+                        <textarea
+                          value={editForm.description}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, description: e.target.value }))}
+                          className="w-full px-2 py-1 text-xs rounded border border-gray-300"
+                          placeholder="Description"
+                          rows="2"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="text-xs text-white font-medium">Category:</label>
+                        <select
+                          value={editForm.category}
+                          onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                          className="w-full px-2 py-1 text-xs rounded border border-gray-300"
+                        >
+                          {Object.entries(categoryLabels).map(([key, label]) => (
+                            <option key={key} value={key}>{label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      {!isVideo && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`edit-profile-${image.id}`}
+                            checked={editForm.is_profile_picture}
+                            onChange={(e) => setEditForm(prev => ({ ...prev, is_profile_picture: e.target.checked }))}
+                            className="rounded"
+                          />
+                          <label htmlFor={`edit-profile-${image.id}`} className="text-xs text-white">
+                            Set as profile picture
+                          </label>
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-2 pt-2">
+                        <button
+                          onClick={() => handleEditSave(image.id)}
+                          className="flex-1 px-3 py-1.5 bg-green-600 text-white rounded text-xs font-medium hover:bg-green-700 flex items-center justify-center gap-1"
+                        >
+                          <Save className="h-3 w-3" />
+                          Save
+                        </button>
+                        <button
+                          onClick={handleEditCancel}
+                          className="flex-1 px-3 py-1.5 bg-gray-600 text-white rounded text-xs font-medium hover:bg-gray-700 flex items-center justify-center gap-1"
+                        >
+                          <X className="h-3 w-3" />
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
