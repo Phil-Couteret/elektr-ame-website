@@ -51,7 +51,14 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   };
 
   const handleImageDelete = async (imageId) => {
-    if (!confirm('Are you sure you want to delete this image?')) return;
+    console.log('handleImageDelete called with imageId:', imageId);
+    
+    if (!confirm('Are you sure you want to delete this image?')) {
+      console.log('Delete cancelled by user');
+      return;
+    }
+
+    console.log('Delete confirmed, sending request...');
 
     try {
       const response = await fetch('/api/delete-artist-image.php', {
@@ -62,16 +69,20 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         body: JSON.stringify({ image_id: imageId })
       });
 
+      console.log('Delete response status:', response.status);
       const result = await response.json();
+      console.log('Delete result:', result);
 
       if (result.success) {
+        console.log('Image deleted successfully');
         fetchImages();
       } else {
         alert('Failed to delete image: ' + result.message);
+        console.error('Delete failed:', result);
       }
     } catch (error) {
       console.error('Error deleting image:', error);
-      alert('Error deleting image');
+      alert('Error deleting image: ' + error.message);
     }
   };
 
