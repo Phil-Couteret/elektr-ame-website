@@ -3,15 +3,43 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Home, LogIn } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isArtistPage = location.pathname.startsWith('/artist/');
 
   const handleHomeClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSectionClick = (section: string) => {
+    if (isArtistPage) {
+      // If on artist page, navigate to home first, then scroll
+      navigate('/');
+      setTimeout(() => {
+        const element = document.querySelector(section);
+        if (element) {
+          const headerOffset = 80;
+          const elementPosition = element.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      // On home page, just scroll
+      const element = document.querySelector(section);
+      if (element) {
+        const headerOffset = 80;
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+    }
   };
 
   return (
@@ -20,18 +48,30 @@ const Header = () => {
         <div className="flex h-16 items-center justify-center relative">
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#artists" className="text-white/80 hover:text-blue-light transition-colors">
+            <button 
+              onClick={() => handleSectionClick('#artists')} 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
               {t('nav.artists')}
-            </a>
-            <a href="#events" className="text-white/80 hover:text-blue-light transition-colors">
+            </button>
+            <button 
+              onClick={() => handleSectionClick('#events')} 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
               {t('nav.events')}
-            </a>
-            <a href="#gallery" className="text-white/80 hover:text-blue-light transition-colors">
+            </button>
+            <button 
+              onClick={() => handleSectionClick('#gallery')} 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
               {t('nav.gallery')}
-            </a>
-            <a href="#about" className="text-white/80 hover:text-blue-light transition-colors">
+            </button>
+            <button 
+              onClick={() => handleSectionClick('#about')} 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
               {t('nav.about')}
-            </a>
+            </button>
             <LanguageSelector />
             <Link to="/join-us">
               <Button className="bg-blue-dark hover:bg-blue-darker text-white">
@@ -75,34 +115,42 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="space-y-1 px-2 pb-3 pt-2 bg-black/90 backdrop-blur-md">
-            <a
-              href="#artists"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleSectionClick('#artists');
+              }}
+              className="block w-full text-left px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
             >
               {t('nav.artists')}
-            </a>
-            <a
-              href="#events"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleSectionClick('#events');
+              }}
+              className="block w-full text-left px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
             >
               {t('nav.events')}
-            </a>
-            <a
-              href="#gallery"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleSectionClick('#gallery');
+              }}
+              className="block w-full text-left px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
             >
               {t('nav.gallery')}
-            </a>
-            <a
-              href="#about"
-              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
-              onClick={() => setIsMenuOpen(false)}
+            </button>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleSectionClick('#about');
+              }}
+              className="block w-full text-left px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
             >
               {t('nav.about')}
-            </a>
+            </button>
             <div className="px-3 py-2">
               <LanguageSelector />
             </div>

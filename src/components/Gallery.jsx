@@ -313,10 +313,20 @@ const Gallery = ({ isAdmin = false }) => {
               </div>
 
               {isAdmin && (
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
+                <div 
+                  className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center"
+                  style={{ pointerEvents: 'none' }}
+                >
+                  <div 
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2"
+                    style={{ pointerEvents: 'auto' }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <button
-                      onClick={() => handleImageDelete(image.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImageDelete(image.id);
+                      }}
                       className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
                       title="Delete image"
                     >

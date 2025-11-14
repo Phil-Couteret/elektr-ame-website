@@ -288,26 +288,33 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   )}
                 </div>
                 
-                {/* Overlay - don't block video controls */}
+                {/* Overlay - don't block image clicks or video controls */}
                 <div 
                   className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 rounded-lg flex items-center justify-center"
-                  style={{ pointerEvents: isVideo ? 'none' : 'auto' }}
+                  style={{ pointerEvents: 'none' }}
                 >
                   <div 
                     className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2"
                     style={{ pointerEvents: 'auto' }}
+                    onClick={(e) => e.stopPropagation()}
                   >
                     {isAdmin && (
                       <>
                         <button
-                          onClick={() => handleEditClick(image)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditClick(image);
+                          }}
                           className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
                           title="Edit image"
                         >
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => handleImageDelete(image.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleImageDelete(image.id);
+                          }}
                           className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
                           title="Delete image"
                         >
