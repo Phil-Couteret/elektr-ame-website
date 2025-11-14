@@ -64,7 +64,8 @@ const GalleryManager = () => {
     // Fetch images for expanded galleries
     Object.keys(expandedGalleries).forEach(galleryIdStr => {
       const galleryId = parseInt(galleryIdStr);
-      if (expandedGalleries[galleryId] && !images[galleryId]) {
+      if (expandedGalleries[galleryId]) {
+        // Always fetch if gallery is expanded (refresh if needed)
         fetchGalleryImages(galleryId);
       }
     });
@@ -115,10 +116,14 @@ const GalleryManager = () => {
       }
 
       const result = await response.json();
+      console.log('Gallery images fetch result for gallery', galleryId, ':', result);
 
       if (result.success) {
         const imageList = result.data?.images || result.images || [];
+        console.log('Setting images for gallery', galleryId, ':', imageList.length, 'images');
         setImages(prev => ({ ...prev, [galleryId]: imageList }));
+      } else {
+        console.error('API returned success=false:', result);
       }
     } catch (err) {
       console.error('Error fetching gallery images:', err);
@@ -482,14 +487,19 @@ const GalleryManager = () => {
               {/* Images Grid */}
               {expandedGalleries[gallery.id] && (
                 <CardContent className="pt-0">
-                  {images[gallery.id]?.length === 0 ? (
+                  {!images[gallery.id] ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-electric-blue mx-auto mb-4"></div>
+                      <p className="text-white/70">Loading images...</p>
+                    </div>
+                  ) : images[gallery.id].length === 0 ? (
                     <div className="text-center py-8">
                       <Image className="h-12 w-12 mx-auto mb-4 text-white/50" />
                       <p className="text-white/70">No images in this gallery yet.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                      {(images[gallery.id] || []).map((image) => (
+                      {images[gallery.id].map((image) => (
                         <Card key={image.id} className="bg-black/60 border-white/10 group relative">
                           <CardContent className="p-0">
                             <div className="relative">
