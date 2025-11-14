@@ -44,8 +44,25 @@ export const Lightbox = ({
       return;
     }
     const validIndex = Math.max(0, Math.min(currentIndex, validImages.length - 1));
-    setIndex(validIndex);
-  }, [currentIndex, validImages.length]);
+    // Ensure the image at this index actually exists and has a valid src
+    if (validImages[validIndex] && validImages[validIndex].src) {
+      setIndex(validIndex);
+    } else {
+      // If the requested index is invalid, find the first valid image
+      const firstValidIndex = validImages.findIndex(img => img && img.src);
+      if (firstValidIndex !== -1) {
+        console.warn('Lightbox: Requested index invalid, using first valid image', {
+          requestedIndex: currentIndex,
+          validIndex,
+          firstValidIndex,
+          validImagesCount: validImages.length
+        });
+        setIndex(firstValidIndex);
+      } else {
+        setIndex(0);
+      }
+    }
+  }, [currentIndex, validImages.length, validImages]);
 
   useEffect(() => {
     if (!isOpen) return;
