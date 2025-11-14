@@ -260,10 +260,13 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
                   onClick={() => {
                     if (!isVideo && !isEditing) {
-                      const filteredImages = getFilteredImages();
+                      // Filter out videos first, then find the index
+                      const filteredImages = getFilteredImages().filter(img => img.media_type !== 'video');
                       const imageIndex = filteredImages.findIndex(img => img.id === image.id);
-                      setLightboxIndex(imageIndex);
-                      setLightboxOpen(true);
+                      if (imageIndex !== -1) {
+                        setLightboxIndex(imageIndex);
+                        setLightboxOpen(true);
+                      }
                     }
                   }}
                 >

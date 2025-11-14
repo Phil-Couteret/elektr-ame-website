@@ -21,11 +21,12 @@ export const Lightbox = ({
   currentIndex,
   onNavigate,
 }: LightboxProps) => {
-  const [index, setIndex] = useState(currentIndex);
+  const [index, setIndex] = useState(() => Math.max(0, Math.min(currentIndex, images.length - 1)));
 
   useEffect(() => {
-    setIndex(currentIndex);
-  }, [currentIndex]);
+    const validIndex = Math.max(0, Math.min(currentIndex, images.length - 1));
+    setIndex(validIndex);
+  }, [currentIndex, images.length]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -51,7 +52,15 @@ export const Lightbox = ({
 
   if (!isOpen || images.length === 0) return null;
 
-  const currentImage = images[index];
+  // Safety check: ensure index is valid and currentImage exists
+  const validIndex = Math.max(0, Math.min(index, images.length - 1));
+  const currentImage = images[validIndex];
+  
+  if (!currentImage || !currentImage.src) {
+    console.error('Lightbox: Invalid image at index', validIndex, images);
+    return null;
+  }
+  
   const hasMultiple = images.length > 1;
 
   const handlePrevious = () => {
@@ -99,11 +108,17 @@ export const Lightbox = ({
         className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
-          src={currentImage.src.startsWith("/") ? currentImage.src : `/${currentImage.src}`}
-          alt={currentImage.alt || currentImage.title || "Gallery image"}
-          className="max-w-full max-h-[85vh] object-contain"
-        />
+        {currentImage.src && (
+          <img
+            src={currentImage.src.startsWith("/") ? currentImage.src : `/${currentImage.src}`}
+            alt={currentImage.alt || currentImage.title || "Gallery image"}
+            className="max-w-full max-h-[85vh] object-contain"
+            onError={(e) => {
+              console.error('Lightbox: Failed to load image', currentImage.src);
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        )}
 
         {/* Image info */}
         {(currentImage.title || currentImage.description) && (
@@ -120,7 +135,7 @@ export const Lightbox = ({
         {/* Image counter */}
         {hasMultiple && (
           <div className="mt-4 text-white/70 text-sm">
-            {index + 1} / {images.length}
+            {validIndex + 1} / {images.length}
           </div>
         )}
       </div>
