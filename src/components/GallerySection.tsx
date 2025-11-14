@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { usePublicData } from "@/hooks/usePublicData";
 import { GalleryItem } from "@/types/admin";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Gallery from "./Gallery";
 
 const GalleryCard = ({ item, onClick }: { item: GalleryItem; onClick?: () => void }) => {
@@ -75,6 +76,7 @@ interface GalleryGroup {
 const GallerySection = () => {
   const { t } = useLanguage();
   const { gallery } = usePublicData();
+  const location = useLocation();
   const [showFullGallery, setShowFullGallery] = useState(false);
   const [galleries, setGalleries] = useState<GalleryGroup[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,20 @@ const GallerySection = () => {
   useEffect(() => {
     fetchGalleries();
   }, []);
+
+  // Close full gallery when clicking header links (similar to artist detail page)
+  useEffect(() => {
+    const handleCloseGallery = () => {
+      if (showFullGallery) {
+        setShowFullGallery(false);
+      }
+    };
+
+    window.addEventListener('closeFullGallery', handleCloseGallery);
+    return () => {
+      window.removeEventListener('closeFullGallery', handleCloseGallery);
+    };
+  }, [showFullGallery]);
 
   const fetchGalleries = async () => {
     try {

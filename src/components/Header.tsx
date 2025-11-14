@@ -18,6 +18,9 @@ const Header = () => {
   };
 
   const handleSectionClick = (section: string) => {
+    // Dispatch custom event to close full gallery if open
+    window.dispatchEvent(new CustomEvent('closeFullGallery'));
+    
     if (isArtistPage) {
       // If on artist page, navigate to home first, then scroll
       navigate('/');

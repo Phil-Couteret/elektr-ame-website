@@ -289,20 +289,20 @@ const Gallery = ({ isAdmin = false }) => {
                 }}
               >
                 {image.media_type === 'video' ? (
-                  <>
+                  <div className="w-full h-full bg-black flex items-center justify-center">
                     <video
                       src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                      controls={false}
-                      muted
+                      className="w-full h-full"
+                      controls
                       preload="metadata"
+                      style={{ objectFit: 'contain' }}
                     >
                       Your browser does not support the video tag.
                     </video>
-                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded">
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded z-10">
                       VIDEO
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <img
                     src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
