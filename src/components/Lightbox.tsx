@@ -21,12 +21,22 @@ export const Lightbox = ({
   currentIndex,
   onNavigate,
 }: LightboxProps) => {
-  const [index, setIndex] = useState(() => Math.max(0, Math.min(currentIndex, images.length - 1)));
+  // Filter out any invalid images (undefined, null, or missing src)
+  const validImages = (images || []).filter(img => img && img.src && typeof img.src === 'string');
+  
+  const [index, setIndex] = useState(() => {
+    if (validImages.length === 0) return 0;
+    return Math.max(0, Math.min(currentIndex, validImages.length - 1));
+  });
 
   useEffect(() => {
-    const validIndex = Math.max(0, Math.min(currentIndex, images.length - 1));
+    if (validImages.length === 0) {
+      setIndex(0);
+      return;
+    }
+    const validIndex = Math.max(0, Math.min(currentIndex, validImages.length - 1));
     setIndex(validIndex);
-  }, [currentIndex, images.length]);
+  }, [currentIndex, validImages.length]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -50,27 +60,32 @@ export const Lightbox = ({
     };
   }, [isOpen, index]);
 
-  if (!isOpen || images.length === 0) return null;
+  // Early return if not open or no valid images
+  if (!isOpen || validImages.length === 0) {
+    return null;
+  }
 
   // Safety check: ensure index is valid and currentImage exists
-  const validIndex = Math.max(0, Math.min(index, images.length - 1));
-  const currentImage = images[validIndex];
+  const validIndex = Math.max(0, Math.min(index, validImages.length - 1));
+  const currentImage = validImages[validIndex];
   
   if (!currentImage || !currentImage.src) {
-    console.error('Lightbox: Invalid image at index', validIndex, images);
+    console.error('Lightbox: Invalid image at index', validIndex, 'Valid images:', validImages.length, 'All images:', images);
+    // Close lightbox if no valid image
+    if (onClose) onClose();
     return null;
   }
   
-  const hasMultiple = images.length > 1;
+  const hasMultiple = validImages.length > 1;
 
   const handlePrevious = () => {
-    const newIndex = index > 0 ? index - 1 : images.length - 1;
+    const newIndex = index > 0 ? index - 1 : validImages.length - 1;
     setIndex(newIndex);
     if (onNavigate) onNavigate(newIndex);
   };
 
   const handleNext = () => {
-    const newIndex = index < images.length - 1 ? index + 1 : 0;
+    const newIndex = index < validImages.length - 1 ? index + 1 : 0;
     setIndex(newIndex);
     if (onNavigate) onNavigate(newIndex);
   };
@@ -135,7 +150,7 @@ export const Lightbox = ({
         {/* Image counter */}
         {hasMultiple && (
           <div className="mt-4 text-white/70 text-sm">
-            {validIndex + 1} / {images.length}
+            {validIndex + 1} / {validImages.length}
           </div>
         )}
       </div>
