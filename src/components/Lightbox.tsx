@@ -157,17 +157,22 @@ export const Lightbox = ({
         className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        {currentImage?.src && (
-          <img
-            src={currentImage.src.startsWith("/") ? currentImage.src : `/${currentImage.src}`}
-            alt={currentImage?.alt || currentImage?.title || "Gallery image"}
-            className="max-w-full max-h-[85vh] object-contain"
-            onError={(e) => {
-              console.error('Lightbox: Failed to load image', currentImage?.src);
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        )}
+        {currentImage?.src && (() => {
+          const imageSrc = currentImage?.src;
+          if (!imageSrc) return null;
+          const normalizedSrc = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
+          return (
+            <img
+              src={normalizedSrc}
+              alt={currentImage?.alt || currentImage?.title || "Gallery image"}
+              className="max-w-full max-h-[85vh] object-contain"
+              onError={(e) => {
+                console.error('Lightbox: Failed to load image', imageSrc);
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          );
+        })()}
 
         {/* Image info */}
         {(currentImage?.title || currentImage?.description) && (
