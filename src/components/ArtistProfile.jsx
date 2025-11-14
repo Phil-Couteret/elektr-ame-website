@@ -159,14 +159,18 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   // Memoized array of images for Lightbox (non-video images with valid filepaths)
   const lightboxImages = useMemo(() => {
     return getFilteredImages()
-      .filter(img => img.media_type !== 'video' && img.filepath)
-      .map(img => ({
-        src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
-        alt: img.alt_text || '',
-        title: img.alt_text || '',
-        description: img.description || ''
-      }));
-  }, [images, selectedCategory, imagesByCategory]);
+      .filter(img => img && img.media_type !== 'video' && img.filepath && typeof img.filepath === 'string')
+      .map(img => {
+        const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
+        return {
+          src: src,
+          alt: img.alt_text || '',
+          title: img.alt_text || '',
+          description: img.description || ''
+        };
+      })
+      .filter(img => img.src); // Final filter to ensure src exists
+  }, [images, selectedCategory]);
 
   const getCategoryCount = (category) => {
     return imagesByCategory[category]?.length || 0;
@@ -271,19 +275,22 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                 <div 
                   className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
                   onClick={() => {
-                    if (!isVideo && !isEditing && image.filepath) {
+                    if (!isVideo && !isEditing && image.filepath && lightboxImages.length > 0) {
                       // Use the same memoized array to find the index
-                      const imageIndex = lightboxImages.findIndex(img => {
-                        const imgPath = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
-                        return img.src === imgPath;
-                      });
+                      const imgPath = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
+                      const imageIndex = lightboxImages.findIndex(img => img.src === imgPath);
                       if (imageIndex !== -1) {
-                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath);
+                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath, 'Total images:', lightboxImages.length);
                         setLightboxIndex(imageIndex);
                         setLightboxOpen(true);
                       } else {
                         console.warn('Image not found in lightbox array:', image.id, image.filepath, 'Available:', lightboxImages.map(img => img.src));
                       }
+                    } else if (!isVideo && !isEditing) {
+                      console.warn('Cannot open lightbox: no valid images or missing filepath', {
+                        hasFilepath: !!image.filepath,
+                        lightboxImagesCount: lightboxImages.length
+                      });
                     }
                   }}
                 >
