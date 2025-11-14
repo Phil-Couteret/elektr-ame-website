@@ -49,12 +49,45 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
       const result = await response.json();
 
       if (result.success) {
-        setImages(result.data.images);
-        setImagesByCategory(result.data.images_by_category);
+        // Filter out any images with invalid filepath
+        const validImages = (result.data.images || []).filter(img => {
+          return img && 
+                 typeof img === 'object' && 
+                 img.filepath && 
+                 typeof img.filepath === 'string' &&
+                 img.filepath.trim().length > 0;
+        });
+        
+        console.log('Fetched images:', {
+          total: result.data.images?.length || 0,
+          valid: validImages.length,
+          invalid: (result.data.images?.length || 0) - validImages.length
+        });
+        
+        // Rebuild imagesByCategory with only valid images
+        const validImagesByCategory = {};
+        validImages.forEach(img => {
+          const cat = img.category || 'other';
+          if (!validImagesByCategory[cat]) {
+            validImagesByCategory[cat] = [];
+          }
+          validImagesByCategory[cat].push(img);
+        });
+        
+        setImages(validImages);
+        setImagesByCategory(validImagesByCategory);
         setProfilePicture(result.data.profile_picture);
+      } else {
+        console.error('API returned error:', result.message);
+        setImages([]);
+        setImagesByCategory({});
+        setProfilePicture(null);
       }
     } catch (error) {
       console.error('Error fetching images:', error);
+      setImages([]);
+      setImagesByCategory({});
+      setProfilePicture(null);
     } finally {
       setLoading(false);
     }
