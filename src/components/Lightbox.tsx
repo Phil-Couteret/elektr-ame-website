@@ -1,0 +1,144 @@
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { useEffect, useState } from "react";
+
+interface LightboxProps {
+  isOpen: boolean;
+  onClose: () => void;
+  images: Array<{
+    src: string;
+    alt?: string;
+    title?: string;
+    description?: string;
+  }>;
+  currentIndex: number;
+  onNavigate?: (index: number) => void;
+}
+
+export const Lightbox = ({
+  isOpen,
+  onClose,
+  images,
+  currentIndex,
+  onNavigate,
+}: LightboxProps) => {
+  const [index, setIndex] = useState(currentIndex);
+
+  useEffect(() => {
+    setIndex(currentIndex);
+  }, [currentIndex]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "ArrowLeft") {
+        handlePrevious();
+      } else if (e.key === "ArrowRight") {
+        handleNext();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden"; // Prevent background scrolling
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, index]);
+
+  if (!isOpen || images.length === 0) return null;
+
+  const currentImage = images[index];
+  const hasMultiple = images.length > 1;
+
+  const handlePrevious = () => {
+    const newIndex = index > 0 ? index - 1 : images.length - 1;
+    setIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
+
+  const handleNext = () => {
+    const newIndex = index < images.length - 1 ? index + 1 : 0;
+    setIndex(newIndex);
+    if (onNavigate) onNavigate(newIndex);
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* Close button */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+        aria-label="Close lightbox"
+      >
+        <X className="h-6 w-6" />
+      </button>
+
+      {/* Previous button */}
+      {hasMultiple && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePrevious();
+          }}
+          className="absolute left-4 z-10 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+          aria-label="Previous image"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+      )}
+
+      {/* Image container */}
+      <div
+        className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={currentImage.src.startsWith("/") ? currentImage.src : `/${currentImage.src}`}
+          alt={currentImage.alt || currentImage.title || "Gallery image"}
+          className="max-w-full max-h-[85vh] object-contain"
+        />
+
+        {/* Image info */}
+        {(currentImage.title || currentImage.description) && (
+          <div className="mt-4 text-center text-white max-w-2xl">
+            {currentImage.title && (
+              <h3 className="text-xl font-semibold mb-2">{currentImage.title}</h3>
+            )}
+            {currentImage.description && (
+              <p className="text-white/80 text-sm">{currentImage.description}</p>
+            )}
+          </div>
+        )}
+
+        {/* Image counter */}
+        {hasMultiple && (
+          <div className="mt-4 text-white/70 text-sm">
+            {index + 1} / {images.length}
+          </div>
+        )}
+      </div>
+
+      {/* Next button */}
+      {hasMultiple && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleNext();
+          }}
+          className="absolute right-4 z-10 p-3 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+          aria-label="Next image"
+        >
+          <ChevronRight className="h-6 w-6" />
+        </button>
+      )}
+    </div>
+  );
+};
+

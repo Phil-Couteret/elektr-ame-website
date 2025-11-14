@@ -3,12 +3,19 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const Contact = () => {
   const { t } = useLanguage();
 
   return (
     <div className="flex min-h-screen flex-col bg-deep-purple">
+      <SEO 
+        title="Contact Us | Elektr-Âme"
+        description="Get in touch with Elektr-Âme. Contact us for inquiries, collaborations, or questions about our electronic music association in Barcelona."
+        url="https://www.elektr-ame.com/contact"
+        keywords="contact, Barcelona, electronic music, inquiries, collaboration"
+      />
       <Header />
       
       <main className="flex-1 pt-16">

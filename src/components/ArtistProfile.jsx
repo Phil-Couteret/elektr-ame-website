@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera, Video, Save, X } from 'lucide-react';
 import ArtistImageUpload from './ArtistImageUpload';
+import { Lightbox } from './Lightbox';
 
 const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   const [images, setImages] = useState([]);
@@ -16,6 +17,8 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
     category: '',
     is_profile_picture: false
   });
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const categoryLabels = {
     profile: 'Profile Picture',
@@ -253,7 +256,17 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
             
             return (
               <div key={image.id} className="relative group">
-                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+                <div 
+                  className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
+                  onClick={() => {
+                    if (!isVideo && !isEditing) {
+                      const filteredImages = getFilteredImages();
+                      const imageIndex = filteredImages.findIndex(img => img.id === image.id);
+                      setLightboxIndex(imageIndex);
+                      setLightboxOpen(true);
+                    }
+                  }}
+                >
                   {isVideo ? (
                     <div className="w-full h-full bg-black flex items-center justify-center">
                       <video
@@ -423,6 +436,22 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
           </div>
         )}
       </div>
+
+      {/* Lightbox */}
+      <Lightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        images={getFilteredImages()
+          .filter(img => img.media_type !== 'video')
+          .map(img => ({
+            src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
+            alt: img.alt_text,
+            title: img.alt_text,
+            description: img.description
+          }))}
+        currentIndex={lightboxIndex}
+        onNavigate={(index) => setLightboxIndex(index)}
+      />
     </div>
   );
 };

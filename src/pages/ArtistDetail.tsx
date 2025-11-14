@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import ArtistProfile from "@/components/ArtistProfile";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 interface Artist {
   id: string;
@@ -83,8 +84,20 @@ const ArtistDetail = () => {
     );
   }
 
+  const artistImage = artist?.picture 
+    ? (artist.picture.startsWith('/') ? artist.picture : `/${artist.picture}`)
+    : "https://www.elektr-ame.com/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png";
+
   return (
     <div className="min-h-screen bg-black text-white">
+      <SEO 
+        title={artist ? `${artist.name} | Elektr-Âme` : "Artist | Elektr-Âme"}
+        description={artist ? `${artist.name} - ${artist.bio?.substring(0, 150) || 'Artist profile on Elektr-Âme'}...` : "Artist profile on Elektr-Âme"}
+        image={artistImage}
+        url={`https://www.elektr-ame.com/artist/${id}`}
+        type="profile"
+        keywords={artist ? `${artist.name}, electronic music, Barcelona, DJ, producer, ${artist.nickname || ''}` : "electronic music, Barcelona"}
+      />
       <Header />
       
       {/* Artist Header */}

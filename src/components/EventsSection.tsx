@@ -1,9 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Download } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePublicData } from "@/hooks/usePublicData";
 import { MusicEvent } from "@/types/admin";
+import { generateGoogleCalendarUrl, downloadCalendarFile, generateOutlookCalendarUrl, CalendarEvent } from "@/utils/calendar";
 
 const EventCard = ({ event }: { event: MusicEvent }) => {
   const { t } = useLanguage();
@@ -27,6 +28,33 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const displayHour = hour % 12 || 12;
     return `${displayHour}:${minutes} ${ampm}`;
+  };
+
+  // Create calendar event from MusicEvent
+  const createCalendarEvent = (event: MusicEvent): CalendarEvent => {
+    const eventDate = new Date(event.date);
+    const [hours, minutes] = (event.time || '20:00').split(':');
+    eventDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    return {
+      title: event.title,
+      description: event.description || '',
+      location: event.location || '',
+      startDate: eventDate,
+      duration: 120, // 2 hours default
+    };
+  };
+
+  const handleAddToCalendar = (event: MusicEvent, provider: 'google' | 'apple' | 'outlook') => {
+    const calendarEvent = createCalendarEvent(event);
+    
+    if (provider === 'google') {
+      window.open(generateGoogleCalendarUrl(calendarEvent), '_blank');
+    } else if (provider === 'outlook') {
+      window.open(generateOutlookCalendarUrl(calendarEvent), '_blank');
+    } else if (provider === 'apple') {
+      downloadCalendarFile(calendarEvent);
+    }
   };
   
   return (
@@ -81,6 +109,60 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
           <div className="flex items-center gap-1 text-sm text-white/60">
             <span className="text-white/40">📍</span>
             {event.location}
+          </div>
+          
+          {/* Add to Calendar Button */}
+          <div className="mt-2">
+            <div className="relative group">
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Show dropdown or open Google Calendar by default
+                  handleAddToCalendar(event, 'google');
+                }}
+                className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple font-semibold text-sm"
+                size="sm"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                Add to Calendar
+              </Button>
+              
+              {/* Calendar Provider Dropdown */}
+              <div className="absolute bottom-full left-0 mb-2 w-full opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <div className="bg-gray-800 border border-white/10 rounded-lg shadow-xl overflow-hidden">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCalendar(event, 'google');
+                    }}
+                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 text-sm flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Google Calendar
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCalendar(event, 'outlook');
+                    }}
+                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 text-sm flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Outlook
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAddToCalendar(event, 'apple');
+                    }}
+                    className="w-full px-4 py-2 text-left text-white hover:bg-white/10 text-sm flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Apple Calendar (.ics)
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
