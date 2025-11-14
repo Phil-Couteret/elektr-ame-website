@@ -371,25 +371,50 @@ const Gallery = ({ isAdmin = false }) => {
         </div>
       )}
 
-      {/* Lightbox */}
-      <Lightbox
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-        images={images
-          .filter(img => img && img.media_type !== 'video' && img.filepath && typeof img.filepath === 'string')
-          .map(img => {
-            const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
-            return {
-              src: src,
-              alt: img.alt_text || '',
-              title: img.alt_text || '',
-              description: img.description || ''
-            };
-          })
-          .filter(img => img && img.src)}
-        currentIndex={lightboxIndex}
-        onNavigate={(index) => setLightboxIndex(index)}
-      />
+      {/* Lightbox - only render if we have valid images */}
+      {(() => {
+        try {
+          const lightboxImages = images
+            .filter(img => {
+              return img && 
+                     typeof img === 'object' && 
+                     img.media_type !== 'video' && 
+                     img.filepath && 
+                     typeof img.filepath === 'string' &&
+                     img.filepath.trim().length > 0;
+            })
+            .map(img => {
+              try {
+                const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
+                return {
+                  src: src,
+                  alt: img.alt_text || '',
+                  title: img.alt_text || '',
+                  description: img.description || ''
+                };
+              } catch (e) {
+                console.error('Error mapping image for lightbox:', e, img);
+                return null;
+              }
+            })
+            .filter(img => img && img.src && typeof img.src === 'string' && img.src.trim().length > 0);
+          
+          if (lightboxImages.length === 0) return null;
+          
+          return (
+            <Lightbox
+              isOpen={lightboxOpen}
+              onClose={() => setLightboxOpen(false)}
+              images={lightboxImages}
+              currentIndex={lightboxIndex}
+              onNavigate={(index) => setLightboxIndex(index)}
+            />
+          );
+        } catch (e) {
+          console.error('Error creating lightbox images:', e);
+          return null;
+        }
+      })()}
     </div>
   );
 };

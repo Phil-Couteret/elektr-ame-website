@@ -158,18 +158,39 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
 
   // Memoized array of images for Lightbox (non-video images with valid filepaths)
   const lightboxImages = useMemo(() => {
-    return getFilteredImages()
-      .filter(img => img && img.media_type !== 'video' && img.filepath && typeof img.filepath === 'string')
-      .map(img => {
-        const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
-        return {
-          src: src,
-          alt: img.alt_text || '',
-          title: img.alt_text || '',
-          description: img.description || ''
-        };
-      })
-      .filter(img => img.src); // Final filter to ensure src exists
+    try {
+      const filtered = getFilteredImages();
+      if (!Array.isArray(filtered)) return [];
+      
+      return filtered
+        .filter(img => {
+          // Strict validation: ensure img exists, is an object, has required properties
+          return img && 
+                 typeof img === 'object' && 
+                 img.media_type !== 'video' && 
+                 img.filepath && 
+                 typeof img.filepath === 'string' &&
+                 img.filepath.trim().length > 0;
+        })
+        .map(img => {
+          try {
+            const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
+            return {
+              src: src,
+              alt: img.alt_text || '',
+              title: img.alt_text || '',
+              description: img.description || ''
+            };
+          } catch (e) {
+            console.error('Error mapping image for lightbox:', e, img);
+            return null;
+          }
+        })
+        .filter(img => img && img.src && typeof img.src === 'string' && img.src.trim().length > 0); // Final filter to ensure src exists and is valid
+    } catch (e) {
+      console.error('Error creating lightbox images array:', e);
+      return [];
+    }
   }, [images, selectedCategory]);
 
   const getCategoryCount = (category) => {
@@ -471,14 +492,16 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         )}
       </div>
 
-      {/* Lightbox */}
-      <Lightbox
-        isOpen={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-        images={lightboxImages}
-        currentIndex={lightboxIndex}
-        onNavigate={(index) => setLightboxIndex(index)}
-      />
+      {/* Lightbox - only render if we have valid images */}
+      {Array.isArray(lightboxImages) && lightboxImages.length > 0 && (
+        <Lightbox
+          isOpen={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          images={lightboxImages}
+          currentIndex={lightboxIndex}
+          onNavigate={(index) => setLightboxIndex(index)}
+        />
+      )}
     </div>
   );
 };
