@@ -1,5 +1,5 @@
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 interface LightboxProps {
   isOpen: boolean;
@@ -21,8 +21,17 @@ export const Lightbox = ({
   currentIndex,
   onNavigate,
 }: LightboxProps) => {
-  // Filter out any invalid images (undefined, null, or missing src)
-  const validImages = (images || []).filter(img => img && img.src && typeof img.src === 'string');
+  // Filter out any invalid images (undefined, null, or missing src) - memoized for stability
+  const validImages = useMemo(() => {
+    if (!images || !Array.isArray(images)) return [];
+    return images.filter(img => {
+      return img && 
+             typeof img === 'object' && 
+             img.src && 
+             typeof img.src === 'string' && 
+             img.src.trim().length > 0;
+    });
+  }, [images]);
   
   const [index, setIndex] = useState(() => {
     if (validImages.length === 0) return 0;
@@ -60,8 +69,21 @@ export const Lightbox = ({
     };
   }, [isOpen, index]);
 
-  // Early return if not open or no valid images
-  if (!isOpen || validImages.length === 0) {
+  // Close lightbox if no valid images (use effect to avoid hooks rule violation)
+  useEffect(() => {
+    if (isOpen && validImages.length === 0) {
+      console.warn('Lightbox: No valid images to display, closing', { imagesCount: images?.length, images });
+      if (onClose) onClose();
+    }
+  }, [isOpen, validImages.length, onClose, images]);
+
+  // Early return if not open
+  if (!isOpen) {
+    return null;
+  }
+
+  // Early return if no valid images
+  if (validImages.length === 0) {
     return null;
   }
 
@@ -69,10 +91,22 @@ export const Lightbox = ({
   const validIndex = Math.max(0, Math.min(index, validImages.length - 1));
   const currentImage = validImages[validIndex];
   
-  if (!currentImage || !currentImage.src) {
-    console.error('Lightbox: Invalid image at index', validIndex, 'Valid images:', validImages.length, 'All images:', images);
-    // Close lightbox if no valid image
-    if (onClose) onClose();
+  // Final safety check before rendering - close if invalid
+  useEffect(() => {
+    if (isOpen && (!currentImage || !currentImage.src || typeof currentImage.src !== 'string')) {
+      console.error('Lightbox: Invalid image at index', validIndex, {
+        validImagesCount: validImages.length,
+        currentIndex: index,
+        validIndex,
+        currentImage,
+        allImages: images
+      });
+      if (onClose) onClose();
+    }
+  }, [isOpen, currentImage, validIndex, validImages.length, index, images, onClose]);
+  
+  // Early return if current image is invalid
+  if (!currentImage || !currentImage.src || typeof currentImage.src !== 'string') {
     return null;
   }
   
@@ -123,25 +157,25 @@ export const Lightbox = ({
         className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        {currentImage.src && (
+        {currentImage?.src && (
           <img
             src={currentImage.src.startsWith("/") ? currentImage.src : `/${currentImage.src}`}
-            alt={currentImage.alt || currentImage.title || "Gallery image"}
+            alt={currentImage?.alt || currentImage?.title || "Gallery image"}
             className="max-w-full max-h-[85vh] object-contain"
             onError={(e) => {
-              console.error('Lightbox: Failed to load image', currentImage.src);
+              console.error('Lightbox: Failed to load image', currentImage?.src);
               e.currentTarget.style.display = 'none';
             }}
           />
         )}
 
         {/* Image info */}
-        {(currentImage.title || currentImage.description) && (
+        {(currentImage?.title || currentImage?.description) && (
           <div className="mt-4 text-center text-white max-w-2xl">
-            {currentImage.title && (
+            {currentImage?.title && (
               <h3 className="text-xl font-semibold mb-2">{currentImage.title}</h3>
             )}
-            {currentImage.description && (
+            {currentImage?.description && (
               <p className="text-white/80 text-sm">{currentImage.description}</p>
             )}
           </div>
