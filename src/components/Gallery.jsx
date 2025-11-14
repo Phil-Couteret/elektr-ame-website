@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Image as ImageIcon, Plus, Edit, Trash2, Search, Filter, Grid, List, Upload, Video } from 'lucide-react';
 import MultiImageUpload from './MultiImageUpload';
+import { Lightbox } from './Lightbox';
 
 const Gallery = ({ isAdmin = false }) => {
   const [images, setImages] = useState([]);
@@ -10,6 +11,8 @@ const Gallery = ({ isAdmin = false }) => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
   const [selectedImages, setSelectedImages] = useState([]);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const categories = [
     { value: 'all', label: 'All Images' },
@@ -275,7 +278,16 @@ const Gallery = ({ isAdmin = false }) => {
                 </div>
               )}
 
-              <div className={`${viewMode === 'list' ? 'w-24 h-24' : 'aspect-square'} rounded-lg overflow-hidden bg-gray-100 relative`}>
+              <div 
+                className={`${viewMode === 'list' ? 'w-24 h-24' : 'aspect-square'} rounded-lg overflow-hidden bg-gray-100 relative ${image.media_type !== 'video' ? 'cursor-pointer' : ''}`}
+                onClick={() => {
+                  if (image.media_type !== 'video') {
+                    const imageIndex = images.findIndex(img => img.id === image.id);
+                    setLightboxIndex(imageIndex);
+                    setLightboxOpen(true);
+                  }
+                }}
+              >
                 {image.media_type === 'video' ? (
                   <>
                     <video
@@ -344,6 +356,22 @@ const Gallery = ({ isAdmin = false }) => {
           </div>
         </div>
       )}
+
+      {/* Lightbox */}
+      <Lightbox
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        images={images
+          .filter(img => img.media_type !== 'video')
+          .map(img => ({
+            src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
+            alt: img.alt_text,
+            title: img.alt_text,
+            description: img.description
+          }))}
+        currentIndex={lightboxIndex}
+        onNavigate={(index) => setLightboxIndex(index)}
+      />
     </div>
   );
 };

@@ -7,10 +7,17 @@ import ArtistSection from "@/components/ArtistSection";
 import GallerySection from "@/components/GallerySection";
 import NewsletterSection from "@/components/NewsletterSection";
 import Footer from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-black text-white">
+      <SEO 
+        title="Elektr-Âme | Barcelona Electronic Music Association"
+        description="Elektr-Âme - Barcelona's electronic music association. Join our community of artists, DJs, producers, and music lovers. Discover upcoming events, artist profiles, and more."
+        url="https://www.elektr-ame.com"
+        keywords="electronic music, Barcelona, DJ, producer, music association, events, concerts, techno, house music"
+      />
       <Header />
       <HeroSection />
       <AboutSection />

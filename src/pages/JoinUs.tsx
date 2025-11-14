@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { SEO } from "@/components/SEO";
 
 // Form validation schema
 const joinUsSchema = z.object({
@@ -88,6 +89,12 @@ const JoinUs = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20 overflow-y-auto">
+      <SEO 
+        title="Join Us | Elektr-Âme"
+        description="Join Elektr-Âme - Barcelona's electronic music association. Become a member and connect with artists, DJs, producers, and music lovers in Barcelona."
+        url="https://www.elektr-ame.com/join-us"
+        keywords="join, membership, Barcelona, electronic music, association, community"
+      />
       <div className="container mx-auto px-4 py-8 pb-20">
         {/* Back button */}
         <div className="mb-6">
