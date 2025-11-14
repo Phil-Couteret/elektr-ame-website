@@ -280,7 +280,7 @@ const Gallery = ({ isAdmin = false }) => {
 
               <div 
                 className={`${viewMode === 'list' ? 'w-24 h-24' : 'aspect-square'} rounded-lg overflow-hidden bg-gray-100 relative ${image.media_type !== 'video' ? 'cursor-pointer' : ''}`}
-                onClick={() => {
+                onClick={(e) => {
                   if (image.media_type !== 'video') {
                     const imageIndex = images.findIndex(img => img.id === image.id);
                     setLightboxIndex(imageIndex);
@@ -289,17 +289,21 @@ const Gallery = ({ isAdmin = false }) => {
                 }}
               >
                 {image.media_type === 'video' ? (
-                  <div className="w-full h-full bg-black flex items-center justify-center">
+                  <div 
+                    className="w-full h-full bg-black flex items-center justify-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <video
                       src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
                       className="w-full h-full"
                       controls
                       preload="metadata"
                       style={{ objectFit: 'contain' }}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       Your browser does not support the video tag.
                     </video>
-                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded z-10">
+                    <div className="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded z-10 pointer-events-none">
                       VIDEO
                     </div>
                   </div>
