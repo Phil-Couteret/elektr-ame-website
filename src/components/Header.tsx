@@ -46,9 +46,16 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+    <header className="fixed top-0 left-0 right-0 w-full z-[100] bg-black/95 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-center relative">
+        <div className="flex h-16 items-center justify-between md:justify-center relative">
+          {/* Logo/Brand - visible on mobile */}
+          <div className="flex md:hidden items-center">
+            <Link to="/" onClick={handleHomeClick} className="text-white font-bold text-lg">
+              Elektr-Âme
+            </Link>
+          </div>
+          
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <button 
@@ -96,13 +103,14 @@ const Header = () => {
           </nav>
 
           {/* Mobile menu button */}
-          <div className="flex md:hidden absolute right-0">
+          <div className="flex md:hidden">
             <button
               type="button"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white hover:text-blue-light"
+              className="text-white hover:text-blue-light p-2"
               aria-controls="mobile-menu"
               aria-expanded={isMenuOpen}
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
