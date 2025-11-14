@@ -58,12 +58,6 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                  img.filepath.trim().length > 0;
         });
         
-        console.log('Fetched images:', {
-          total: result.data.images?.length || 0,
-          valid: validImages.length,
-          invalid: (result.data.images?.length || 0) - validImages.length
-        });
-        
         // Rebuild imagesByCategory with only valid images
         const validImagesByCategory = {};
         validImages.forEach(img => {
@@ -94,14 +88,9 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
   };
 
   const handleImageDelete = async (imageId) => {
-    console.log('handleImageDelete called with imageId:', imageId);
-    
     if (!confirm('Are you sure you want to delete this image?')) {
-      console.log('Delete cancelled by user');
       return;
     }
-
-    console.log('Delete confirmed, sending request...');
 
     try {
       const response = await fetch('/api/delete-artist-image.php', {
@@ -112,12 +101,9 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         body: JSON.stringify({ image_id: imageId })
       });
 
-      console.log('Delete response status:', response.status);
       const result = await response.json();
-      console.log('Delete result:', result);
 
       if (result.success) {
-        console.log('Image deleted successfully');
         fetchImages();
       } else {
         alert('Failed to delete image: ' + result.message);
@@ -170,7 +156,6 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
       const result = await response.json();
 
       if (result.success) {
-        console.log('Image updated successfully');
         setEditingImage(null);
         fetchImages();
       } else {
@@ -355,42 +340,16 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                         return normalizedSrc === imgPath || img.src === imgPath;
                       });
                       
-                      console.log('Click on image:', {
-                        imageId: image.id,
-                        originalFilepath: image.filepath,
-                        normalizedPath: imgPath,
-                        foundIndex: imageIndex,
-                        lightboxImagesCount: lightboxImages.length,
-                        lightboxImages: lightboxImages.map((img, idx) => ({
-                          idx,
-                          src: img?.src,
-                          normalized: normalizePath(img?.src || '')
-                        }))
-                      });
-                      
                       // Double-check that the image at this index exists and has a valid src
                       if (imageIndex !== -1 && lightboxImages[imageIndex] && lightboxImages[imageIndex].src) {
-                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, 'Path:', imgPath, 'Image at index:', lightboxImages[imageIndex]);
                         setLightboxIndex(imageIndex);
                         // Use setTimeout to ensure state updates happen after current render cycle
                         setTimeout(() => {
                           setLightboxOpen(true);
                         }, 0);
                       } else {
-                        console.error('Image not found in lightbox array or invalid:', {
-                          imageId: image.id,
-                          imageFilepath: image.filepath,
-                          normalizedPath: imgPath,
-                          foundIndex: imageIndex,
-                          imageAtIndex: imageIndex !== -1 ? lightboxImages[imageIndex] : null,
-                          availableImages: lightboxImages.map((img, idx) => ({ idx, src: img?.src, normalized: normalizePath(img?.src || '') }))
-                        });
+                        console.error('Image not found in lightbox array:', image.id, image.filepath);
                       }
-                    } else if (!isVideo && !isEditing) {
-                      console.warn('Cannot open lightbox: no valid images or missing filepath', {
-                        hasFilepath: !!image.filepath,
-                        lightboxImagesCount: lightboxImages.length
-                      });
                     }
                   }}
                 >
@@ -409,9 +368,9 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   ) : (
                     <img
                       src={image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`}
-                      alt={image.alt_text}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                    />
+                    alt={image.alt_text}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
                   )}
                 </div>
                 
@@ -437,16 +396,16 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                         >
                           <Edit className="h-4 w-4" />
                         </button>
-                        <button
+                      <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleImageDelete(image.id);
                           }}
-                          className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
-                          title="Delete image"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700"
+                        title="Delete image"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                       </>
                     )}
                   </div>
@@ -457,12 +416,12 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                     {isVideo ? (
                       <Video className="h-3 w-3" />
                     ) : (
-                      <Icon className="h-3 w-3" />
+                    <Icon className="h-3 w-3" />
                     )}
                     <span>{categoryLabels[image.category]}</span>
                   </div>
                 </div>
-                
+
                 {image.is_profile_picture && (
                   <div className="absolute top-2 right-2">
                     <div className="bg-blue-600 text-white p-1 rounded-full">
@@ -470,7 +429,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                     </div>
                   </div>
                 )}
-                
+
                 {isVideo && (
                   <div className={`absolute ${image.is_profile_picture ? 'top-10 right-2' : 'top-2 right-2'}`}>
                     <div className="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
