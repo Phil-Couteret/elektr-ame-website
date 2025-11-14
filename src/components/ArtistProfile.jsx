@@ -319,7 +319,9 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {getFilteredImages().map((image) => {
+          {getFilteredImages()
+            .filter(image => image && image.filepath && typeof image.filepath === 'string' && image.filepath.trim().length > 0)
+            .map((image) => {
             const Icon = categoryIcons[image.category];
             const isVideo = image.media_type === 'video';
             const isEditing = editingImage === image.id;
