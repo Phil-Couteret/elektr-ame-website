@@ -376,13 +376,17 @@ const Gallery = ({ isAdmin = false }) => {
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         images={images
-          .filter(img => img.media_type !== 'video')
-          .map(img => ({
-            src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
-            alt: img.alt_text,
-            title: img.alt_text,
-            description: img.description
-          }))}
+          .filter(img => img && img.media_type !== 'video' && img.filepath && typeof img.filepath === 'string')
+          .map(img => {
+            const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
+            return {
+              src: src,
+              alt: img.alt_text || '',
+              title: img.alt_text || '',
+              description: img.description || ''
+            };
+          })
+          .filter(img => img && img.src)}
         currentIndex={lightboxIndex}
         onNavigate={(index) => setLightboxIndex(index)}
       />
