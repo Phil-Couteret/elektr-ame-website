@@ -351,7 +351,7 @@ const GalleryManager = () => {
                   setShowCreateGallery(false);
                   setNewGallery({ title: '', description: '' });
                 }}
-                className="border-white/20 text-white hover:bg-white/10"
+                className="border-white/20 bg-black/40 text-white hover:bg-white/10"
               >
                 Cancel
               </Button>
@@ -407,7 +407,7 @@ const GalleryManager = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => setEditingGallery(null)}
-                            className="border-white/20 text-white hover:bg-white/10"
+                            className="border-white/20 bg-black/40 text-white hover:bg-white/10"
                           >
                             Cancel
                           </Button>
@@ -432,7 +432,7 @@ const GalleryManager = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => setEditingGallery(gallery)}
-                            className="border-electric-blue text-electric-blue hover:bg-electric-blue/20"
+                            className="border-electric-blue bg-black/40 text-electric-blue hover:bg-electric-blue/20"
                           >
                             <Edit2 className="h-4 w-4" />
                           </Button>
@@ -440,7 +440,7 @@ const GalleryManager = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleDeleteGallery(gallery.id)}
-                            className="border-red-400 text-red-400 hover:bg-red-400/20"
+                            className="border-red-400 bg-black/40 text-red-400 hover:bg-red-400/20"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -448,7 +448,7 @@ const GalleryManager = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => toggleGallery(gallery.id)}
-                            className="border-white/20 text-white hover:bg-white/10"
+                            className="border-white/20 bg-black/40 text-white hover:bg-white/10"
                           >
                             {expandedGalleries[gallery.id] ? 'Hide' : 'Show'} Images
                           </Button>
@@ -456,7 +456,7 @@ const GalleryManager = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => setUploadingToGallery(uploadingToGallery === gallery.id ? null : gallery.id)}
-                            className="border-electric-blue text-electric-blue hover:bg-electric-blue/20"
+                            className="border-electric-blue bg-black/40 text-electric-blue hover:bg-electric-blue/20"
                           >
                             <Upload className="h-4 w-4 mr-1" />
                             {uploadingToGallery === gallery.id ? 'Cancel' : 'Upload'}
@@ -525,7 +525,7 @@ const GalleryManager = () => {
                                     size="sm"
                                     variant="outline"
                                     onClick={() => handleImageDelete(image.id, gallery.id)}
-                                    className="border-red-400 text-red-400 hover:bg-red-400/20"
+                                    className="border-red-400 bg-black/60 text-red-400 hover:bg-red-400/20"
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
