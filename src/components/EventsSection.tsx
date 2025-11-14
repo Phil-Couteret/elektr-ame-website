@@ -60,7 +60,7 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
   return (
     <div className="flex flex-col overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-xl rounded-xl bg-gradient-to-br from-black/80 to-gray-800/80 backdrop-blur border border-white/5">
       <div className="h-48 relative overflow-hidden">
-        {event.picture ? (
+        {event.picture && typeof event.picture === 'string' && event.picture.trim().length > 0 ? (
           <img 
             src={event.picture.startsWith('/') ? event.picture : '/' + event.picture} 
             alt={event.title}
