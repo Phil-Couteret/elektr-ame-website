@@ -334,13 +334,25 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                     if (!isVideo && !isEditing && image.filepath && lightboxImages.length > 0) {
                       // Use the same memoized array to find the index
                       const imgPath = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
-                      const imageIndex = lightboxImages.findIndex(img => img.src === imgPath);
-                      if (imageIndex !== -1) {
-                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath, 'Total images:', lightboxImages.length);
+                      const imageIndex = lightboxImages.findIndex(img => img && img.src === imgPath);
+                      
+                      // Double-check that the image at this index exists and has a valid src
+                      if (imageIndex !== -1 && lightboxImages[imageIndex] && lightboxImages[imageIndex].src) {
+                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath, 'Total images:', lightboxImages.length, 'Image at index:', lightboxImages[imageIndex]);
                         setLightboxIndex(imageIndex);
-                        setLightboxOpen(true);
+                        // Use setTimeout to ensure state updates happen after current render cycle
+                        setTimeout(() => {
+                          setLightboxOpen(true);
+                        }, 0);
                       } else {
-                        console.warn('Image not found in lightbox array:', image.id, image.filepath, 'Available:', lightboxImages.map(img => img.src));
+                        console.warn('Image not found in lightbox array or invalid:', {
+                          imageId: image.id,
+                          imageFilepath: image.filepath,
+                          imgPath,
+                          foundIndex: imageIndex,
+                          imageAtIndex: imageIndex !== -1 ? lightboxImages[imageIndex] : null,
+                          availableImages: lightboxImages.map((img, idx) => ({ idx, src: img?.src }))
+                        });
                       }
                     } else if (!isVideo && !isEditing) {
                       console.warn('Cannot open lightbox: no valid images or missing filepath', {
