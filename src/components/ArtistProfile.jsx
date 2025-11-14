@@ -189,6 +189,18 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
     return imagesByCategory[selectedCategory] || [];
   };
 
+  // Normalize path function - used consistently for all path comparisons
+  const normalizePath = (path) => {
+    if (!path) return '';
+    // Remove any leading/trailing whitespace
+    path = path.trim();
+    // Ensure it starts with /
+    if (!path.startsWith('/')) {
+      path = `/${path}`;
+    }
+    return path;
+  };
+
   // Memoized array of images for Lightbox (non-video images with valid filepaths)
   const lightboxImages = useMemo(() => {
     try {
@@ -207,7 +219,8 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
         })
         .map(img => {
           try {
-            const src = img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`;
+            // Use the same normalization function
+            const src = normalizePath(img.filepath);
             return {
               src: src,
               alt: img.alt_text || '',
@@ -332,26 +345,45 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
                   onClick={() => {
                     if (!isVideo && !isEditing && image.filepath && lightboxImages.length > 0) {
-                      // Use the same memoized array to find the index
-                      const imgPath = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
-                      const imageIndex = lightboxImages.findIndex(img => img && img.src === imgPath);
+                      // Use the same normalization function as in lightboxImages
+                      const imgPath = normalizePath(image.filepath);
+                      
+                      // Find index using normalized path comparison
+                      const imageIndex = lightboxImages.findIndex(img => {
+                        if (!img || !img.src) return false;
+                        const normalizedSrc = normalizePath(img.src);
+                        return normalizedSrc === imgPath || img.src === imgPath;
+                      });
+                      
+                      console.log('Click on image:', {
+                        imageId: image.id,
+                        originalFilepath: image.filepath,
+                        normalizedPath: imgPath,
+                        foundIndex: imageIndex,
+                        lightboxImagesCount: lightboxImages.length,
+                        lightboxImages: lightboxImages.map((img, idx) => ({
+                          idx,
+                          src: img?.src,
+                          normalized: normalizePath(img?.src || '')
+                        }))
+                      });
                       
                       // Double-check that the image at this index exists and has a valid src
                       if (imageIndex !== -1 && lightboxImages[imageIndex] && lightboxImages[imageIndex].src) {
-                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath, 'Total images:', lightboxImages.length, 'Image at index:', lightboxImages[imageIndex]);
+                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, 'Path:', imgPath, 'Image at index:', lightboxImages[imageIndex]);
                         setLightboxIndex(imageIndex);
                         // Use setTimeout to ensure state updates happen after current render cycle
                         setTimeout(() => {
                           setLightboxOpen(true);
                         }, 0);
                       } else {
-                        console.warn('Image not found in lightbox array or invalid:', {
+                        console.error('Image not found in lightbox array or invalid:', {
                           imageId: image.id,
                           imageFilepath: image.filepath,
-                          imgPath,
+                          normalizedPath: imgPath,
                           foundIndex: imageIndex,
                           imageAtIndex: imageIndex !== -1 ? lightboxImages[imageIndex] : null,
-                          availableImages: lightboxImages.map((img, idx) => ({ idx, src: img?.src }))
+                          availableImages: lightboxImages.map((img, idx) => ({ idx, src: img?.src, normalized: normalizePath(img?.src || '') }))
                         });
                       }
                     } else if (!isVideo && !isEditing) {
