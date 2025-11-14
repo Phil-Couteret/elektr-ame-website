@@ -51,12 +51,6 @@ export const Lightbox = ({
       // If the requested index is invalid, find the first valid image
       const firstValidIndex = validImages.findIndex(img => img && img.src);
       if (firstValidIndex !== -1) {
-        console.warn('Lightbox: Requested index invalid, using first valid image', {
-          requestedIndex: currentIndex,
-          validIndex,
-          firstValidIndex,
-          validImagesCount: validImages.length
-        });
         setIndex(firstValidIndex);
       } else {
         setIndex(0);
@@ -89,10 +83,9 @@ export const Lightbox = ({
   // Close lightbox if no valid images (use effect to avoid hooks rule violation)
   useEffect(() => {
     if (isOpen && validImages.length === 0) {
-      console.warn('Lightbox: No valid images to display, closing', { imagesCount: images?.length, images });
       if (onClose) onClose();
     }
-  }, [isOpen, validImages.length, onClose, images]);
+  }, [isOpen, validImages.length, onClose]);
 
   // Early return if not open
   if (!isOpen) {
@@ -111,16 +104,10 @@ export const Lightbox = ({
   // Final safety check before rendering - close if invalid
   useEffect(() => {
     if (isOpen && (!currentImage || !currentImage.src || typeof currentImage.src !== 'string')) {
-      console.error('Lightbox: Invalid image at index', validIndex, {
-        validImagesCount: validImages.length,
-        currentIndex: index,
-        validIndex,
-        currentImage,
-        allImages: images
-      });
+      console.error('Lightbox: Invalid image at index', validIndex);
       if (onClose) onClose();
     }
-  }, [isOpen, currentImage, validIndex, validImages.length, index, images, onClose]);
+  }, [isOpen, currentImage, validIndex, validImages.length, index, onClose]);
   
   // Early return if current image is invalid
   if (!currentImage || !currentImage.src || typeof currentImage.src !== 'string') {
