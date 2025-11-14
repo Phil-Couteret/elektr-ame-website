@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Image as ImageIcon, Plus, Edit, Trash2, Star, Camera, Video, Save, X } from 'lucide-react';
 import ArtistImageUpload from './ArtistImageUpload';
 import { Lightbox } from './Lightbox';
@@ -156,6 +156,18 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
     return imagesByCategory[selectedCategory] || [];
   };
 
+  // Memoized array of images for Lightbox (non-video images with valid filepaths)
+  const lightboxImages = useMemo(() => {
+    return getFilteredImages()
+      .filter(img => img.media_type !== 'video' && img.filepath)
+      .map(img => ({
+        src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
+        alt: img.alt_text || '',
+        title: img.alt_text || '',
+        description: img.description || ''
+      }));
+  }, [images, selectedCategory, imagesByCategory]);
+
   const getCategoryCount = (category) => {
     return imagesByCategory[category]?.length || 0;
   };
@@ -259,13 +271,18 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                 <div 
                   className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
                   onClick={() => {
-                    if (!isVideo && !isEditing) {
-                      // Filter out videos first, then find the index
-                      const filteredImages = getFilteredImages().filter(img => img.media_type !== 'video');
-                      const imageIndex = filteredImages.findIndex(img => img.id === image.id);
+                    if (!isVideo && !isEditing && image.filepath) {
+                      // Use the same memoized array to find the index
+                      const imageIndex = lightboxImages.findIndex(img => {
+                        const imgPath = image.filepath.startsWith('/') ? image.filepath : `/${image.filepath}`;
+                        return img.src === imgPath;
+                      });
                       if (imageIndex !== -1) {
+                        console.log('Opening lightbox at index', imageIndex, 'for image', image.id, image.filepath);
                         setLightboxIndex(imageIndex);
                         setLightboxOpen(true);
+                      } else {
+                        console.warn('Image not found in lightbox array:', image.id, image.filepath, 'Available:', lightboxImages.map(img => img.src));
                       }
                     }
                   }}
@@ -451,14 +468,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
       <Lightbox
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
-        images={getFilteredImages()
-          .filter(img => img.media_type !== 'video')
-          .map(img => ({
-            src: img.filepath.startsWith('/') ? img.filepath : `/${img.filepath}`,
-            alt: img.alt_text,
-            title: img.alt_text,
-            description: img.description
-          }))}
+        images={lightboxImages}
         currentIndex={lightboxIndex}
         onNavigate={(index) => setLightboxIndex(index)}
       />
