@@ -4,27 +4,32 @@
  * Handles secure authentication with password hashing
  */
 
-// Start session
+// Prevent any output before headers - MUST be first
+ob_start();
+
+// Use config helper for environment-aware CORS
+require_once __DIR__ . '/config-helper.php';
+setCorsHeaders();
+
+// Start session - after output buffering to prevent any session output
 session_start();
 
 header('Content-Type: application/json');
-// Allow both production and local development
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, ['https://www.elektr-ame.com', 'http://localhost:8080', 'http://127.0.0.1:8080'])) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-}
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Credentials: true');
+// Prevent caching of API responses
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    ob_end_clean();
     http_response_code(200);
     exit();
 }
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_end_clean();
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method not allowed']);
     exit();
@@ -32,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Include database configuration
 require_once __DIR__ . '/config.php';
+
+// Clear any output buffer before JSON output
+ob_end_clean();
 
 try {
     
@@ -59,7 +67,8 @@ try {
     }
     
     // Get user from database
-    $stmt = $pdo->prepare("SELECT id, email, password_hash, full_name, role, is_active FROM admin_users WHERE email = :email");
+    // Note: Table uses 'name' column, not 'full_name'
+    $stmt = $pdo->prepare("SELECT id, email, password_hash, name, role, is_active FROM admin_users WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -87,7 +96,7 @@ try {
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_id'] = $user['id'];
     $_SESSION['admin_email'] = $user['email'];
-    $_SESSION['admin_name'] = $user['full_name'];
+    $_SESSION['admin_name'] = $user['name'];
     $_SESSION['admin_role'] = $user['role'];
     $_SESSION['login_time'] = time();
     
@@ -100,7 +109,7 @@ try {
         'message' => 'Login successful',
         'user' => [
             'email' => $user['email'],
-            'name' => $user['full_name'],
+            'name' => $user['name'],
             'role' => $user['role']
         ]
     ]);
@@ -110,7 +119,8 @@ try {
     http_response_code(500);
     echo json_encode([
         'success' => false,
-        'message' => 'Server error occurred'
+        'message' => 'Server error occurred',
+        'error' => $e->getMessage()
     ]);
 } catch (Exception $e) {
     http_response_code(401);
