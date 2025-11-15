@@ -101,31 +101,16 @@ export const Lightbox = ({
   const validIndex = Math.max(0, Math.min(index, validImages.length - 1));
   const currentImage = validImages[validIndex];
   
-  // Final safety check before rendering - but don't close immediately, try to find valid image first
+  // Final safety check before rendering - close if invalid
   useEffect(() => {
-    if (isOpen && validImages.length > 0) {
-      // If current image is invalid, try to find a valid one
-      if (!currentImage || !currentImage.src || typeof currentImage.src !== 'string') {
-        const firstValidIndex = validImages.findIndex(img => img && img.src && typeof img.src === 'string');
-        if (firstValidIndex !== -1) {
-          setIndex(firstValidIndex);
-          if (onNavigate) onNavigate(firstValidIndex);
-        } else {
-          // Only close if no valid images exist at all
-          console.error('Lightbox: No valid images found');
-          if (onClose) onClose();
-        }
-      }
+    if (isOpen && (!currentImage || !currentImage.src || typeof currentImage.src !== 'string')) {
+      console.error('Lightbox: Invalid image at index', validIndex);
+      if (onClose) onClose();
     }
-  }, [isOpen, currentImage, validIndex, validImages.length, index, onClose, onNavigate, validImages]);
+  }, [isOpen, currentImage, validIndex, validImages.length, index, onClose]);
   
-  // If current image is invalid, use first valid image as fallback
-  const imageToRender = (currentImage && currentImage.src && typeof currentImage.src === 'string') 
-    ? currentImage 
-    : validImages.find(img => img && img.src && typeof img.src === 'string');
-  
-  // Early return only if no valid images exist at all
-  if (!imageToRender || !imageToRender.src || typeof imageToRender.src !== 'string') {
+  // Early return if current image is invalid
+  if (!currentImage || !currentImage.src || typeof currentImage.src !== 'string') {
     return null;
   }
   
@@ -176,43 +161,31 @@ export const Lightbox = ({
         className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        {(() => {
-          const imageSrc = imageToRender.src;
+        {currentImage?.src && (() => {
+          const imageSrc = currentImage?.src;
+          if (!imageSrc) return null;
           const normalizedSrc = imageSrc.startsWith("/") ? imageSrc : `/${imageSrc}`;
           return (
             <img
-              key={`${normalizedSrc}-${validIndex}`} // Force re-render on src/index change
               src={normalizedSrc}
-              alt={imageToRender.alt || imageToRender.title || "Gallery image"}
+              alt={currentImage?.alt || currentImage?.title || "Gallery image"}
               className="max-w-full max-h-[85vh] object-contain"
               onError={(e) => {
                 console.error('Lightbox: Failed to load image', imageSrc);
-                // Try next image instead of hiding
-                const currentIdx = validImages.indexOf(imageToRender);
-                if (currentIdx !== -1 && currentIdx < validImages.length - 1) {
-                  const nextIdx = currentIdx + 1;
-                  setIndex(nextIdx);
-                  if (onNavigate) onNavigate(nextIdx);
-                } else if (currentIdx > 0) {
-                  const prevIdx = currentIdx - 1;
-                  setIndex(prevIdx);
-                  if (onNavigate) onNavigate(prevIdx);
-                } else {
-                  e.currentTarget.style.display = 'none';
-                }
+                e.currentTarget.style.display = 'none';
               }}
             />
           );
         })()}
 
         {/* Image info */}
-        {(imageToRender?.title || imageToRender?.description) && (
+        {(currentImage?.title || currentImage?.description) && (
           <div className="mt-4 text-center text-white max-w-2xl">
-            {imageToRender?.title && (
-              <h3 className="text-xl font-semibold mb-2">{imageToRender.title}</h3>
+            {currentImage?.title && (
+              <h3 className="text-xl font-semibold mb-2">{currentImage.title}</h3>
             )}
-            {imageToRender?.description && (
-              <p className="text-white/80 text-sm">{imageToRender.description}</p>
+            {currentImage?.description && (
+              <p className="text-white/80 text-sm">{currentImage.description}</p>
             )}
           </div>
         )}
