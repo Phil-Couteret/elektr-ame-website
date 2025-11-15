@@ -1,7 +1,7 @@
 // Elektr-Âme PWA Service Worker
-// Version 1.0.5 - Updated to clear cache for Header logo removal
+// Version 1.0.6 - Fix video playback by excluding from cache
 
-const CACHE_VERSION = 'elektr-ame-v1.0.5';
+const CACHE_VERSION = 'elektr-ame-v1.0.6';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
@@ -86,6 +86,13 @@ self.addEventListener('fetch', (event) => {
           }
         })
     );
+    return;
+  }
+
+  // Skip video files (need range requests for playback)
+  if (request.destination === 'video' || 
+      url.pathname.match(/\.(mp4|webm|ogg|mov|avi)$/i)) {
+    // Let videos bypass service worker completely
     return;
   }
 
