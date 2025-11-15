@@ -74,3 +74,4 @@ public/event-media/*
 # Shell scripts (local only)
 *.sh
 !database/*.sh
+config.php
