@@ -207,6 +207,7 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
             // Use the same normalization function
             const src = normalizePath(img.filepath);
             return {
+              id: img.id, // Store image ID for reliable lookup
               src: src,
               alt: img.alt_text || '',
               title: img.alt_text || '',
@@ -330,25 +331,40 @@ const ArtistProfile = ({ artistId, artistName, isAdmin = false }) => {
                   className={`aspect-square rounded-lg overflow-hidden bg-gray-100 ${!isVideo && !isEditing ? 'cursor-pointer' : ''}`}
                   onClick={() => {
                     if (!isVideo && !isEditing && image.filepath && lightboxImages.length > 0) {
-                      // Use the same normalization function as in lightboxImages
-                      const imgPath = normalizePath(image.filepath);
+                      // Find index by image ID first (most reliable method)
+                      let imageIndex = lightboxImages.findIndex(img => img && img.id === image.id);
                       
-                      // Find index using normalized path comparison
-                      const imageIndex = lightboxImages.findIndex(img => {
-                        if (!img || !img.src) return false;
-                        const normalizedSrc = normalizePath(img.src);
-                        return normalizedSrc === imgPath || img.src === imgPath;
-                      });
+                      // Fallback: Find by normalized path if ID match fails
+                      if (imageIndex === -1) {
+                        const imgPath = normalizePath(image.filepath);
+                        imageIndex = lightboxImages.findIndex(img => {
+                          if (!img || !img.src) return false;
+                          const normalizedSrc = normalizePath(img.src);
+                          return normalizedSrc === imgPath;
+                        });
+                      }
                       
-                      // Double-check that the image at this index exists and has a valid src
-                      if (imageIndex !== -1 && lightboxImages[imageIndex] && lightboxImages[imageIndex].src) {
+                      // Final fallback: Find by direct path comparison
+                      if (imageIndex === -1) {
+                        imageIndex = lightboxImages.findIndex(img => {
+                          if (!img || !img.src) return false;
+                          return img.src === image.filepath || img.src === normalizePath(image.filepath);
+                        });
+                      }
+                      
+                      // Verify the index is valid and the image exists
+                      if (imageIndex !== -1 && imageIndex < lightboxImages.length && lightboxImages[imageIndex] && lightboxImages[imageIndex].src) {
                         setLightboxIndex(imageIndex);
                         // Use setTimeout to ensure state updates happen after current render cycle
                         setTimeout(() => {
                           setLightboxOpen(true);
                         }, 0);
                       } else {
-                        console.error('Image not found in lightbox array:', image.id, image.filepath);
+                        console.error('Image not found in lightbox array:', {
+                          imageId: image.id,
+                          filepath: image.filepath,
+                          lightboxImagesCount: lightboxImages.length
+                        });
                       }
                     }
                   }}
