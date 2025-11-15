@@ -83,22 +83,56 @@ try {
         $source = $fileData['source'];
 
         if ($file['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = "Error uploading {$file['name']}";
+            $errorMsg = "Error uploading {$file['name']} - ";
+            switch ($file['error']) {
+                case UPLOAD_ERR_INI_SIZE:
+                    $errorMsg .= "File exceeds upload_max_filesize";
+                    break;
+                case UPLOAD_ERR_FORM_SIZE:
+                    $errorMsg .= "File exceeds MAX_FILE_SIZE";
+                    break;
+                case UPLOAD_ERR_PARTIAL:
+                    $errorMsg .= "File was only partially uploaded";
+                    break;
+                case UPLOAD_ERR_NO_FILE:
+                    $errorMsg .= "No file was uploaded";
+                    break;
+                case UPLOAD_ERR_NO_TMP_DIR:
+                    $errorMsg .= "Missing temporary folder";
+                    break;
+                case UPLOAD_ERR_CANT_WRITE:
+                    $errorMsg .= "Failed to write file to disk";
+                    break;
+                case UPLOAD_ERR_EXTENSION:
+                    $errorMsg .= "PHP extension stopped the upload";
+                    break;
+                default:
+                    $errorMsg .= "Unknown error code: {$file['error']}";
+            }
+            $errors[] = $errorMsg;
+            error_log($errorMsg);
             continue;
         }
 
         // Determine media type and allowed types
+        // Check both MIME type and file extension (browsers sometimes send wrong MIME types)
         $isVideo = false;
         $allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         $allowedVideoTypes = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
+        $allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        $allowedVideoExtensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'qt'];
         
-        if (in_array($file['type'], $allowedVideoTypes) || $source === 'videos') {
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $mimeType = $file['type'];
+        
+        // Check MIME type first, then fallback to extension or source
+        if (in_array($mimeType, $allowedVideoTypes) || in_array($extension, $allowedVideoExtensions) || $source === 'videos') {
             $isVideo = true;
             $maxSize = 100 * 1024 * 1024; // 100MB for videos
-        } else if (in_array($file['type'], $allowedImageTypes)) {
+        } else if (in_array($mimeType, $allowedImageTypes) || in_array($extension, $allowedImageExtensions)) {
             $maxSize = 10 * 1024 * 1024; // 10MB for images
         } else {
-            $errors[] = "Invalid file type for {$file['name']}";
+            $errors[] = "Invalid file type for {$file['name']} (type: {$mimeType}, ext: {$extension})";
             continue;
         }
 
@@ -107,14 +141,20 @@ try {
             continue;
         }
 
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        // Extension already extracted above
         $uniqueFilename = uniqid() . '_' . time() . '.' . $extension;
         $filePath = $uploadDir . $uniqueFilename;
 
         if (!move_uploaded_file($file['tmp_name'], $filePath)) {
-            $errors[] = "Failed to save {$file['name']}";
+            $error = "Failed to save {$file['name']} to {$filePath}";
+            $errors[] = $error;
+            error_log($error);
+            error_log("Upload dir writable: " . (is_writable($uploadDir) ? 'yes' : 'no'));
+            error_log("Upload dir exists: " . (is_dir($uploadDir) ? 'yes' : 'no'));
             continue;
         }
+        
+        error_log("Successfully saved file to: {$filePath}");
 
         $width = 0;
         $height = 0;
@@ -132,16 +172,19 @@ try {
                 $height = $videoInfo['height'] ?? 0;
                 $videoDuration = $videoInfo['duration'] ?? null;
                 if (file_exists($thumbnailPath)) {
-                    $relativeThumbnailPath = 'artist-images/thumbnails/thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
+                    $relativeThumbnailPath = 'public/artist-images/thumbnails/thumb_' . pathinfo($uniqueFilename, PATHINFO_FILENAME) . '.jpg';
                 }
             }
         } else {
             // For images, create thumbnail
             $thumbnailPath = $thumbnailDir . 'thumb_' . $uniqueFilename;
             if (createThumbnail($filePath, $thumbnailPath, 300, 300)) {
-                $relativeThumbnailPath = 'artist-images/thumbnails/thumb_' . $uniqueFilename;
+                $relativeThumbnailPath = 'public/artist-images/thumbnails/thumb_' . $uniqueFilename;
+                error_log("Thumbnail created: {$thumbnailPath}");
             } else {
-                $errors[] = "Failed to create thumbnail for {$file['name']}";
+                $error = "Failed to create thumbnail for {$file['name']}";
+                $errors[] = $error;
+                error_log($error);
             }
 
             $imageInfo = getimagesize($filePath);
@@ -168,25 +211,40 @@ try {
         ");
 
         $altText = $description ?: ($isVideo ? "Artist video - {$category}" : "Artist image - {$category}");
-        $relativeFilePath = 'artist-images/' . $uniqueFilename;
+        // Store path relative to public directory for HTTP access
+        $relativeFilePath = 'public/artist-images/' . $uniqueFilename;
 
-        $stmt->execute([
-            $artistId,
-            $file['name'],
-            $relativeFilePath,
-            $relativeThumbnailPath,
-            $altText,
-            $description,
-            $category,
-            $isVideo ? 'video' : 'image',
-            $isProfilePicture ? 1 : 0,
-            $width,
-            $height,
-            $file['size'],
-            $videoDuration
-        ]);
-
-        $uploadedCount++;
+        try {
+            $stmt->execute([
+                $artistId,
+                $file['name'],
+                $relativeFilePath,
+                $relativeThumbnailPath,
+                $altText,
+                $description,
+                $category,
+                $isVideo ? 'video' : 'image',
+                $isProfilePicture ? 1 : 0,
+                $width,
+                $height,
+                $file['size'],
+                $videoDuration
+            ]);
+            
+            error_log("Database insert successful for: {$file['name']}");
+            $uploadedCount++;
+        } catch (PDOException $e) {
+            $error = "Database error for {$file['name']}: " . $e->getMessage();
+            $errors[] = $error;
+            error_log($error);
+            // Clean up uploaded file if database insert failed
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+            if (isset($thumbnailPath) && file_exists($thumbnailPath)) {
+                unlink($thumbnailPath);
+            }
+        }
     }
 
     if ($uploadedCount > 0) {

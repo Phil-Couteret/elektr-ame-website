@@ -7,9 +7,9 @@ RewriteBase /
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Allow API calls to pass through (BEFORE React Router rewrite)
+# Allow API calls to pass through
 RewriteCond %{REQUEST_URI} ^/api/
-RewriteRule . - [L]
+RewriteRule ^(.*)$ - [L]
 
 # React Router - Serve index.html for all other routes
 # Don't rewrite if the file/directory exists
@@ -79,6 +79,11 @@ ExpiresByType image/jpeg "access plus 1 year"
 ExpiresByType image/png "access plus 1 year"
 ExpiresByType image/webp "access plus 1 year"
 
+# Videos
+ExpiresByType video/mp4 "access plus 1 month"
+ExpiresByType video/webm "access plus 1 month"
+ExpiresByType video/ogg "access plus 1 month"
+
 # CSS and JavaScript
 ExpiresByType text/css "access plus 1 month"
 ExpiresByType application/javascript "access plus 1 month"
@@ -87,3 +92,10 @@ ExpiresByType application/javascript "access plus 1 month"
 ExpiresByType text/html "access plus 0 seconds"
 </IfModule>
 
+# Ensure proper MIME types for video files
+<IfModule mod_mime.c>
+AddType video/mp4 .mp4
+AddType video/webm .webm
+AddType video/ogg .ogg .ogv
+AddType video/quicktime .mov
+</IfModule>
