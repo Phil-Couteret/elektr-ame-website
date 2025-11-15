@@ -1,14 +1,26 @@
 <?php
+// Prevent any output before headers
+ob_start();
+
 header('Content-Type: application/json');
+// Prevent caching of API responses
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 require_once __DIR__ . '/config-helper.php';
 setCorsHeaders();
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    ob_end_clean();
     http_response_code(200);
     exit();
 }
 
 require_once __DIR__ . '/config.php';
+
+// Clear any output buffer
+ob_end_clean();
 
 try {
     $search = $_GET['search'] ?? '';
@@ -107,8 +119,17 @@ try {
         ]
     ]);
 
+} catch (PDOException $e) {
+    http_response_code(500);
+    error_log("Database error in get-gallery-images: " . $e->getMessage());
+    echo json_encode([
+        'success' => false,
+        'message' => 'Database error occurred',
+        'error' => $e->getMessage()
+    ]);
 } catch (Exception $e) {
     http_response_code(500);
+    error_log("Error in get-gallery-images: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()

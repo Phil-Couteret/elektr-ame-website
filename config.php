@@ -11,13 +11,13 @@
  * OVH Database Credentials:
  * - Host: elektry2025.mysql.db
  * - Database: elektry2025
- * - Username: elektry2025
+ * - Username: elektry
  * - Password: 92Alcolea2025
  */
 
 $host = "elektry2025.mysql.db";
 $dbname = "elektry2025";
-$username = "elektry2025";
+$username = "elektry";
 $password = "92Alcolea2025";
 
 try {

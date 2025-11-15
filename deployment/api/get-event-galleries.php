@@ -1,4 +1,9 @@
 <?php
+/**
+ * Get Event Galleries API
+ * Returns all galleries for a specific event
+ */
+
 // Prevent any output before headers
 ob_start();
 
@@ -23,30 +28,45 @@ require_once __DIR__ . '/config.php';
 ob_end_clean();
 
 try {
+    $eventId = isset($_GET['event_id']) ? (int)$_GET['event_id'] : null;
+    
+    if (!$eventId) {
+        throw new Exception('Event ID is required');
+    }
+    
+    // Check if event_id column exists
+    $checkCol = $pdo->query("SHOW COLUMNS FROM galleries LIKE 'event_id'");
+    $hasEventCol = $checkCol->rowCount() > 0;
+    
+    if (!$hasEventCol) {
+        // If column doesn't exist yet, return empty array
+        echo json_encode([
+            'success' => true,
+            'galleries' => [],
+            'message' => 'Event galleries not yet supported (database migration needed)'
+        ]);
+        exit();
+    }
+    
     $stmt = $pdo->prepare("
         SELECT 
             g.*,
             COUNT(gi.id) as image_count,
-            gi_cover.filepath as cover_image_path,
-            e.title as event_title,
-            a.name as artist_name
+            gi_cover.filepath as cover_image_path
         FROM galleries g
         LEFT JOIN gallery_images gi ON g.id = gi.gallery_id
         LEFT JOIN gallery_images gi_cover ON g.cover_image_id = gi_cover.id
-        LEFT JOIN events e ON g.event_id = e.id
-        LEFT JOIN artists a ON g.artist_id = a.id
-        WHERE g.is_active = 1
+        WHERE g.event_id = ? AND g.is_active = 1
         GROUP BY g.id
         ORDER BY g.display_order ASC, g.created_at DESC
     ");
     
-    $stmt->execute();
+    $stmt->execute([$eventId]);
     $galleries = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Use first image as fallback if no cover image
     foreach ($galleries as &$gallery) {
         if (empty($gallery['cover_image_path']) && $gallery['image_count'] > 0) {
-            // Get the first image from this gallery
             $firstImageStmt = $pdo->prepare("
                 SELECT filepath 
                 FROM gallery_images 
@@ -70,7 +90,7 @@ try {
     
 } catch (PDOException $e) {
     http_response_code(500);
-    error_log("Database error in galleries-list: " . $e->getMessage());
+    error_log("Database error in get-event-galleries: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => 'Database error occurred',
@@ -78,7 +98,7 @@ try {
     ]);
 } catch (Exception $e) {
     http_response_code(500);
-    error_log("Error in galleries-list: " . $e->getMessage());
+    error_log("Error in get-event-galleries: " . $e->getMessage());
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
