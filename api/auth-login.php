@@ -7,6 +7,10 @@
 // Prevent any output before headers - MUST be first
 ob_start();
 
+// Use config helper for environment-aware CORS
+require_once __DIR__ . '/config-helper.php';
+setCorsHeaders();
+
 // Start session - after output buffering to prevent any session output
 session_start();
 
@@ -15,14 +19,6 @@ header('Content-Type: application/json');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
-// Allow both production and local development
-$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, ['https://www.elektr-ame.com', 'http://localhost:8080', 'http://127.0.0.1:8080'])) {
-    header('Access-Control-Allow-Origin: ' . $origin);
-}
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Credentials: true');
 
 // Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
