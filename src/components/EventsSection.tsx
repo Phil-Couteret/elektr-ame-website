@@ -8,6 +8,12 @@ import { generateGoogleCalendarUrl, downloadCalendarFile, generateOutlookCalenda
 
 const EventCard = ({ event }: { event: MusicEvent }) => {
   const { t } = useLanguage();
+  const eventDateTime = new Date(event.date);
+  if (event.time) {
+    const [hours, minutes] = event.time.split(':');
+    eventDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+  }
+  const isPastEvent = eventDateTime < new Date();
   
   // Format date for display
   const formatEventDate = (dateString: string) => {
@@ -112,7 +118,8 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
           </div>
           
           {/* Add to Calendar Button */}
-          <div className="mt-2">
+          {!isPastEvent && (
+            <div className="mt-2">
             <div className="relative group">
               <Button
                 onClick={(e) => {
@@ -163,7 +170,8 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
