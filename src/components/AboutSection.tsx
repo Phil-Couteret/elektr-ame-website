@@ -75,9 +75,6 @@ const AboutSection = () => {
           <p className="text-lg text-white/80">
             {t('about.description')}
           </p>
-          <p className="text-md text-white/70 mt-2">
-            <MapPin className="h-4 w-4 inline-block mr-1" /> Carrer Alcolea, 92 08014 Barcelona
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

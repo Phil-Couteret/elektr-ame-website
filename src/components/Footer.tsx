@@ -1,5 +1,5 @@
 
-import { Music, MapPin, X } from "lucide-react";
+import { Music, X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
 
@@ -45,11 +45,6 @@ const Footer = () => {
           <div className="text-white/50 text-sm mb-4 md:mb-0">
             {t('footer.rights')}
           </div>
-          
-          <div className="text-white/50 text-sm mb-4 md:mb-0 flex items-center">
-            <MapPin className="h-4 w-4 mr-1" /> Carrer Alcolea, 92 08014 Barcelona
-          </div>
-          
           <div className="flex space-x-6">
             <a href="#" className="text-white/50 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

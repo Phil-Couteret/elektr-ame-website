@@ -22,7 +22,7 @@ export default {
   // About
   'about.title': 'Sobre Elektr-Âme',
   'about.description': 'Fundada en 2025, Elektr-Âme es una organización impulsada por la comunidad dedicada a promover la cultura de la música electrónica en Barcelona a través de eventos, educación y apoyo a artistas.',
-  'about.mission': 'Nuestra Misión',
+  'about.mission': 'Nuestra Visión',
   'about.mission.text': 'Elektr-Âme tiene como objetivo promover la música electrónica, las artes digitales y las prácticas culturales asociadas a través de eventos, talleres, residencias de artistas y actividades educativas que celebran la vibrante cultura de Barcelona.',
   'about.values': 'Nuestros Valores:',
   'about.values.text': 'Estamos comprometidos con la igualdad de género y la diversidad en la escena musical, la sostenibilidad ambiental en la producción cultural y la creación de redes internacionales para el intercambio de artistas.',
