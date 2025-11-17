@@ -152,7 +152,7 @@ CERTIFICADO DE DONACIÓN / CUOTA DE SOCIO
 ELEKTR-ÂME
 Carrer Alcolea, 92
 08014 Barcelona
-CIF: [Pending]
+CIF: G24808495
 
 BENEFICIARIO:
 ${memberName}

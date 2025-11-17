@@ -22,7 +22,7 @@ export default {
   // About
   'about.title': 'About Elektr-Âme',
   'about.description': 'Founded in 2025, Elektr-Âme is a community-driven organization dedicated to promoting electronic music culture in Barcelona through events, education, and artist support.',
-  'about.mission': 'Our Mission',
+  'about.mission': 'Our Vision',
   'about.mission.text': 'Elektr-Âme aims to promote electronic music, digital arts, and associated cultural practices through events, workshops, artist residencies, and educational activities that celebrate Barcelona\'s vibrant culture.',
   'about.values': 'Our Values:',
   'about.values.text': 'We are committed to gender equality and diversity in the music scene, environmental sustainability in cultural production, and creating international networks for artist exchange.',
