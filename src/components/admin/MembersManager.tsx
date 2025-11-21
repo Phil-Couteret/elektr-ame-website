@@ -482,39 +482,51 @@ const MembersManager = () => {
                 </TableHeader>
                 <TableBody>
                   {filteredMembers.map((member) => (
-                    <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
-                      <TableCell className="text-white">
-                        <div className="flex items-center justify-between gap-4">
-                          <div className="flex-1 min-w-0">
+                    <>
+                      {/* Roles Row */}
+                      {(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
+                        <TableRow key={`${member.id}-roles`} className="border-white/5 hover:bg-white/5">
+                          <TableCell className="text-white">
                             <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
                             {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
                             <div className="text-xs text-white/40">{member.city}</div>
-                          </div>
-                          {(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
-                            <div className="flex gap-1 flex-wrap justify-end flex-shrink-0">
+                          </TableCell>
+                          <TableCell colSpan={7}>
+                            <div className="flex gap-1 flex-wrap">
                               {member.is_dj && <span className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded">DJ</span>}
                               {member.is_producer && <span className="text-xs bg-blue-600/30 text-blue-300 px-1.5 py-0.5 rounded">Producer</span>}
                               {member.is_vj && <span className="text-xs bg-pink-600/30 text-pink-300 px-1.5 py-0.5 rounded">VJ</span>}
                               {member.is_visual_artist && <span className="text-xs bg-green-600/30 text-green-300 px-1.5 py-0.5 rounded">Visual Artist</span>}
                               {member.is_fan && <span className="text-xs bg-yellow-600/30 text-yellow-300 px-1.5 py-0.5 rounded">Fan</span>}
                             </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {/* Main Data Row */}
+                      <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
+                        <TableCell className="text-white">
+                          {!(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
+                            <>
+                              <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
+                              {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
+                              <div className="text-xs text-white/40">{member.city}</div>
+                            </>
                           )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-white/80 text-sm">{member.email}</TableCell>
-                      <TableCell>{getStatusBadge(member.status)}</TableCell>
-                      <TableCell>{getMembershipTypeBadge(member.membership_type)}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <span className="text-white/80 text-sm">{formatSimpleDate(member.membership_end_date)}</span>
-                          {member.status === 'approved' && getExpirationWarning(member.membership_end_date)}
-                        </div>
-                      </TableCell>
-                      <TableCell>{getPaymentStatusBadge(member.payment_status)}</TableCell>
-                      <TableCell className="text-white/80">
-                        {member.payment_amount ? `€${parseFloat(member.payment_amount.toString()).toFixed(2)}` : '-'}
-                      </TableCell>
-                      <TableCell className="text-right">
+                        </TableCell>
+                        <TableCell className="text-white/80 text-sm">{member.email}</TableCell>
+                        <TableCell>{getStatusBadge(member.status)}</TableCell>
+                        <TableCell>{getMembershipTypeBadge(member.membership_type)}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            <span className="text-white/80 text-sm">{formatSimpleDate(member.membership_end_date)}</span>
+                            {member.status === 'approved' && getExpirationWarning(member.membership_end_date)}
+                          </div>
+                        </TableCell>
+                        <TableCell>{getPaymentStatusBadge(member.payment_status)}</TableCell>
+                        <TableCell className="text-white/80">
+                          {member.payment_amount ? `€${parseFloat(member.payment_amount.toString()).toFixed(2)}` : '-'}
+                        </TableCell>
+                        <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             size="sm"
@@ -603,6 +615,7 @@ const MembersManager = () => {
                         </div>
                       </TableCell>
                     </TableRow>
+                    </>
                   ))}
                 </TableBody>
               </Table>
