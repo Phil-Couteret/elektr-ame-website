@@ -3,8 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArtistProfile from "@/components/ArtistProfile";
+import PressKitModal from "@/components/PressKitModal";
+import SongModal from "@/components/SongModal";
+import StreamModal from "@/components/StreamModal";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User } from "lucide-react";
+import { ArrowLeft, User, FileText, Music, Video } from "lucide-react";
 import { SEO } from "@/components/SEO";
 
 interface Artist {
@@ -13,6 +16,13 @@ interface Artist {
   nickname?: string;
   bio: string;
   picture?: string;
+  pressKitUrl?: string;
+  song1Url?: string;
+  song2Url?: string;
+  song3Url?: string;
+  stream1Url?: string;
+  stream2Url?: string;
+  stream3Url?: string;
   socialLinks: { [key: string]: string };
 }
 
@@ -21,6 +31,13 @@ const ArtistDetail = () => {
   const navigate = useNavigate();
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
+  const [pressKitModalOpen, setPressKitModalOpen] = useState(false);
+  const [songModalOpen, setSongModalOpen] = useState(false);
+  const [selectedSongUrl, setSelectedSongUrl] = useState<string>('');
+  const [selectedSongTitle, setSelectedSongTitle] = useState<string>('');
+  const [streamModalOpen, setStreamModalOpen] = useState(false);
+  const [selectedStreamUrl, setSelectedStreamUrl] = useState<string>('');
+  const [selectedStreamTitle, setSelectedStreamTitle] = useState<string>('');
 
   useEffect(() => {
     if (id) {
@@ -40,6 +57,8 @@ const ArtistDetail = () => {
       if (result.success) {
         const foundArtist = result.artists.find((a: any) => a.id.toString() === artistId);
         if (foundArtist) {
+          console.log('Artist data:', foundArtist);
+          console.log('Press-kit URL:', foundArtist.pressKitUrl);
           setArtist(foundArtist);
         }
       }
@@ -131,6 +150,19 @@ const ArtistDetail = () => {
               )}
               <p className="text-white/80 text-lg mb-6 max-w-3xl">{artist.bio}</p>
 
+              {/* Press Kit Link */}
+              {artist.pressKitUrl && (
+                <div className="mb-6 flex justify-center md:justify-start">
+                  <Button
+                    onClick={() => setPressKitModalOpen(true)}
+                    className="bg-electric-blue/20 hover:bg-electric-blue/30 text-electric-blue border border-electric-blue/50"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Press-Kit
+                  </Button>
+                </div>
+              )}
+
               {/* Social Links */}
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                 {Object.entries(artist.socialLinks).map(([platform, url]) => {
@@ -148,6 +180,96 @@ const ArtistDetail = () => {
                   );
                 })}
               </div>
+
+              {/* Songs Links */}
+              {(artist.song1Url || artist.song2Url || artist.song3Url) && (
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start mt-4">
+                  {artist.song1Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedSongUrl(artist.song1Url!);
+                        setSelectedSongTitle(`${artist.name} - Song 1`);
+                        setSongModalOpen(true);
+                      }}
+                      className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/50"
+                    >
+                      <Music className="h-4 w-4 mr-2" />
+                      Song 1
+                    </Button>
+                  )}
+                  {artist.song2Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedSongUrl(artist.song2Url!);
+                        setSelectedSongTitle(`${artist.name} - Song 2`);
+                        setSongModalOpen(true);
+                      }}
+                      className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/50"
+                    >
+                      <Music className="h-4 w-4 mr-2" />
+                      Song 2
+                    </Button>
+                  )}
+                  {artist.song3Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedSongUrl(artist.song3Url!);
+                        setSelectedSongTitle(`${artist.name} - Song 3`);
+                        setSongModalOpen(true);
+                      }}
+                      className="bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/50"
+                    >
+                      <Music className="h-4 w-4 mr-2" />
+                      Song 3
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              {/* Streams Links */}
+              {(artist.stream1Url || artist.stream2Url || artist.stream3Url) && (
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start mt-4">
+                  {artist.stream1Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedStreamUrl(artist.stream1Url!);
+                        setSelectedStreamTitle(`${artist.name} - Stream 1`);
+                        setStreamModalOpen(true);
+                      }}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/50"
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Stream 1
+                    </Button>
+                  )}
+                  {artist.stream2Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedStreamUrl(artist.stream2Url!);
+                        setSelectedStreamTitle(`${artist.name} - Stream 2`);
+                        setStreamModalOpen(true);
+                      }}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/50"
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Stream 2
+                    </Button>
+                  )}
+                  {artist.stream3Url && (
+                    <Button
+                      onClick={() => {
+                        setSelectedStreamUrl(artist.stream3Url!);
+                        setSelectedStreamTitle(`${artist.name} - Stream 3`);
+                        setStreamModalOpen(true);
+                      }}
+                      className="bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/50"
+                    >
+                      <Video className="h-4 w-4 mr-2" />
+                      Stream 3
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -164,6 +286,44 @@ const ArtistDetail = () => {
           />
         </div>
       </section>
+
+      {/* Press Kit Modal */}
+      {artist?.pressKitUrl && (
+        <PressKitModal
+          isOpen={pressKitModalOpen}
+          onClose={() => setPressKitModalOpen(false)}
+          pressKitUrl={artist.pressKitUrl}
+          artistName={artist.name}
+        />
+      )}
+
+      {/* Song Modal */}
+      {selectedSongUrl && (
+        <SongModal
+          isOpen={songModalOpen}
+          onClose={() => {
+            setSongModalOpen(false);
+            setSelectedSongUrl('');
+            setSelectedSongTitle('');
+          }}
+          songUrl={selectedSongUrl}
+          songTitle={selectedSongTitle}
+        />
+      )}
+
+      {/* Stream Modal */}
+      {selectedStreamUrl && (
+        <StreamModal
+          isOpen={streamModalOpen}
+          onClose={() => {
+            setStreamModalOpen(false);
+            setSelectedStreamUrl('');
+            setSelectedStreamTitle('');
+          }}
+          streamUrl={selectedStreamUrl}
+          streamTitle={selectedStreamTitle}
+        />
+      )}
 
       <Footer />
     </div>

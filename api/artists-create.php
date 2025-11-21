@@ -60,8 +60,8 @@ try {
     $bioTranslationsJson = json_encode($input['bioTranslations'] ?? ['en' => '', 'es' => '', 'ca' => '']);
     
     $stmt = $pdo->prepare("
-        INSERT INTO artists (name, nickname, bio, bio_key, bio_translations, picture, genre, website, social_media, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO artists (name, nickname, bio, bio_key, bio_translations, picture, press_kit_url, song1_url, song2_url, song3_url, stream1_url, stream2_url, stream3_url, genre, website, social_media, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     $stmt->execute([
@@ -71,6 +71,13 @@ try {
         $input['bioKey'] ?? $input['bio_key'] ?? '',
         $bioTranslationsJson,
         $input['picture'] ?? '',
+        $input['pressKitUrl'] ?? $input['press_kit_url'] ?? null,
+        $input['song1Url'] ?? $input['song1_url'] ?? null,
+        $input['song2Url'] ?? $input['song2_url'] ?? null,
+        $input['song3Url'] ?? $input['song3_url'] ?? null,
+        $input['stream1Url'] ?? $input['stream1_url'] ?? null,
+        $input['stream2Url'] ?? $input['stream2_url'] ?? null,
+        $input['stream3Url'] ?? $input['stream3_url'] ?? null,
         $input['genre'] ?? null,
         $input['website'] ?? null,
         $socialMediaJson,

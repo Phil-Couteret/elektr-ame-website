@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 ob_start();
 
 header('Content-Type: application/json');
@@ -8,6 +10,14 @@ setCorsHeaders();
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     ob_end_clean();
     http_response_code(200);
+    exit();
+}
+
+// Check if user is authenticated
+if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    ob_end_clean();
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
     exit();
 }
 

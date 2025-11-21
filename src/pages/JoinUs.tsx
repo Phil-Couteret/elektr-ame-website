@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { SEO } from "@/components/SEO";
 
 // Form validation schema
@@ -36,6 +36,8 @@ type JoinUsFormData = z.infer<typeof joinUsSchema>;
 const JoinUs = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const invitationToken = searchParams.get('invite');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
@@ -62,7 +64,10 @@ const JoinUs = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include', // Important for session cookies
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          invite: invitationToken // Include invitation token if present
+        }),
       });
 
       if (response.ok) {

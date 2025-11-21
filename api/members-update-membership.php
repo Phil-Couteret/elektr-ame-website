@@ -142,6 +142,18 @@ try {
     
     // Update invitation status if payment was made
     if ($before && isset($input['payment_status']) && $input['payment_status'] === 'paid' && $before['payment_status'] !== 'paid') {
+        // Fetch member email and inviter_id for matching invitations
+        $memberStmt = $pdo->prepare("SELECT email, inviter_id FROM members WHERE id = ?");
+        $memberStmt->execute([$memberId]);
+        $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
+        $memberEmail = $member ? strtolower(trim($member['email'])) : null;
+        $inviterId = $member ? $member['inviter_id'] : null;
+
+        $rowsByMemberId = 0;
+        $rowsByEmail = 0;
+        $rowsByInviter = 0;
+
+        // Method 1: Update by invitee_member_id (most reliable)
         $stmt = $pdo->prepare("
             UPDATE member_invitations 
             SET status = 'payed',
@@ -150,7 +162,51 @@ try {
             AND status IN ('sent', 'registered')
         ");
         $stmt->execute([$memberId]);
+        $rowsByMemberId = $stmt->rowCount();
         
+        // Method 2: If no rows updated and we have email, try by email (case-insensitive, trimmed)
+        if ($rowsByMemberId === 0 && $memberEmail) {
+            $stmt = $pdo->prepare("
+                UPDATE member_invitations 
+                SET status = 'payed',
+                    payed_at = NOW(),
+                    invitee_member_id = COALESCE(invitee_member_id, ?)
+                WHERE LOWER(TRIM(invitee_email)) = ?
+                AND status IN ('sent', 'registered')
+            ");
+            $stmt->execute([$memberId, $memberEmail]);
+            $rowsByEmail = $stmt->rowCount();
+        }
+        
+        // Method 3: If still no rows and member has inviter_id, find invitation by inviter + email
+        if ($rowsByMemberId === 0 && $rowsByEmail === 0 && $inviterId && $memberEmail) {
+            $stmt = $pdo->prepare("
+                UPDATE member_invitations 
+                SET status = 'payed',
+                    payed_at = NOW(),
+                    invitee_member_id = COALESCE(invitee_member_id, ?)
+                WHERE inviter_id = ?
+                AND LOWER(TRIM(invitee_email)) = ?
+                AND status IN ('sent', 'registered')
+            ");
+            $stmt->execute([$memberId, $inviterId, $memberEmail]);
+            $rowsByInviter = $stmt->rowCount();
+        }
+        
+        error_log("Invitation payment update: member_id=$memberId, email=$memberEmail, inviter_id=$inviterId, by_member_id=$rowsByMemberId, by_email=$rowsByEmail, by_inviter=$rowsByInviter");
+        
+        // Debug: Check if any invitations exist for this member
+        if ($rowsByMemberId === 0 && $rowsByEmail === 0 && $rowsByInviter === 0) {
+            $debugStmt = $pdo->prepare("
+                SELECT id, inviter_id, invitee_email, invitee_member_id, status 
+                FROM member_invitations 
+                WHERE invitee_member_id = ? OR LOWER(TRIM(invitee_email)) = ?
+            ");
+            $debugStmt->execute([$memberId, $memberEmail ?? '']);
+            $debugInvitations = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
+            error_log("Invitation payment debug: Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
+        }
+
         try {
             require_once __DIR__ . '/classes/EmailAutomation.php';
             $emailAutomation = new EmailAutomation($pdo);

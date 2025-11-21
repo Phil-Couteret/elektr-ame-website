@@ -61,6 +61,29 @@ try {
     // Generate email verification token
     $verificationToken = bin2hex(random_bytes(32)); // 64 character token
     
+    // Check if registration is from an invitation
+    // Check both GET (URL parameter) and POST (form data) for invitation token
+    $invitationToken = null;
+    if (isset($_GET['invite'])) {
+        $invitationToken = $_GET['invite'];
+    } elseif (isset($input['invite'])) {
+        $invitationToken = $input['invite'];
+    }
+    
+    $inviterId = null;
+    
+    if ($invitationToken) {
+        // Find invitation by token
+        $invStmt = $pdo->prepare("SELECT inviter_id, invitee_email FROM member_invitations WHERE invitation_token = ?");
+        $invStmt->execute([$invitationToken]);
+        $invitation = $invStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($invitation) {
+            $inviterId = $invitation['inviter_id'];
+            error_log("Registration from invitation: token=$invitationToken, inviter_id=$inviterId");
+        }
+    }
+    
     // Prepare SQL statement
     $sql = "INSERT INTO members (
         first_name, 
@@ -76,6 +99,7 @@ try {
         zip_code, 
         city, 
         country,
+        inviter_id,
         is_dj,
         is_producer,
         is_vj,
@@ -96,6 +120,7 @@ try {
         :zipCode, 
         :city, 
         :country,
+        :inviterId,
         :isDj,
         :isProducer,
         :isVj,
@@ -123,6 +148,7 @@ try {
     $stmt->bindParam(':zipCode', $zipCode);
     $stmt->bindParam(':city', $input['city']);
     $stmt->bindParam(':country', $input['country']);
+    $stmt->bindParam(':inviterId', $inviterId, PDO::PARAM_INT);
     $isDj = isset($input['isDj']) && $input['isDj'] ? 1 : 0;
     $stmt->bindParam(':isDj', $isDj, PDO::PARAM_INT);
     $isProducer = isset($input['isProducer']) && $input['isProducer'] ? 1 : 0;
@@ -142,15 +168,67 @@ try {
     
     // Check if this registration is from an invitation and update invitation status
     $inviteeEmail = strtolower(trim($input['email']));
-    $stmt = $pdo->prepare("
-        UPDATE member_invitations 
-        SET status = 'registered',
-            invitee_member_id = ?,
-            registered_at = NOW()
-        WHERE invitee_email = ? 
-        AND status = 'sent'
-    ");
-    $stmt->execute([$memberId, $inviteeEmail]);
+    
+    // Update invitation - try by token first, then by email
+    if ($invitationToken) {
+        // Update by token (most reliable)
+        $stmt = $pdo->prepare("
+            UPDATE member_invitations 
+            SET status = 'registered',
+                invitee_member_id = ?,
+                registered_at = NOW()
+            WHERE invitation_token = ?
+        ");
+        $stmt->execute([$memberId, $invitationToken]);
+        $rowsUpdated = $stmt->rowCount();
+        error_log("Registration: Updated invitation by token: $invitationToken, member_id: $memberId, rows: $rowsUpdated");
+    } else {
+        // Fallback: Update by email (case-insensitive, trimmed)
+        // Try to update any invitation with matching email, even if already linked
+        $stmt = $pdo->prepare("
+            UPDATE member_invitations 
+            SET status = 'registered',
+                invitee_member_id = COALESCE(invitee_member_id, ?),
+                registered_at = COALESCE(registered_at, NOW())
+            WHERE LOWER(TRIM(invitee_email)) = ? 
+            AND status = 'sent'
+        ");
+        $stmt->execute([$memberId, $inviteeEmail]);
+        $rowsUpdated = $stmt->rowCount();
+        
+        if ($rowsUpdated > 0) {
+            error_log("Registration: Updated $rowsUpdated invitation(s) for email: $inviteeEmail, member_id: $memberId");
+        } else {
+            // If no rows updated with status='sent', try updating any invitation with this email
+            $stmt = $pdo->prepare("
+                UPDATE member_invitations 
+                SET invitee_member_id = COALESCE(invitee_member_id, ?),
+                    registered_at = COALESCE(registered_at, NOW()),
+                    status = CASE 
+                        WHEN status = 'sent' THEN 'registered'
+                        ELSE status
+                    END
+                WHERE LOWER(TRIM(invitee_email)) = ?
+                AND (invitee_member_id IS NULL OR invitee_member_id = 0)
+            ");
+            $stmt->execute([$memberId, $inviteeEmail]);
+            $rowsUpdated = $stmt->rowCount();
+            
+            if ($rowsUpdated > 0) {
+                error_log("Registration: Updated $rowsUpdated invitation(s) for email: $inviteeEmail (any status), member_id: $memberId");
+            } else {
+                // Debug: Check if invitation exists
+                $debugStmt = $pdo->prepare("
+                    SELECT id, invitee_email, invitee_member_id, status 
+                    FROM member_invitations 
+                    WHERE LOWER(TRIM(invitee_email)) = ?
+                ");
+                $debugStmt->execute([$inviteeEmail]);
+                $debugInvitations = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
+                error_log("Registration: No invitation updated for email: $inviteeEmail. Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
+            }
+        }
+    }
     
     // Set session for member portal access
     $_SESSION['member_id'] = $memberId;

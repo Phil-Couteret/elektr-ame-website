@@ -72,6 +72,34 @@ try {
         $updateFields[] = "picture = ?";
         $params[] = $input['picture'];
     }
+    if (isset($input['pressKitUrl']) || isset($input['press_kit_url'])) {
+        $updateFields[] = "press_kit_url = ?";
+        $params[] = $input['pressKitUrl'] ?? $input['press_kit_url'] ?? null;
+    }
+    if (isset($input['song1Url']) || isset($input['song1_url'])) {
+        $updateFields[] = "song1_url = ?";
+        $params[] = $input['song1Url'] ?? $input['song1_url'] ?? null;
+    }
+    if (isset($input['song2Url']) || isset($input['song2_url'])) {
+        $updateFields[] = "song2_url = ?";
+        $params[] = $input['song2Url'] ?? $input['song2_url'] ?? null;
+    }
+    if (isset($input['song3Url']) || isset($input['song3_url'])) {
+        $updateFields[] = "song3_url = ?";
+        $params[] = $input['song3Url'] ?? $input['song3_url'] ?? null;
+    }
+    if (isset($input['stream1Url']) || isset($input['stream1_url'])) {
+        $updateFields[] = "stream1_url = ?";
+        $params[] = $input['stream1Url'] ?? $input['stream1_url'] ?? null;
+    }
+    if (isset($input['stream2Url']) || isset($input['stream2_url'])) {
+        $updateFields[] = "stream2_url = ?";
+        $params[] = $input['stream2Url'] ?? $input['stream2_url'] ?? null;
+    }
+    if (isset($input['stream3Url']) || isset($input['stream3_url'])) {
+        $updateFields[] = "stream3_url = ?";
+        $params[] = $input['stream3Url'] ?? $input['stream3_url'] ?? null;
+    }
     if (isset($input['genre'])) {
         $updateFields[] = "genre = ?";
         $params[] = $input['genre'];

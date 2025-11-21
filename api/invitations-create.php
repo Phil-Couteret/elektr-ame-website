@@ -98,6 +98,9 @@ try {
         exit;
     }
 
+    // Generate invitation token for tracking
+    $invitationToken = bin2hex(random_bytes(32)); // 64 character token
+
     // Create invitation
     $stmt = $pdo->prepare("
         INSERT INTO member_invitations (
@@ -105,11 +108,12 @@ try {
             invitee_first_name,
             invitee_email,
             status,
+            invitation_token,
             sent_at
-        ) VALUES (?, ?, ?, 'sent', NOW())
+        ) VALUES (?, ?, ?, 'sent', ?, NOW())
     ");
 
-    $stmt->execute([$inviterId, $inviteeFirstName, $inviteeEmail]);
+    $stmt->execute([$inviterId, $inviteeFirstName, $inviteeEmail, $invitationToken]);
     $invitationId = $pdo->lastInsertId();
 
     // Fetch the created invitation
@@ -139,7 +143,7 @@ try {
 
     // Send invitation email
     try {
-        $joinLink = "https://www.elektr-ame.com/join-us";
+        $joinLink = "https://www.elektr-ame.com/join-us?invite=" . $invitationToken;
         $subject = "You've been invited to join Elektr-Âme! 🎵";
         
         $message = "Hello {$inviteeFirstName},\n\n";
@@ -153,6 +157,7 @@ try {
         $message .= "- Support for the electronic music community\n\n";
         $message .= "**Join us now:**\n";
         $message .= "Click here to register: {$joinLink}\n\n";
+        $message .= "This link includes a special invitation code from {$inviterName}.\n\n";
         $message .= "If you have any questions, feel free to reach out to us at contact@elektr-ame.com.\n\n";
         $message .= "We hope to see you soon!\n\n";
         $message .= "Best regards,\n";
@@ -168,10 +173,24 @@ try {
         
         $mailResult = mail($inviteeEmail, $subject, $message, $headers);
         
+        // Update invitation with email sending status
         if ($mailResult) {
             error_log("Invitation email sent successfully to: {$inviteeEmail} from member ID: {$inviterId}");
+            $updateStmt = $pdo->prepare("
+                UPDATE member_invitations 
+                SET email_sent = 1, email_sent_at = NOW(), email_error = NULL
+                WHERE id = ?
+            ");
+            $updateStmt->execute([$invitationId]);
         } else {
+            $errorMsg = "Failed to send invitation email";
             error_log("Failed to send invitation email to: {$inviteeEmail}");
+            $updateStmt = $pdo->prepare("
+                UPDATE member_invitations 
+                SET email_sent = 0, email_error = ?
+                WHERE id = ?
+            ");
+            $updateStmt->execute([$errorMsg, $invitationId]);
             // Don't fail the invitation creation if email fails
         }
     } catch (Exception $e) {
