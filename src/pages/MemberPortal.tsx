@@ -24,7 +24,8 @@ import {
   X as CloseIcon,
   RefreshCw,
   LogOut,
-  Lock
+  Lock,
+  UserPlus
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -77,12 +78,20 @@ const MemberPortal = () => {
     new_password: '',
     confirm_password: ''
   });
+  const [inviteFormData, setInviteFormData] = useState({
+    first_name: '',
+    email: ''
+  });
+  const [isSendingInvitation, setIsSendingInvitation] = useState(false);
+  const [invitations, setInvitations] = useState<any[]>([]);
+  const [invitationsLoading, setInvitationsLoading] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchMemberData();
+    fetchInvitations();
   }, []);
 
   const fetchMemberData = async () => {
@@ -351,6 +360,102 @@ const MemberPortal = () => {
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   };
 
+  const fetchInvitations = async () => {
+    setInvitationsLoading(true);
+    try {
+      const response = await fetch('/api/invitations-list.php', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setInvitations(data.invitations || []);
+      } else {
+        console.error('Failed to fetch invitations:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching invitations:', error);
+    } finally {
+      setInvitationsLoading(false);
+    }
+  };
+
+  const handleSendInvitation = async () => {
+    if (!inviteFormData.first_name || !inviteFormData.email) {
+      toast({
+        title: t('portal.sponsorship.error.notEligible'),
+        description: t('portal.sponsorship.inviteForm.firstName') + ' and ' + t('portal.sponsorship.inviteForm.email') + ' are required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsSendingInvitation(true);
+    try {
+      const response = await fetch('/api/invitations-create.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          first_name: inviteFormData.first_name,
+          email: inviteFormData.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: t('portal.sponsorship.success.invitationSent'),
+          description: t('portal.sponsorship.inviteForm.firstName') + ': ' + inviteFormData.first_name,
+        });
+        setInviteFormData({ first_name: '', email: '' });
+        fetchInvitations();
+      } else {
+        let errorMessage = data.error || 'Failed to send invitation';
+        if (errorMessage.includes('already sent')) {
+          errorMessage = t('portal.sponsorship.error.alreadyInvited');
+        } else if (errorMessage.includes('already registered')) {
+          errorMessage = t('portal.sponsorship.error.alreadyMember');
+        } else if (errorMessage.includes('approved member with paid membership')) {
+          errorMessage = t('portal.sponsorship.error.notEligible');
+        }
+        toast({
+          title: 'Error',
+          description: errorMessage,
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Network error. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSendingInvitation(false);
+    }
+  };
+
+  const getInvitationStatusBadge = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/50">{t('portal.sponsorship.status.sent')}</Badge>;
+      case 'registered':
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/50">{t('portal.sponsorship.status.registered')}</Badge>;
+      case 'payed':
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/50">{t('portal.sponsorship.status.payed')}</Badge>;
+      case 'approved':
+        return <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/50">{t('portal.sponsorship.status.approved')}</Badge>;
+      default:
+        return <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/50">{status}</Badge>;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
@@ -438,10 +543,11 @@ const MemberPortal = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-3 bg-black/40 border-white/10">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="card">Digital Card</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-black/40 border-white/10">
+            <TabsTrigger value="overview">{t('portal.tabs.overview')}</TabsTrigger>
+            <TabsTrigger value="card">{t('portal.tabs.card')}</TabsTrigger>
+            <TabsTrigger value="profile">{t('portal.tabs.profile')}</TabsTrigger>
+            <TabsTrigger value="sponsorship">{t('portal.tabs.sponsorship')}</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -892,6 +998,116 @@ const MemberPortal = () => {
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Sponsorship Tab */}
+          <TabsContent value="sponsorship" className="mt-6 space-y-6">
+            <Card className="bg-black/40 border-white/10">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <UserPlus className="h-5 w-5 text-blue-light" />
+                  {t('portal.sponsorship.title')}
+                </CardTitle>
+                <p className="text-white/70 text-sm mt-2">
+                  {t('portal.sponsorship.description')}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Invitation Form */}
+                <div className="space-y-4 pb-6 border-b border-white/10">
+                  <h3 className="text-white font-semibold">{t('portal.sponsorship.inviteForm.title')}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="invitee_first_name" className="text-white">
+                        {t('portal.sponsorship.inviteForm.firstName')} *
+                      </Label>
+                      <Input
+                        id="invitee_first_name"
+                        value={inviteFormData.first_name}
+                        onChange={(e) => setInviteFormData({...inviteFormData, first_name: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                        placeholder={t('portal.sponsorship.inviteForm.firstNamePlaceholder')}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="invitee_email" className="text-white">
+                        {t('portal.sponsorship.inviteForm.email')} *
+                      </Label>
+                      <Input
+                        id="invitee_email"
+                        type="email"
+                        value={inviteFormData.email}
+                        onChange={(e) => setInviteFormData({...inviteFormData, email: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                        placeholder={t('portal.sponsorship.inviteForm.emailPlaceholder')}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleSendInvitation}
+                    disabled={isSendingInvitation || !inviteFormData.first_name || !inviteFormData.email}
+                    className="bg-blue-medium hover:bg-blue-dark text-white"
+                  >
+                    {isSendingInvitation ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        {t('portal.sponsorship.inviteForm.sending')}
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        {t('portal.sponsorship.inviteForm.button')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Invitations List */}
+                <div className="space-y-4">
+                  <h3 className="text-white font-semibold">{t('portal.sponsorship.invitations.title')}</h3>
+                  {invitationsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 text-blue-light animate-spin" />
+                    </div>
+                  ) : invitations.length === 0 ? (
+                    <div className="text-center py-8">
+                      <UserPlus className="h-12 w-12 text-white/30 mx-auto mb-4" />
+                      <p className="text-white/70 font-semibold mb-2">{t('portal.sponsorship.invitations.empty')}</p>
+                      <p className="text-white/50 text-sm">{t('portal.sponsorship.invitations.emptyDescription')}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {invitations.map((invitation) => (
+                        <Card key={invitation.id} className="bg-black/20 border-white/10">
+                          <CardContent className="p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitations.name')}</p>
+                                <p className="text-white font-medium">{invitation.invitee_first_name}</p>
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitations.email')}</p>
+                                <p className="text-white">{invitation.invitee_email}</p>
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitations.status')}</p>
+                                {getInvitationStatusBadge(invitation.status)}
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitations.sentAt')}</p>
+                                <p className="text-white text-sm">
+                                  {new Date(invitation.sent_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
