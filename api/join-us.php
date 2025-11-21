@@ -140,6 +140,18 @@ try {
     // Get the new member ID
     $memberId = $pdo->lastInsertId();
     
+    // Check if this registration is from an invitation and update invitation status
+    $inviteeEmail = strtolower(trim($input['email']));
+    $stmt = $pdo->prepare("
+        UPDATE member_invitations 
+        SET status = 'registered',
+            invitee_member_id = ?,
+            registered_at = NOW()
+        WHERE invitee_email = ? 
+        AND status = 'sent'
+    ");
+    $stmt->execute([$memberId, $inviteeEmail]);
+    
     // Set session for member portal access
     $_SESSION['member_id'] = $memberId;
     $_SESSION['member_email'] = $input['email'];

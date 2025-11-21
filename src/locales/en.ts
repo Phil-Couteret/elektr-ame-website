@@ -432,6 +432,7 @@ export default {
   'portal.tabs.overview': 'Overview',
   'portal.tabs.card': 'Digital Card',
   'portal.tabs.profile': 'Profile',
+  'portal.tabs.sponsorship': 'Sponsorship',
   
   // Overview Tab
   'portal.overview.membershipInfo': 'Membership Information',
@@ -631,5 +632,31 @@ export default {
   'pwa.install.description': 'Install our app for quick access to your membership card, events, and more!',
   'pwa.install.button': 'Install',
   'pwa.install.later': 'Maybe Later',
-  'pwa.install.benefits': 'Offline access • Faster loading • Home screen icon'
+  'pwa.install.benefits': 'Offline access • Faster loading • Home screen icon',
+  
+  // Sponsorship Tab
+  'portal.sponsorship.title': 'Invite Friends',
+  'portal.sponsorship.description': 'Share Elektr-Âme with your friends and help grow our community',
+  'portal.sponsorship.inviteForm.title': 'Send Invitation',
+  'portal.sponsorship.inviteForm.firstName': 'First Name',
+  'portal.sponsorship.inviteForm.firstNamePlaceholder': 'Enter first name',
+  'portal.sponsorship.inviteForm.email': 'Email Address',
+  'portal.sponsorship.inviteForm.emailPlaceholder': 'Enter email address',
+  'portal.sponsorship.inviteForm.button': 'Invite',
+  'portal.sponsorship.inviteForm.sending': 'Sending...',
+  'portal.sponsorship.invitations.title': 'Your Invitations',
+  'portal.sponsorship.invitations.empty': 'No invitations sent yet',
+  'portal.sponsorship.invitations.emptyDescription': 'Invite your friends to join Elektr-Âme and help grow our community',
+  'portal.sponsorship.invitations.name': 'Name',
+  'portal.sponsorship.invitations.email': 'Email',
+  'portal.sponsorship.invitations.status': 'Status',
+  'portal.sponsorship.invitations.sentAt': 'Sent',
+  'portal.sponsorship.status.sent': 'Sent',
+  'portal.sponsorship.status.registered': 'Registered',
+  'portal.sponsorship.status.payed': 'Paid',
+  'portal.sponsorship.status.approved': 'Approved',
+  'portal.sponsorship.error.alreadyInvited': 'You have already sent an invitation to this email',
+  'portal.sponsorship.error.alreadyMember': 'This email is already registered as a member',
+  'portal.sponsorship.error.notEligible': 'You must be an approved member with paid membership to send invitations',
+  'portal.sponsorship.success.invitationSent': 'Invitation sent successfully'
 };

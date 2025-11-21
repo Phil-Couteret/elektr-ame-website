@@ -140,8 +140,17 @@ try {
         throw new Exception('Member not found or no changes made');
     }
     
-    // Trigger email automation for renewal
+    // Update invitation status if payment was made
     if ($before && isset($input['payment_status']) && $input['payment_status'] === 'paid' && $before['payment_status'] !== 'paid') {
+        $stmt = $pdo->prepare("
+            UPDATE member_invitations 
+            SET status = 'payed',
+                payed_at = NOW()
+            WHERE invitee_member_id = ? 
+            AND status IN ('sent', 'registered')
+        ");
+        $stmt->execute([$memberId]);
+        
         try {
             require_once __DIR__ . '/classes/EmailAutomation.php';
             $emailAutomation = new EmailAutomation($pdo);

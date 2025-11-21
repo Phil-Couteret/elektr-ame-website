@@ -429,6 +429,7 @@ export default {
   'portal.tabs.overview': 'Resum',
   'portal.tabs.card': 'Targeta Digital',
   'portal.tabs.profile': 'Perfil',
+  'portal.tabs.sponsorship': 'Patrocini',
   
   // Pestanya Resum
   'portal.overview.membershipInfo': 'Informació de Membresa',
@@ -628,5 +629,31 @@ export default {
   'pwa.install.description': 'Instal·la la nostra app per accés ràpid a la teva targeta de membre, esdeveniments i més!',
   'pwa.install.button': 'Instal·lar',
   'pwa.install.later': 'Potser Més Tard',
-  'pwa.install.benefits': 'Accés offline • Càrrega més ràpida • Icona a la pantalla d\'inici'
+  'pwa.install.benefits': 'Accés offline • Càrrega més ràpida • Icona a la pantalla d\'inici',
+  
+  // Pestanya Patrocini
+  'portal.sponsorship.title': 'Convidar Amics',
+  'portal.sponsorship.description': 'Comparteix Elektr-Âme amb els teus amics i ajuda a fer créixer la nostra comunitat',
+  'portal.sponsorship.inviteForm.title': 'Enviar Invitació',
+  'portal.sponsorship.inviteForm.firstName': 'Nom',
+  'portal.sponsorship.inviteForm.firstNamePlaceholder': 'Introdueix el nom',
+  'portal.sponsorship.inviteForm.email': 'Adreça de Correu',
+  'portal.sponsorship.inviteForm.emailPlaceholder': 'Introdueix l\'adreça de correu',
+  'portal.sponsorship.inviteForm.button': 'Convidar',
+  'portal.sponsorship.inviteForm.sending': 'Enviant...',
+  'portal.sponsorship.invitations.title': 'Les Teves Invitacions',
+  'portal.sponsorship.invitations.empty': 'Encara no has enviat invitacions',
+  'portal.sponsorship.invitations.emptyDescription': 'Convida als teus amics a unir-se a Elektr-Âme i ajuda a fer créixer la nostra comunitat',
+  'portal.sponsorship.invitations.name': 'Nom',
+  'portal.sponsorship.invitations.email': 'Correu',
+  'portal.sponsorship.invitations.status': 'Estat',
+  'portal.sponsorship.invitations.sentAt': 'Enviat',
+  'portal.sponsorship.status.sent': 'Enviat',
+  'portal.sponsorship.status.registered': 'Registrat',
+  'portal.sponsorship.status.payed': 'Pagat',
+  'portal.sponsorship.status.approved': 'Aprovat',
+  'portal.sponsorship.error.alreadyInvited': 'Ja has enviat una invitació a aquest correu',
+  'portal.sponsorship.error.alreadyMember': 'Aquest correu ja està registrat com a membre',
+  'portal.sponsorship.error.notEligible': 'Has de ser un membre aprovat amb membresia pagada per enviar invitacions',
+  'portal.sponsorship.success.invitationSent': 'Invitació enviada amb èxit'
 };

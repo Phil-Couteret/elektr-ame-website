@@ -429,6 +429,7 @@ export default {
   'portal.tabs.overview': 'Resumen',
   'portal.tabs.card': 'Tarjeta Digital',
   'portal.tabs.profile': 'Perfil',
+  'portal.tabs.sponsorship': 'Patrocinio',
   
   // Pestaña Resumen
   'portal.overview.membershipInfo': 'Información de Membresía',
@@ -628,5 +629,31 @@ export default {
   'pwa.install.description': '¡Instala nuestra app para acceso rápido a tu tarjeta de miembro, eventos y más!',
   'pwa.install.button': 'Instalar',
   'pwa.install.later': 'Quizás Más Tarde',
-  'pwa.install.benefits': 'Acceso offline • Carga más rápida • Icono en pantalla de inicio'
+  'pwa.install.benefits': 'Acceso offline • Carga más rápida • Icono en pantalla de inicio',
+  
+  // Pestaña Patrocinio
+  'portal.sponsorship.title': 'Invitar Amigos',
+  'portal.sponsorship.description': 'Comparte Elektr-Âme con tus amigos y ayuda a hacer crecer nuestra comunidad',
+  'portal.sponsorship.inviteForm.title': 'Enviar Invitación',
+  'portal.sponsorship.inviteForm.firstName': 'Nombre',
+  'portal.sponsorship.inviteForm.firstNamePlaceholder': 'Ingresa el nombre',
+  'portal.sponsorship.inviteForm.email': 'Dirección de Correo',
+  'portal.sponsorship.inviteForm.emailPlaceholder': 'Ingresa la dirección de correo',
+  'portal.sponsorship.inviteForm.button': 'Invitar',
+  'portal.sponsorship.inviteForm.sending': 'Enviando...',
+  'portal.sponsorship.invitations.title': 'Tus Invitaciones',
+  'portal.sponsorship.invitations.empty': 'Aún no has enviado invitaciones',
+  'portal.sponsorship.invitations.emptyDescription': 'Invita a tus amigos a unirse a Elektr-Âme y ayuda a hacer crecer nuestra comunidad',
+  'portal.sponsorship.invitations.name': 'Nombre',
+  'portal.sponsorship.invitations.email': 'Correo',
+  'portal.sponsorship.invitations.status': 'Estado',
+  'portal.sponsorship.invitations.sentAt': 'Enviado',
+  'portal.sponsorship.status.sent': 'Enviado',
+  'portal.sponsorship.status.registered': 'Registrado',
+  'portal.sponsorship.status.payed': 'Pagado',
+  'portal.sponsorship.status.approved': 'Aprobado',
+  'portal.sponsorship.error.alreadyInvited': 'Ya has enviado una invitación a este correo',
+  'portal.sponsorship.error.alreadyMember': 'Este correo ya está registrado como miembro',
+  'portal.sponsorship.error.notEligible': 'Debes ser un miembro aprobado con membresía pagada para enviar invitaciones',
+  'portal.sponsorship.success.invitationSent': 'Invitación enviada exitosamente'
 };

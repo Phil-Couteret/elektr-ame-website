@@ -61,6 +61,18 @@ try {
         throw new Exception('Member not found');
     }
     
+    // Update invitation status if member was approved
+    if ($status === 'approved') {
+        $stmt = $pdo->prepare("
+            UPDATE member_invitations 
+            SET status = 'approved',
+                approved_at = NOW()
+            WHERE invitee_member_id = ? 
+            AND status IN ('sent', 'registered', 'payed')
+        ");
+        $stmt->execute([$memberId]);
+    }
+    
     // Trigger email automation for status change
     try {
         require_once __DIR__ . '/classes/EmailAutomation.php';
