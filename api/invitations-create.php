@@ -131,6 +131,54 @@ try {
     $stmt->execute([$invitationId]);
     $invitation = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Get inviter information for the email
+    $stmt = $pdo->prepare("SELECT first_name, second_name FROM members WHERE id = ?");
+    $stmt->execute([$inviterId]);
+    $inviter = $stmt->fetch(PDO::FETCH_ASSOC);
+    $inviterName = $inviter ? ($inviter['first_name'] . ' ' . $inviter['second_name']) : 'A friend';
+
+    // Send invitation email
+    try {
+        $joinLink = "https://www.elektr-ame.com/join-us";
+        $subject = "You've been invited to join Elektr-Âme! 🎵";
+        
+        $message = "Hello {$inviteeFirstName},\n\n";
+        $message .= "{$inviterName} has invited you to join Elektr-Âme, an electronic music community and association based in Barcelona.\n\n";
+        $message .= "**About Elektr-Âme:**\n";
+        $message .= "We're a community focused on developing electronic music projects, hosting events, and building a network of artists and enthusiasts.\n\n";
+        $message .= "**What you'll get:**\n";
+        $message .= "- Access to exclusive events and workshops\n";
+        $message .= "- Networking opportunities with artists and producers\n";
+        $message .= "- Digital membership card\n";
+        $message .= "- Support for the electronic music community\n\n";
+        $message .= "**Join us now:**\n";
+        $message .= "Click here to register: {$joinLink}\n\n";
+        $message .= "If you have any questions, feel free to reach out to us at contact@elektr-ame.com.\n\n";
+        $message .= "We hope to see you soon!\n\n";
+        $message .= "Best regards,\n";
+        $message .= "The Elektr-Âme Team\n\n";
+        $message .= "---\n";
+        $message .= "This invitation was sent by {$inviterName}.\n";
+        $message .= "If you didn't expect this invitation, you can safely ignore this email.\n";
+        
+        $headers = "From: Elektr-Âme <noreply@elektr-ame.com>\r\n";
+        $headers .= "Reply-To: contact@elektr-ame.com\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion();
+        $headers .= "\r\nContent-Type: text/plain; charset=UTF-8";
+        
+        $mailResult = mail($inviteeEmail, $subject, $message, $headers);
+        
+        if ($mailResult) {
+            error_log("Invitation email sent successfully to: {$inviteeEmail} from member ID: {$inviterId}");
+        } else {
+            error_log("Failed to send invitation email to: {$inviteeEmail}");
+            // Don't fail the invitation creation if email fails
+        }
+    } catch (Exception $e) {
+        error_log("Error sending invitation email: " . $e->getMessage());
+        // Don't fail the invitation creation if email fails
+    }
+
     echo json_encode([
         'success' => true,
         'message' => 'Invitation sent successfully',
