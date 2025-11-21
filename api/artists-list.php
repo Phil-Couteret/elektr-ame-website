@@ -71,6 +71,13 @@ try {
         $artist['picture'] = $profilePictures[$artist['id']] ?? ($artist['picture'] ?? '');
         $artist['nickname'] = $artist['nickname'] ?? '';
         $artist['bioKey'] = $artist['bio_key'] ?? '';
+        $artist['pressKitUrl'] = $artist['press_kit_url'] ?? null;
+        $artist['song1Url'] = $artist['song1_url'] ?? null;
+        $artist['song2Url'] = $artist['song2_url'] ?? null;
+        $artist['song3Url'] = $artist['song3_url'] ?? null;
+        $artist['stream1Url'] = $artist['stream1_url'] ?? null;
+        $artist['stream2Url'] = $artist['stream2_url'] ?? null;
+        $artist['stream3Url'] = $artist['stream3_url'] ?? null;
         
         // Parse bio translations from JSON
         $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
@@ -81,7 +88,9 @@ try {
         
         $artist['createdAt'] = $artist['created_at'];
         $artist['updatedAt'] = $artist['updated_at'];
-        unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_translations']);
+        unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_translations'], 
+              $artist['press_kit_url'], $artist['song1_url'], $artist['song2_url'], $artist['song3_url'],
+              $artist['stream1_url'], $artist['stream2_url'], $artist['stream3_url']);
     }
 
     echo json_encode([

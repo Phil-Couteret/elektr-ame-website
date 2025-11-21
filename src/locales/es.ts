@@ -229,6 +229,7 @@ export default {
   'admin.tabs.members': 'Miembros',
   'admin.tabs.newsletter': 'Boletín',
   'admin.tabs.emailAutomation': 'Automatización de Correos',
+  'admin.tabs.invitations': 'Invitaciones',
   'admin.tabs.users': 'Usuarios',
   
   // Admin - Members Management
@@ -324,6 +325,47 @@ export default {
   'admin.message.exportError': 'Error al exportar miembros',
   'admin.message.loadError': 'Error al cargar miembros',
   'admin.message.updateError': 'Error al actualizar miembro',
+  'admin.message.fetchError': 'Error al cargar datos',
+  'admin.message.deleteError': 'Error al eliminar',
+  
+  // Admin - Gestión de Invitaciones
+  'admin.invitations.title': 'Invitaciones de Miembros',
+  'admin.invitations.description': 'Ver y gestionar todas las invitaciones de miembros. Rastrea el estado de entrega de correos y elimina invitaciones no exitosas o antiguas.',
+  'admin.invitations.empty': 'No se encontraron invitaciones',
+  'admin.invitations.status.sent': 'Enviado',
+  'admin.invitations.status.registered': 'Registrado',
+  'admin.invitations.status.payed': 'Pagado',
+  'admin.invitations.status.approved': 'Aprobado',
+  'admin.invitations.emailSent': 'Correo Enviado',
+  'admin.invitations.emailNotSent': 'Correo No Enviado',
+  'admin.invitations.daysAgo': 'días atrás',
+  'admin.invitations.delete': 'Eliminar',
+  'admin.invitations.deleteSuccess': 'Invitación eliminada exitosamente',
+  'admin.invitations.deleteConfirm.title': '¿Eliminar Invitación?',
+  'admin.invitations.deleteConfirm.message': '¿Estás seguro de que deseas eliminar la invitación para {name} ({email})? Esta acción no se puede deshacer.',
+  'admin.invitations.stats.total': 'Total',
+  'admin.invitations.stats.sent': 'Enviado',
+  'admin.invitations.stats.emailSent': 'Correo Enviado',
+  'admin.invitations.stats.emailNotSent': 'Correo Fallido',
+  'admin.invitations.filters.status': 'Estado',
+  'admin.invitations.filters.emailStatus': 'Estado del Correo',
+  'admin.invitations.filters.age': 'Antigüedad',
+  'admin.invitations.filters.search': 'Buscar',
+  'admin.invitations.filters.all': 'Todos',
+  'admin.invitations.filters.emailSent': 'Correo Enviado',
+  'admin.invitations.filters.emailNotSent': 'Correo No Enviado',
+  'admin.invitations.filters.olderThan30': 'Más de 30 días',
+  'admin.invitations.filters.olderThan60': 'Más de 60 días',
+  'admin.invitations.filters.olderThan90': 'Más de 90 días',
+  'admin.invitations.filters.searchPlaceholder': 'Buscar por nombre o correo...',
+  'admin.invitations.table.inviter': 'Invitador',
+  'admin.invitations.table.invitee': 'Invitado',
+  'admin.invitations.table.email': 'Correo',
+  'admin.invitations.table.status': 'Estado',
+  'admin.invitations.table.emailStatus': 'Estado del Correo',
+  'admin.invitations.table.sentAt': 'Enviado',
+  'admin.invitations.table.age': 'Antigüedad',
+  'admin.invitations.table.actions': 'Acciones',
   
   // Admin - Add Member
   'admin.addMember.button': 'Añadir Miembro',
@@ -623,6 +665,7 @@ export default {
   'common.cancel': 'Cancelar',
   'common.loading': 'Cargando...',
   'common.close': 'Cerrar',
+  'common.refresh': 'Actualizar',
   
   // PWA Instalación
   'pwa.install.title': 'Instalar Elektr-Âme',
@@ -655,5 +698,13 @@ export default {
   'portal.sponsorship.error.alreadyInvited': 'Ya has enviado una invitación a este correo',
   'portal.sponsorship.error.alreadyMember': 'Este correo ya está registrado como miembro',
   'portal.sponsorship.error.notEligible': 'Debes ser un miembro aprobado con membresía pagada para enviar invitaciones',
-  'portal.sponsorship.success.invitationSent': 'Invitación enviada exitosamente'
+  'portal.sponsorship.success.invitationSent': 'Invitación enviada exitosamente',
+  'portal.sponsorship.invitedMembers.title': 'Tus Miembros Invitados',
+  'portal.sponsorship.invitedMembers.empty': 'Aún no se han unido miembros',
+  'portal.sponsorship.invitedMembers.emptyDescription': 'Los miembros que se registren usando tu enlace de invitación aparecerán aquí',
+  'portal.sponsorship.invitedMembers.name': 'Nombre',
+  'portal.sponsorship.invitedMembers.email': 'Correo',
+  'portal.sponsorship.invitedMembers.status': 'Estado',
+  'portal.sponsorship.invitedMembers.membership': 'Membresía',
+  'portal.sponsorship.invitedMembers.joined': 'Se Unió'
 };

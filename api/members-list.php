@@ -31,6 +31,7 @@ try {
             first_name,
             last_name,
             second_name,
+            artist_name,
             email,
             phone,
             street,
@@ -44,6 +45,11 @@ try {
             payment_status,
             last_payment_date,
             payment_amount,
+            is_dj,
+            is_producer,
+            is_vj,
+            is_visual_artist,
+            is_fan,
             notes,
             created_at,
             updated_at
@@ -52,6 +58,16 @@ try {
     ");
     
     $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Convert role fields from integers (0/1) to booleans
+    foreach ($members as &$member) {
+        $member['is_dj'] = (bool)($member['is_dj'] ?? 0);
+        $member['is_producer'] = (bool)($member['is_producer'] ?? 0);
+        $member['is_vj'] = (bool)($member['is_vj'] ?? 0);
+        $member['is_visual_artist'] = (bool)($member['is_visual_artist'] ?? 0);
+        $member['is_fan'] = (bool)($member['is_fan'] ?? 0);
+    }
+    unset($member); // Break reference
     
     echo json_encode([
         'success' => true,

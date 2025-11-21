@@ -1,3 +1,0 @@
-app.engine=php
-app.engine.version=8.4
-app.engine.rewrite=1

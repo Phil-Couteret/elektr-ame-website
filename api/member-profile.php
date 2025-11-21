@@ -50,6 +50,7 @@ try {
             membership_end_date,
             payment_status,
             payment_amount,
+            inviter_id,
             is_dj,
             is_producer,
             is_vj,

@@ -17,6 +17,13 @@ export interface Artist {
     ca?: string;
   };
   picture?: string;
+  pressKitUrl?: string; // URL or file path to press-kit document
+  song1Url?: string; // URL to first song
+  song2Url?: string; // URL to second song
+  song3Url?: string; // URL to third song
+  stream1Url?: string; // URL to first stream (YouTube, etc.)
+  stream2Url?: string; // URL to second stream
+  stream3Url?: string; // URL to third stream
   socialLinks: SocialLinks;
   createdAt: string;
   updatedAt: string;

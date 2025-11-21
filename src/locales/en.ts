@@ -232,6 +232,7 @@ export default {
   'admin.tabs.members': 'Members',
   'admin.tabs.newsletter': 'Newsletter',
   'admin.tabs.emailAutomation': 'Email Automation',
+  'admin.tabs.invitations': 'Invitations',
   'admin.tabs.users': 'Users',
   
   // Admin - Members Management
@@ -327,6 +328,47 @@ export default {
   'admin.message.exportError': 'Failed to export members',
   'admin.message.loadError': 'Failed to load members',
   'admin.message.updateError': 'Failed to update member',
+  'admin.message.fetchError': 'Failed to fetch data',
+  'admin.message.deleteError': 'Failed to delete',
+  
+  // Admin - Invitations Management
+  'admin.invitations.title': 'Member Invitations',
+  'admin.invitations.description': 'View and manage all member invitations. Track email delivery status and remove unsuccessful or old invitations.',
+  'admin.invitations.empty': 'No invitations found',
+  'admin.invitations.status.sent': 'Sent',
+  'admin.invitations.status.registered': 'Registered',
+  'admin.invitations.status.payed': 'Paid',
+  'admin.invitations.status.approved': 'Approved',
+  'admin.invitations.emailSent': 'Email Sent',
+  'admin.invitations.emailNotSent': 'Email Not Sent',
+  'admin.invitations.daysAgo': 'days ago',
+  'admin.invitations.delete': 'Delete',
+  'admin.invitations.deleteSuccess': 'Invitation deleted successfully',
+  'admin.invitations.deleteConfirm.title': 'Delete Invitation?',
+  'admin.invitations.deleteConfirm.message': 'Are you sure you want to delete the invitation for {name} ({email})? This action cannot be undone.',
+  'admin.invitations.stats.total': 'Total',
+  'admin.invitations.stats.sent': 'Sent',
+  'admin.invitations.stats.emailSent': 'Email Sent',
+  'admin.invitations.stats.emailNotSent': 'Email Failed',
+  'admin.invitations.filters.status': 'Status',
+  'admin.invitations.filters.emailStatus': 'Email Status',
+  'admin.invitations.filters.age': 'Age',
+  'admin.invitations.filters.search': 'Search',
+  'admin.invitations.filters.all': 'All',
+  'admin.invitations.filters.emailSent': 'Email Sent',
+  'admin.invitations.filters.emailNotSent': 'Email Not Sent',
+  'admin.invitations.filters.olderThan30': 'Older than 30 days',
+  'admin.invitations.filters.olderThan60': 'Older than 60 days',
+  'admin.invitations.filters.olderThan90': 'Older than 90 days',
+  'admin.invitations.filters.searchPlaceholder': 'Search by name or email...',
+  'admin.invitations.table.inviter': 'Inviter',
+  'admin.invitations.table.invitee': 'Invitee',
+  'admin.invitations.table.email': 'Email',
+  'admin.invitations.table.status': 'Status',
+  'admin.invitations.table.emailStatus': 'Email Status',
+  'admin.invitations.table.sentAt': 'Sent At',
+  'admin.invitations.table.age': 'Age',
+  'admin.invitations.table.actions': 'Actions',
   
   // Admin - Add Member
   'admin.addMember.button': 'Add Member',
@@ -626,6 +668,7 @@ export default {
   'common.cancel': 'Cancel',
   'common.loading': 'Loading...',
   'common.close': 'Close',
+  'common.refresh': 'Refresh',
   
   // PWA Install Prompt
   'pwa.install.title': 'Install Elektr-Âme',
@@ -658,5 +701,13 @@ export default {
   'portal.sponsorship.error.alreadyInvited': 'You have already sent an invitation to this email',
   'portal.sponsorship.error.alreadyMember': 'This email is already registered as a member',
   'portal.sponsorship.error.notEligible': 'You must be an approved member with paid membership to send invitations',
-  'portal.sponsorship.success.invitationSent': 'Invitation sent successfully'
+  'portal.sponsorship.success.invitationSent': 'Invitation sent successfully',
+  'portal.sponsorship.invitedMembers.title': 'Your Invited Members',
+  'portal.sponsorship.invitedMembers.empty': 'No members have joined yet',
+  'portal.sponsorship.invitedMembers.emptyDescription': 'Members who register using your invitation link will appear here',
+  'portal.sponsorship.invitedMembers.name': 'Name',
+  'portal.sponsorship.invitedMembers.email': 'Email',
+  'portal.sponsorship.invitedMembers.status': 'Status',
+  'portal.sponsorship.invitedMembers.membership': 'Membership',
+  'portal.sponsorship.invitedMembers.joined': 'Joined'
 };

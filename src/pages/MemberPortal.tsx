@@ -25,7 +25,8 @@ import {
   RefreshCw,
   LogOut,
   Lock,
-  UserPlus
+  UserPlus,
+  Users
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -85,6 +86,8 @@ const MemberPortal = () => {
   const [isSendingInvitation, setIsSendingInvitation] = useState(false);
   const [invitations, setInvitations] = useState<any[]>([]);
   const [invitationsLoading, setInvitationsLoading] = useState(true);
+  const [invitedMembers, setInvitedMembers] = useState<any[]>([]);
+  const [invitedMembersLoading, setInvitedMembersLoading] = useState(true);
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -92,7 +95,16 @@ const MemberPortal = () => {
   useEffect(() => {
     fetchMemberData();
     fetchInvitations();
+    fetchInvitedMembers();
   }, []);
+
+  // Refresh invitations and invited members when sponsorship tab is opened
+  useEffect(() => {
+    if (activeTab === 'sponsorship') {
+      fetchInvitations();
+      fetchInvitedMembers();
+    }
+  }, [activeTab]);
 
   const fetchMemberData = async () => {
     try {
@@ -379,6 +391,28 @@ const MemberPortal = () => {
       console.error('Error fetching invitations:', error);
     } finally {
       setInvitationsLoading(false);
+    }
+  };
+
+  const fetchInvitedMembers = async () => {
+    setInvitedMembersLoading(true);
+    try {
+      const response = await fetch('/api/members-get-invited.php', {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setInvitedMembers(data.invited_members || []);
+      } else {
+        console.error('Failed to fetch invited members:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching invited members:', error);
+    } finally {
+      setInvitedMembersLoading(false);
     }
   };
 
@@ -1066,7 +1100,23 @@ const MemberPortal = () => {
 
                 {/* Invitations List */}
                 <div className="space-y-4">
-                  <h3 className="text-white font-semibold">{t('portal.sponsorship.invitations.title')}</h3>
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-semibold">{t('portal.sponsorship.invitations.title')}</h3>
+                    <Button
+                      onClick={fetchInvitations}
+                      disabled={invitationsLoading}
+                      variant="outline"
+                      size="sm"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      {invitationsLoading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                      )}
+                      {t('common.refresh')}
+                    </Button>
+                  </div>
                   {invitationsLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-8 w-8 text-blue-light animate-spin" />
@@ -1099,6 +1149,74 @@ const MemberPortal = () => {
                                 <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitations.sentAt')}</p>
                                 <p className="text-white text-sm">
                                   {new Date(invitation.sent_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Invited Members List */}
+                <div className="space-y-4 pt-6 border-t border-white/10">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-white font-semibold">{t('portal.sponsorship.invitedMembers.title')}</h3>
+                    <Button
+                      onClick={fetchInvitedMembers}
+                      disabled={invitedMembersLoading}
+                      variant="outline"
+                      size="sm"
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      {invitedMembersLoading ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                      )}
+                      {t('common.refresh')}
+                    </Button>
+                  </div>
+                  {invitedMembersLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-8 w-8 text-blue-light animate-spin" />
+                    </div>
+                  ) : invitedMembers.length === 0 ? (
+                    <div className="text-center py-8">
+                      <Users className="h-12 w-12 text-white/30 mx-auto mb-4" />
+                      <p className="text-white/70 font-semibold mb-2">{t('portal.sponsorship.invitedMembers.empty')}</p>
+                      <p className="text-white/50 text-sm">{t('portal.sponsorship.invitedMembers.emptyDescription')}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {invitedMembers.map((member) => (
+                        <Card key={member.id} className="bg-black/20 border-white/10">
+                          <CardContent className="p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.name')}</p>
+                                <p className="text-white font-medium">{member.first_name} {member.second_name}</p>
+                                {member.artist_name && (
+                                  <p className="text-blue-light text-xs">{member.artist_name}</p>
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.email')}</p>
+                                <p className="text-white text-sm">{member.email}</p>
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.status')}</p>
+                                {getStatusBadge(member.status)}
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.membership')}</p>
+                                {getMembershipTypeBadge(member.membership_type || 'free')}
+                              </div>
+                              <div>
+                                <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.joined')}</p>
+                                <p className="text-white text-sm">
+                                  {new Date(member.created_at).toLocaleDateString()}
                                 </p>
                               </div>
                             </div>

@@ -63,11 +63,12 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
       setFormData({
         phone: member.phone || '',
         artist_name: member.artist_name || '',
-        is_dj: member.is_dj || false,
-        is_producer: member.is_producer || false,
-        is_vj: member.is_vj || false,
-        is_visual_artist: member.is_visual_artist || false,
-        is_fan: member.is_fan || false,
+        // Convert to boolean explicitly - handle both number (0/1) and boolean (true/false) from API
+        is_dj: Boolean(member.is_dj),
+        is_producer: Boolean(member.is_producer),
+        is_vj: Boolean(member.is_vj),
+        is_visual_artist: Boolean(member.is_visual_artist),
+        is_fan: Boolean(member.is_fan),
         membership_type: member.membership_type || 'free_trial',
         membership_start_date: member.membership_start_date || '',
         membership_end_date: member.membership_end_date || '',

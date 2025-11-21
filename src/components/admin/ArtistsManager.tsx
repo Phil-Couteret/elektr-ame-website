@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Plus, Edit2, Trash2, User, Music, ExternalLink, Languages, Loader2, Image as ImageIcon } from "lucide-react";
+import { Plus, Edit2, Trash2, User, Music, ExternalLink, Languages, Loader2, Image as ImageIcon, Upload, FileText } from "lucide-react";
 import { useAdminData } from "@/hooks/useAdminData";
 import { Artist, SocialLinks } from "@/types/admin";
 import ArtistImageUpload from "@/components/ArtistImageUpload";
@@ -33,6 +33,7 @@ const ArtistsManager = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState<{ [key: string]: boolean }>({});
+  const [uploadingPressKit, setUploadingPressKit] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -45,6 +46,13 @@ const ArtistsManager = () => {
       ca: ""
     },
     picture: "",
+    pressKitUrl: "",
+    song1Url: "",
+    song2Url: "",
+    song3Url: "",
+    stream1Url: "",
+    stream2Url: "",
+    stream3Url: "",
     socialLinks: {} as SocialLinks
   });
 
@@ -60,6 +68,13 @@ const ArtistsManager = () => {
         ca: ""
       },
       picture: "",
+      pressKitUrl: "",
+      song1Url: "",
+      song2Url: "",
+      song3Url: "",
+      stream1Url: "",
+      stream2Url: "",
+      stream3Url: "",
       socialLinks: {}
     });
     setIsEditing(false);
@@ -80,6 +95,13 @@ const ArtistsManager = () => {
         ca: ""
       },
       picture: artist.picture || "",
+      pressKitUrl: artist.pressKitUrl || "",
+      song1Url: artist.song1Url || "",
+      song2Url: artist.song2Url || "",
+      song3Url: artist.song3Url || "",
+      stream1Url: artist.stream1Url || "",
+      stream2Url: artist.stream2Url || "",
+      stream3Url: artist.stream3Url || "",
       socialLinks: { ...artist.socialLinks }
     });
     setEditingArtist(artist);
@@ -371,6 +393,173 @@ const ArtistsManager = () => {
                       />
                     </div>
                   )}
+                </div>
+              </div>
+
+              {/* Press Kit */}
+              <div className="space-y-2">
+                <Label htmlFor="pressKitUrl" className="text-white">
+                  Press Kit (URL or File)
+                </Label>
+                <p className="text-xs text-white/60 mb-2">
+                  Enter a URL to an external press-kit document, or upload a file (PDF/DOC).
+                </p>
+                <div className="flex gap-2">
+                  <Input
+                    id="pressKitUrl"
+                    value={formData.pressKitUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, pressKitUrl: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50 flex-1"
+                    placeholder="https://example.com/press-kit.pdf or /public/press-kits/artist-name.pdf"
+                  />
+                  <input
+                    type="file"
+                    id="pressKitFile"
+                    accept=".pdf,.doc,.docx"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      
+                      setUploadingPressKit(true);
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await fetch('/api/upload-press-kit.php', {
+                          method: 'POST',
+                          credentials: 'include',
+                          body: formData
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                          setFormData(prev => ({ ...prev, pressKitUrl: result.filepath }));
+                        } else {
+                          alert(result.message || 'Failed to upload press-kit');
+                        }
+                      } catch (error) {
+                        console.error('Error uploading press-kit:', error);
+                        alert('Failed to upload press-kit');
+                      } finally {
+                        setUploadingPressKit(false);
+                        // Reset file input
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => document.getElementById('pressKitFile')?.click()}
+                    disabled={uploadingPressKit}
+                    variant="outline"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    {uploadingPressKit ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload
+                      </>
+                    )}
+                  </Button>
+                </div>
+                {formData.pressKitUrl && (
+                  <div className="flex items-center gap-2 text-sm text-white/70">
+                    <FileText className="h-4 w-4" />
+                    <span className="truncate">{formData.pressKitUrl}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData(prev => ({ ...prev, pressKitUrl: '' }))}
+                      className="text-red-400 hover:text-red-300 h-6 px-2"
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Songs */}
+              <div className="space-y-2">
+                <Label className="text-white">Songs (URLs)</Label>
+                <p className="text-xs text-white/60 mb-2">
+                  Enter up to 3 song URLs. Songs will be played in an iframe.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="song1Url" className="text-white text-sm">Song 1</Label>
+                    <Input
+                      id="song1Url"
+                      value={formData.song1Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, song1Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://example.com/song1.mp3"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="song2Url" className="text-white text-sm">Song 2</Label>
+                    <Input
+                      id="song2Url"
+                      value={formData.song2Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, song2Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://example.com/song2.mp3"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="song3Url" className="text-white text-sm">Song 3</Label>
+                    <Input
+                      id="song3Url"
+                      value={formData.song3Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, song3Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://example.com/song3.mp3"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Streams */}
+              <div className="space-y-2">
+                <Label className="text-white">Streams (URLs)</Label>
+                <p className="text-xs text-white/60 mb-2">
+                  Enter up to 3 stream URLs (YouTube, video files, etc.). Streams will be played in an iframe with favorites option.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="stream1Url" className="text-white text-sm">Stream 1</Label>
+                    <Input
+                      id="stream1Url"
+                      value={formData.stream1Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, stream1Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://youtube.com/watch?v=... or /public/videos/stream1.mp4"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stream2Url" className="text-white text-sm">Stream 2</Label>
+                    <Input
+                      id="stream2Url"
+                      value={formData.stream2Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, stream2Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://youtube.com/watch?v=... or /public/videos/stream2.mp4"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stream3Url" className="text-white text-sm">Stream 3</Label>
+                    <Input
+                      id="stream3Url"
+                      value={formData.stream3Url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, stream3Url: e.target.value }))}
+                      className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                      placeholder="https://youtube.com/watch?v=... or /public/videos/stream3.mp4"
+                    />
+                  </div>
                 </div>
               </div>
 
