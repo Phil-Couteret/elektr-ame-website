@@ -484,12 +484,14 @@ const MembersManager = () => {
                   {filteredMembers.map((member) => (
                     <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
                       <TableCell className="text-white">
-                        <div>
-                          <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
-                          {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
-                          <div className="text-xs text-white/40">{member.city}, {member.country}</div>
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
+                            {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
+                            <div className="text-xs text-white/40">{member.city}</div>
+                          </div>
                           {(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
-                            <div className="flex gap-1 mt-1 flex-wrap">
+                            <div className="flex gap-1 flex-wrap justify-end flex-shrink-0">
                               {member.is_dj && <span className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded">DJ</span>}
                               {member.is_producer && <span className="text-xs bg-blue-600/30 text-blue-300 px-1.5 py-0.5 rounded">Producer</span>}
                               {member.is_vj && <span className="text-xs bg-pink-600/30 text-pink-300 px-1.5 py-0.5 rounded">VJ</span>}
