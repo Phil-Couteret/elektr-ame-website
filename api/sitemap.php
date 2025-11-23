@@ -52,6 +52,7 @@ try {
     // Static pages
     outputUrl($baseUrl . '/join-us', $currentDate, 'monthly', '0.8');
     outputUrl($baseUrl . '/contact', $currentDate, 'monthly', '0.7');
+    outputUrl($baseUrl . '/initiatives', $currentDate, 'monthly', '0.7');
     
     // Get events from database
     $stmt = $pdo->prepare("
