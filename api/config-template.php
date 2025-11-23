@@ -19,4 +19,5 @@ try {
     error_log("Database connection failed: " . $e->getMessage());
     die(json_encode(['success' => false, 'message' => 'Database connection failed']));
 }
+?>
 
