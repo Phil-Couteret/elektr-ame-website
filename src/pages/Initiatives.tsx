@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Mic, Music, Sparkles, Book, Globe, Leaf, Users, Calendar } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 interface InitiativeProps {
   icon: React.ReactNode;
@@ -82,6 +83,12 @@ const InitiativeCard = ({ initiative }: { initiative: InitiativeProps }) => {
 const Initiatives = () => {
   return (
     <div className="min-h-screen bg-black text-white">
+      <SEO 
+        title="Our Initiatives | Elektr-Âme"
+        description="Discover Elektr-Âme's initiatives: cultural events, workshops, artist residencies, heritage preservation, and solidarity projects in Barcelona's electronic music scene."
+        url="https://www.elektr-ame.com/initiatives"
+        keywords="initiatives, workshops, events, artist residencies, Barcelona, electronic music, cultural projects"
+      />
       <Header />
       
       {/* Hero Section */}
