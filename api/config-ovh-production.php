@@ -41,5 +41,4 @@ try {
         'username' => $username
     ]));
 }
-?>
 
