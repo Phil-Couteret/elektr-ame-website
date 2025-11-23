@@ -1,14 +1,24 @@
-User-agent: Googlebot
-Allow: /
+# Robots.txt for Elektr-Âme
+# https://www.elektr-ame.com
 
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
+# Allow all search engines
 User-agent: *
 Allow: /
+
+# Disallow admin and member-only areas
+User-agent: *
+Disallow: /admin
+Disallow: /member-portal
+Disallow: /api/
+
+# Allow API endpoints that should be indexed (if any)
+# User-agent: *
+# Allow: /api/events-list.php
+# Allow: /api/artists-list.php
+
+# Sitemap location
+Sitemap: https://www.elektr-ame.com/sitemap.xml
+
+# Crawl-delay (optional, adjust if needed)
+# User-agent: *
+# Crawl-delay: 1

@@ -11,6 +11,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # RewriteCond %{HTTP_HOST} !^www\.
 # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Sitemap - serve from PHP endpoint (only if file doesn't exist)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} ^/sitemap\.xml$
+RewriteRule ^sitemap\.xml$ /api/sitemap.php [L]
+
 # Allow API calls to pass through
 RewriteCond %{REQUEST_URI} ^/api/
 RewriteRule ^(.*)$ - [L]

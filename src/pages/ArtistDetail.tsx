@@ -9,6 +9,7 @@ import StreamModal from "@/components/StreamModal";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, User, FileText, Music, Video } from "lucide-react";
 import { SEO } from "@/components/SEO";
+import { generatePersonData, generateBreadcrumbData, getDefaultOrganizationData } from "@/utils/structuredData";
 
 interface Artist {
   id: string;
@@ -107,15 +108,37 @@ const ArtistDetail = () => {
     ? (artist.picture.startsWith('/') ? artist.picture : `/${artist.picture}`)
     : "https://www.elektr-ame.com/elektr-ame-media/85e5425f-9e5d-4f41-a064-2e7734dc6c51.png";
 
+  // Generate structured data for artist
+  const structuredData = artist ? [
+    generatePersonData({
+      name: artist.name,
+      alternateName: artist.nickname,
+      description: artist.bio || `${artist.name} - Electronic music artist on Elektr-Âme`,
+      image: artistImage.startsWith('http') ? artistImage : `https://www.elektr-ame.com${artistImage}`,
+      url: `https://www.elektr-ame.com/artist/${id}`,
+      jobTitle: 'Electronic Music Artist',
+      sameAs: artist.socialLinks ? Object.values(artist.socialLinks).filter(Boolean) : [],
+    }),
+    generateBreadcrumbData({
+      items: [
+        { name: 'Home', url: 'https://www.elektr-ame.com' },
+        { name: 'Artists', url: 'https://www.elektr-ame.com/#artists' },
+        { name: artist.name, url: `https://www.elektr-ame.com/artist/${id}` },
+      ],
+    }),
+    getDefaultOrganizationData(),
+  ] : [getDefaultOrganizationData()];
+
   return (
     <div className="min-h-screen bg-black text-white">
       <SEO 
         title={artist ? `${artist.name} | Elektr-Âme` : "Artist | Elektr-Âme"}
         description={artist ? `${artist.name} - ${artist.bio?.substring(0, 150) || 'Artist profile on Elektr-Âme'}...` : "Artist profile on Elektr-Âme"}
-        image={artistImage}
+        image={artistImage.startsWith('http') ? artistImage : `https://www.elektr-ame.com${artistImage}`}
         url={`https://www.elektr-ame.com/artist/${id}`}
         type="profile"
         keywords={artist ? `${artist.name}, electronic music, Barcelona, DJ, producer, ${artist.nickname || ''}` : "electronic music, Barcelona"}
+        structuredData={structuredData}
       />
       <Header />
       

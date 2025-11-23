@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 
 const MemberLogin = () => {
   const [email, setEmail] = useState("");
@@ -58,6 +59,12 @@ const MemberLogin = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-deep-purple via-deep-purple/95 to-black">
+      <SEO 
+        title="Member Login | Elektr-Âme"
+        description="Login to your Elektr-Âme member account. Access your member portal, manage your profile, and stay connected with the community."
+        url="https://www.elektr-ame.com/member-login"
+        keywords="member login, Elektr-Âme, member portal, Barcelona, electronic music"
+      />
       <Header />
       
       <div className="container mx-auto px-4 py-20">
