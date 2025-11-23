@@ -17,7 +17,7 @@ Disallow: /api/
 # Allow: /api/artists-list.php
 
 # Sitemap location
-Sitemap: https://www.elektr-ame.com/sitemap.xml
+Sitemap: https://www.elektr-ame.com/api/sitemap.php
 
 # Crawl-delay (optional, adjust if needed)
 # User-agent: *
