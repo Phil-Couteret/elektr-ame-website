@@ -4,9 +4,17 @@
  * Generates XML sitemap for search engines
  */
 
-header('Content-Type: application/xml; charset=utf-8');
+// Start output buffering to catch any accidental output from includes
+ob_start();
 
+// Include config (may have whitespace or output)
 require_once __DIR__ . '/config.php';
+
+// Discard any output from config.php or whitespace
+ob_end_clean();
+
+// Set headers after cleaning buffer (must be before any output)
+header('Content-Type: application/xml; charset=utf-8');
 
 // Base URL
 $baseUrl = 'https://www.elektr-ame.com';
@@ -14,7 +22,7 @@ $baseUrl = 'https://www.elektr-ame.com';
 // Get current date
 $currentDate = date('Y-m-d');
 
-// Start XML output
+// Start XML output - MUST be first output after headers
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
 echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
 
@@ -98,4 +106,3 @@ try {
 
 // Close XML
 echo '</urlset>';
-
