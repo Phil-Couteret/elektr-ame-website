@@ -37,24 +37,40 @@ try {
         throw new Exception('Verification token is required');
     }
     
+    // Normalize token
+    $token = trim($token);
+    
     // Check if token belongs to an email change request first
-    $changeStmt = $pdo->prepare("
-        SELECT 
-            r.id,
-            r.member_id,
-            r.new_email,
-            r.status,
-            r.expires_at,
-            m.email,
-            m.first_name,
-            m.status as member_status
-        FROM member_email_change_requests r
-        JOIN members m ON m.id = r.member_id
-        WHERE r.token = :token
-        LIMIT 1
-    ");
-    $changeStmt->execute([':token' => $token]);
-    $changeRequest = $changeStmt->fetch(PDO::FETCH_ASSOC);
+    $changeRequest = false;
+    try {
+        $changeStmt = $pdo->prepare("
+            SELECT 
+                r.id,
+                r.member_id,
+                r.new_email,
+                r.status,
+                r.expires_at,
+                m.email,
+                m.first_name,
+                m.status as member_status
+            FROM member_email_change_requests r
+            JOIN members m ON m.id = r.member_id
+            WHERE r.token = :token
+            LIMIT 1
+        ");
+        $changeStmt->execute([':token' => $token]);
+        $changeRequest = $changeStmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($changeRequest) {
+            error_log("Email change request found: id={$changeRequest['id']}, member_id={$changeRequest['member_id']}, status={$changeRequest['status']}");
+        } else {
+            error_log("No email change request found for token: " . substr($token, 0, 8) . "...");
+        }
+    } catch (PDOException $e) {
+        // Table might not exist yet - log and fall through to regular verification
+        error_log("Email change request table query failed (might not exist): " . $e->getMessage());
+        $changeRequest = false;
+    }
 
     if ($changeRequest) {
         if ($changeRequest['status'] !== 'pending') {

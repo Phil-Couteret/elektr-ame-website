@@ -203,11 +203,15 @@ const MemberPortal = () => {
 
   const startEditing = () => {
     if (memberData) {
+      // If there's a pending email change, use the new email in the form
+      // Otherwise use the current email
+      const emailToShow = memberData.pending_email_change?.new_email || memberData.email;
+      
       setEditFormData({
         first_name: memberData.first_name,
         second_name: memberData.second_name,
         artist_name: memberData.artist_name || '',
-        email: memberData.email,
+        email: emailToShow,
         phone: memberData.phone || '',
         address: memberData.address || '',
         city: memberData.city || '',
