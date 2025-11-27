@@ -17,6 +17,7 @@ const VerifyEmail = () => {
   const [alreadyVerified, setAlreadyVerified] = useState(false);
   const [error, setError] = useState('');
   const [memberStatus, setMemberStatus] = useState('');
+  const [verificationType, setVerificationType] = useState<'account' | 'email_change'>('account');
 
   useEffect(() => {
     if (!token) {
@@ -38,7 +39,14 @@ const VerifyEmail = () => {
         const data = await response.json();
 
         if (data.success) {
-          if (data.already_verified) {
+          const type = (data.verification_type as 'account' | 'email_change') || 'account';
+          setVerificationType(type);
+
+          if (type === 'email_change') {
+            setVerified(true);
+            setMemberStatus(data.member_status || '');
+            setAlreadyVerified(false);
+          } else if (data.already_verified) {
             setAlreadyVerified(true);
           } else {
             setVerified(true);
@@ -59,6 +67,11 @@ const VerifyEmail = () => {
   }, [token, t]);
 
   const handleContinue = () => {
+    if (verificationType === 'email_change') {
+      navigate('/member-portal');
+      return;
+    }
+
     if (memberStatus === 'approved') {
       navigate('/member-login');
     } else {
@@ -83,39 +96,56 @@ const VerifyEmail = () => {
             )}
 
             {!verifying && verified && (
-              <>
-                <Alert className="border-green-500/50 bg-green-500/10">
-                  <CheckCircle className="h-4 w-4 text-green-400" />
-                  <AlertDescription className="text-green-400">
-                    {t('verifyEmail.success')}
-                  </AlertDescription>
-                </Alert>
-
-                {memberStatus === 'pending' && (
-                  <Alert className="border-blue-500/50 bg-blue-500/10">
-                    <Mail className="h-4 w-4 text-blue-400" />
-                    <AlertDescription className="text-blue-400">
-                      {t('verifyEmail.pendingApproval')}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {memberStatus === 'approved' && (
+              verificationType === 'email_change' ? (
+                <>
                   <Alert className="border-green-500/50 bg-green-500/10">
                     <CheckCircle className="h-4 w-4 text-green-400" />
                     <AlertDescription className="text-green-400">
-                      {t('verifyEmail.canLogin')}
+                      {t('verifyEmail.emailChangeSuccess')}
                     </AlertDescription>
                   </Alert>
-                )}
+                  <Button
+                    onClick={() => navigate('/member-portal')}
+                    className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+                  >
+                    {t('verifyEmail.emailChangeButton')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Alert className="border-green-500/50 bg-green-500/10">
+                    <CheckCircle className="h-4 w-4 text-green-400" />
+                    <AlertDescription className="text-green-400">
+                      {t('verifyEmail.success')}
+                    </AlertDescription>
+                  </Alert>
 
-                <Button 
-                  onClick={handleContinue}
-                  className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
-                >
-                  {memberStatus === 'approved' ? t('verifyEmail.loginButton') : t('verifyEmail.homeButton')}
-                </Button>
-              </>
+                  {memberStatus === 'pending' && (
+                    <Alert className="border-blue-500/50 bg-blue-500/10">
+                      <Mail className="h-4 w-4 text-blue-400" />
+                      <AlertDescription className="text-blue-400">
+                        {t('verifyEmail.pendingApproval')}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {memberStatus === 'approved' && (
+                    <Alert className="border-green-500/50 bg-green-500/10">
+                      <CheckCircle className="h-4 w-4 text-green-400" />
+                      <AlertDescription className="text-green-400">
+                        {t('verifyEmail.canLogin')}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Button 
+                    onClick={handleContinue}
+                    className="w-full bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+                  >
+                    {memberStatus === 'approved' ? t('verifyEmail.loginButton') : t('verifyEmail.homeButton')}
+                  </Button>
+                </>
+              )
             )}
 
             {!verifying && alreadyVerified && (

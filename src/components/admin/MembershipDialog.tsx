@@ -42,6 +42,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
   const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
+    email: '',
     phone: '',
     artist_name: '',
     is_dj: false,
@@ -61,6 +62,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
   useEffect(() => {
     if (member) {
       setFormData({
+        email: member.email || '',
         phone: member.phone || '',
         artist_name: member.artist_name || '',
         // Convert to boolean explicitly - handle both number (0/1) and boolean (true/false) from API
@@ -161,6 +163,17 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
             
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
+                <Label>{t('admin.addMember.email')}</Label>
+                <Input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="bg-black/40 border-white/10 text-white"
+                  placeholder="name@example.com"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
                 <Label>{t('admin.addMember.phone')}</Label>
                 <Input
                   type="tel"
@@ -170,16 +183,16 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                   placeholder="+1234567890"
                 />
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label>{t('admin.addMember.artistName')}</Label>
-                <Input
-                  value={formData.artist_name}
-                  onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
-                  className="bg-black/40 border-white/10 text-white"
-                  placeholder={t('admin.addMember.artistNamePlaceholder')}
-                />
-              </div>
+            <div className="space-y-2">
+              <Label>{t('admin.addMember.artistName')}</Label>
+              <Input
+                value={formData.artist_name}
+                onChange={(e) => setFormData({ ...formData, artist_name: e.target.value })}
+                className="bg-black/40 border-white/10 text-white"
+                placeholder={t('admin.addMember.artistNamePlaceholder')}
+              />
             </div>
 
             <div className="space-y-2">

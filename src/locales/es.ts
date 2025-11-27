@@ -191,6 +191,8 @@ export default {
   'verifyEmail.loginButton': 'Ir a Inicio de Sesión',
   'verifyEmail.homeButton': 'Ir a Inicio',
   'verifyEmail.resendButton': 'Reenviar Email de Verificación',
+  'verifyEmail.emailChangeSuccess': 'Tu correo de acceso se actualizó correctamente.',
+  'verifyEmail.emailChangeButton': 'Ir al portal de miembros',
   
   // Reenviar Verificación
   'resendVerification.title': 'Reenviar Verificación',
@@ -545,6 +547,11 @@ export default {
   'portal.profile.updateSuccessMessage': '¡Tu perfil ha sido actualizado correctamente!',
   'portal.profile.updateError': 'Error en la Actualización',
   'portal.profile.updateErrorMessage': 'Error al actualizar el perfil. Por favor, inténtalo de nuevo.',
+  'portal.profile.emailChangeConfirmationSent': 'Confirma tu nuevo correo',
+  'portal.profile.emailChangeConfirmationSentDescription': 'Te enviamos un enlace de confirmación a {email}. Revisa tu bandeja para completar la actualización.',
+  'portal.profile.pendingEmailChange.title': 'Cambio de correo pendiente',
+  'portal.profile.pendingEmailChange.message': 'Confirma {email} antes de {date} para completar la actualización de tu correo de acceso.',
+  'portal.profile.pendingEmailChange.messageNoDate': 'Confirma {email} para completar la actualización de tu correo de acceso.',
 
   // Cambiar Contraseña
   'portal.changePassword.title': 'Cambiar Contraseña',

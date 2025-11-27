@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
   User, 
   CreditCard, 
@@ -32,6 +33,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MemberCard from "@/components/MemberCard";
 
+interface PendingEmailChange {
+  new_email: string;
+  requested_at?: string;
+  expires_at?: string;
+}
+
 interface MemberData {
   id: number;
   email: string;
@@ -54,6 +61,7 @@ interface MemberData {
   is_visual_artist: boolean;
   is_fan: boolean;
   created_at: string;
+  pending_email_change?: PendingEmailChange;
 }
 
 const MemberPortal = () => {
@@ -240,10 +248,19 @@ const MemberPortal = () => {
       const data = await response.json();
 
       if (data.success) {
-        toast({
-          title: t('portal.profile.updateSuccess'),
-          description: t('portal.profile.updateSuccessMessage'),
-        });
+        const pendingChange = data.pending_email_change;
+        if (pendingChange) {
+          toast({
+            title: t('portal.profile.emailChangeConfirmationSent'),
+            description: t('portal.profile.emailChangeConfirmationSentDescription', { email: pendingChange.new_email }),
+          });
+        } else {
+          toast({
+            title: t('portal.profile.updateSuccess'),
+            description: t('portal.profile.updateSuccessMessage'),
+          });
+        }
+
         setIsEditing(false);
         // Refresh member data
         fetchMemberData();
@@ -502,6 +519,8 @@ const MemberPortal = () => {
     return null;
   }
 
+  const pendingEmailChange = memberData.pending_email_change;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-12">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
@@ -754,6 +773,26 @@ const MemberPortal = () => {
                         <p className="text-white">{memberData.email}</p>
                       </div>
                     </div>
+
+                    {pendingEmailChange && (
+                      <div className="pb-4 border-b border-white/10">
+                        <Alert className="border-yellow-500/50 bg-yellow-500/10 text-yellow-100">
+                          <AlertTitle className="text-yellow-200">
+                            {t('portal.profile.pendingEmailChange.title')}
+                          </AlertTitle>
+                          <AlertDescription className="text-yellow-100 text-sm">
+                            {pendingEmailChange.expires_at
+                              ? t('portal.profile.pendingEmailChange.message', {
+                                  email: pendingEmailChange.new_email,
+                                  date: new Date(pendingEmailChange.expires_at).toLocaleString(),
+                                })
+                              : t('portal.profile.pendingEmailChange.messageNoDate', {
+                                  email: pendingEmailChange.new_email,
+                                })}
+                          </AlertDescription>
+                        </Alert>
+                      </div>
+                    )}
 
                     <div className="flex items-center gap-3 pb-4 border-b border-white/10">
                       <User className="h-5 w-5 text-white/50" />

@@ -81,8 +81,27 @@ try {
     $member['is_visual_artist'] = (bool)$member['is_visual_artist'];
     $member['is_fan'] = (bool)$member['is_fan'];
 
+    // Fetch pending email change if any
+    $pendingStmt = $pdo->prepare("
+        SELECT new_email, requested_at, expires_at 
+        FROM member_email_change_requests 
+        WHERE member_id = ? AND status = 'pending'
+        ORDER BY requested_at DESC
+        LIMIT 1
+    ");
+    $pendingStmt->execute([$member_id]);
+    $pendingEmailChange = $pendingStmt->fetch(PDO::FETCH_ASSOC);
+
     // Don't send internal notes to member
     unset($member['notes']);
+
+    if ($pendingEmailChange) {
+        $member['pending_email_change'] = [
+            'new_email' => $pendingEmailChange['new_email'],
+            'requested_at' => $pendingEmailChange['requested_at'],
+            'expires_at' => $pendingEmailChange['expires_at']
+        ];
+    }
 
     echo json_encode([
         'success' => true,
