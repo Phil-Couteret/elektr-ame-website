@@ -114,18 +114,29 @@ try {
     $pendingEmailChange = null;
 
     if ($emailChanged) {
-        // Cancel any previous pending requests
-        $cancelStmt = $pdo->prepare("UPDATE member_email_change_requests SET status = 'cancelled' WHERE member_id = ? AND status = 'pending'");
-        $cancelStmt->execute([$member_id]);
+        try {
+            // Cancel any previous pending requests
+            $cancelStmt = $pdo->prepare("UPDATE member_email_change_requests SET status = 'cancelled' WHERE member_id = ? AND status = 'pending'");
+            $cancelStmt->execute([$member_id]);
 
-        $token = bin2hex(random_bytes(32));
-        $expiresAt = (new DateTime('+48 hours'))->format('Y-m-d H:i:s');
+            $token = bin2hex(random_bytes(32));
+            $expiresAt = (new DateTime('+48 hours'))->format('Y-m-d H:i:s');
 
-        $insertStmt = $pdo->prepare("
-            INSERT INTO member_email_change_requests (member_id, current_email, new_email, token, expires_at)
-            VALUES (?, ?, ?, ?, ?)
-        ");
-        $insertStmt->execute([$member_id, $currentEmail, $emailInputRaw, $token, $expiresAt]);
+            $insertStmt = $pdo->prepare("
+                INSERT INTO member_email_change_requests (member_id, current_email, new_email, token, expires_at)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $insertStmt->execute([$member_id, $currentEmail, $emailInputRaw, $token, $expiresAt]);
+            
+            error_log("Email change request created: member_id=$member_id, new_email=$emailInputRaw, token=" . substr($token, 0, 8) . "...");
+        } catch (PDOException $e) {
+            // If table doesn't exist, log error and throw exception
+            error_log("Failed to create email change request: " . $e->getMessage());
+            if (strpos($e->getMessage(), "doesn't exist") !== false || strpos($e->getMessage(), "Unknown table") !== false) {
+                throw new Exception('Email change feature is not available. Please contact support.');
+            }
+            throw $e;
+        }
 
         $verificationLink = "https://www.elektr-ame.com/verify-email?token=" . $token;
 
@@ -159,7 +170,7 @@ try {
         }
 
         $pendingEmailChange = [
-            'new_email' => $emailInput,
+            'new_email' => $emailInputRaw,
             'expires_at' => $expiresAt
         ];
     } else {
