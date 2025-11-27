@@ -43,8 +43,27 @@ try {
     
     // Build dynamic UPDATE query based on provided fields
     if (isset($input['phone'])) {
+        $phoneValue = trim((string)$input['phone']);
+        if ($phoneValue !== '' && !preg_match('/^\+?[0-9\s\-().]{7,20}$/', $phoneValue)) {
+            throw new Exception('Invalid phone format');
+        }
         $updates[] = "phone = :phone";
-        $params[':phone'] = $input['phone'];
+        $params[':phone'] = $phoneValue !== '' ? $phoneValue : null;
+    }
+    
+    if (isset($input['email'])) {
+        $emailValueRaw = trim((string)$input['email']);
+        $emailValueNormalized = strtolower($emailValueRaw);
+        if (!filter_var($emailValueRaw, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Invalid email format');
+        }
+        $emailCheck = $pdo->prepare("SELECT id FROM members WHERE LOWER(email) = :email AND id != :id");
+        $emailCheck->execute([':email' => $emailValueNormalized, ':id' => $memberId]);
+        if ($emailCheck->fetch()) {
+            throw new Exception('Email address already in use by another member');
+        }
+        $updates[] = "email = :email";
+        $params[':email'] = $emailValueRaw;
     }
     
     if (isset($input['artist_name'])) {

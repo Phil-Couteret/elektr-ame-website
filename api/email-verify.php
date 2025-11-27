@@ -37,6 +37,86 @@ try {
         throw new Exception('Verification token is required');
     }
     
+    // Check if token belongs to an email change request first
+    $changeStmt = $pdo->prepare("
+        SELECT 
+            r.id,
+            r.member_id,
+            r.new_email,
+            r.status,
+            r.expires_at,
+            m.email,
+            m.first_name,
+            m.status as member_status
+        FROM member_email_change_requests r
+        JOIN members m ON m.id = r.member_id
+        WHERE r.token = :token
+        LIMIT 1
+    ");
+    $changeStmt->execute([':token' => $token]);
+    $changeRequest = $changeStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($changeRequest) {
+        if ($changeRequest['status'] !== 'pending') {
+            throw new Exception('This email change link is no longer valid.');
+        }
+
+        if ($changeRequest['expires_at'] && strtotime($changeRequest['expires_at']) < time()) {
+            $pdo->prepare("UPDATE member_email_change_requests SET status = 'expired' WHERE id = ?")
+                ->execute([$changeRequest['id']]);
+            throw new Exception('This email change link has expired. Please request a new change.');
+        }
+
+        // Ensure the new email isn't used by someone else
+        $duplicateStmt = $pdo->prepare("SELECT id FROM members WHERE LOWER(email) = :email AND id != :member_id");
+        $duplicateStmt->execute([
+            ':email' => strtolower($changeRequest['new_email']),
+            ':member_id' => $changeRequest['member_id']
+        ]);
+
+        if ($duplicateStmt->fetch()) {
+            throw new Exception('This email is already associated with another member.');
+        }
+
+        $pdo->beginTransaction();
+
+        $updateMember = $pdo->prepare("
+            UPDATE members 
+            SET email = :new_email,
+                email_verified = 1,
+                email_verified_at = NOW(),
+                email_verification_token = NULL
+            WHERE id = :member_id
+        ");
+        $updateMember->execute([
+            ':new_email' => $changeRequest['new_email'],
+            ':member_id' => $changeRequest['member_id']
+        ]);
+
+        $updateRequest = $pdo->prepare("
+            UPDATE member_email_change_requests 
+            SET status = 'confirmed',
+                confirmed_at = NOW()
+            WHERE id = :id
+        ");
+        $updateRequest->execute([':id' => $changeRequest['id']]);
+
+        $pdo->commit();
+
+        if (isset($_SESSION['member_id']) && $_SESSION['member_id'] == $changeRequest['member_id']) {
+            $_SESSION['member_email'] = $changeRequest['new_email'];
+        }
+
+        echo json_encode([
+            'success' => true,
+            'already_verified' => false,
+            'message' => 'Your email address has been updated successfully.',
+            'verification_type' => 'email_change',
+            'member_status' => $changeRequest['member_status']
+        ]);
+        exit();
+    }
+
     // Find member with this verification token
     $stmt = $pdo->prepare("
         SELECT 
@@ -60,7 +140,9 @@ try {
         echo json_encode([
             'success' => true,
             'already_verified' => true,
-            'message' => 'Email address already verified. You can log in now.'
+            'message' => 'Email address already verified. You can log in now.',
+            'verification_type' => 'account',
+            'member_status' => $member['status']
         ]);
         exit();
     }
@@ -105,10 +187,14 @@ try {
         'success' => true,
         'already_verified' => false,
         'message' => 'Email verified successfully! You can now log in.',
-        'member_status' => $member['status']
+        'member_status' => $member['status'],
+        'verification_type' => 'account'
     ]);
     
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log("Database error in email-verify: " . $e->getMessage());
     http_response_code(500);
     echo json_encode([
@@ -116,6 +202,9 @@ try {
         'message' => 'A server error occurred. Please try again later.'
     ]);
 } catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     http_response_code(400);
     echo json_encode([
         'success' => false,

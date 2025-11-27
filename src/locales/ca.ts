@@ -191,6 +191,8 @@ export default {
   'verifyEmail.loginButton': 'Anar a Inici de Sessió',
   'verifyEmail.homeButton': 'Anar a Inici',
   'verifyEmail.resendButton': 'Reenviar Email de Verificació',
+  'verifyEmail.emailChangeSuccess': 'El teu correu d\'accés s\'ha actualitzat correctament.',
+  'verifyEmail.emailChangeButton': 'Ves al portal de membres',
   
   // Reenviar Verificació
   'resendVerification.title': 'Reenviar Verificació',
@@ -545,6 +547,11 @@ export default {
   'portal.profile.updateSuccessMessage': 'El teu perfil s\'ha actualitzat correctament!',
   'portal.profile.updateError': 'Error en l\'Actualització',
   'portal.profile.updateErrorMessage': 'Error en actualitzar el perfil. Si us plau, torna-ho a intentar.',
+  'portal.profile.emailChangeConfirmationSent': 'Confirma el teu nou correu',
+  'portal.profile.emailChangeConfirmationSentDescription': 'Hem enviat un enllaç de confirmació a {email}. Revisa la safata d\'entrada per finalitzar l\'actualització.',
+  'portal.profile.pendingEmailChange.title': 'Canvi de correu pendent',
+  'portal.profile.pendingEmailChange.message': 'Confirma {email} abans de {date} per completar l\'actualització del correu d\'accés.',
+  'portal.profile.pendingEmailChange.messageNoDate': 'Confirma {email} per completar l\'actualització del correu d\'accés.',
 
   // Canviar Contrasenya
   'portal.changePassword.title': 'Canviar Contrasenya',

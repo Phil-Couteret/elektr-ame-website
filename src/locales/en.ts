@@ -194,6 +194,8 @@ export default {
   'verifyEmail.loginButton': 'Go to Login',
   'verifyEmail.homeButton': 'Go to Home',
   'verifyEmail.resendButton': 'Resend Verification Email',
+  'verifyEmail.emailChangeSuccess': 'Your login email has been updated successfully.',
+  'verifyEmail.emailChangeButton': 'Go to Member Portal',
   
   // Resend Verification
   'resendVerification.title': 'Resend Verification',
@@ -548,6 +550,11 @@ export default {
   'portal.profile.updateSuccessMessage': 'Your profile has been updated successfully!',
   'portal.profile.updateError': 'Update Failed',
   'portal.profile.updateErrorMessage': 'Failed to update profile. Please try again.',
+  'portal.profile.emailChangeConfirmationSent': 'Confirm your new email',
+  'portal.profile.emailChangeConfirmationSentDescription': 'We sent a confirmation link to {email}. Please check your inbox to finish updating your profile.',
+  'portal.profile.pendingEmailChange.title': 'Email change pending',
+  'portal.profile.pendingEmailChange.message': 'Please confirm {email} before {date} to finish updating your login email.',
+  'portal.profile.pendingEmailChange.messageNoDate': 'Please confirm {email} to finish updating your login email.',
   
   // Change Password
   'portal.changePassword.title': 'Change Password',
