@@ -76,3 +76,4 @@ public/event-media/*
 *.sh
 !database/*.sh
 config.php
+deployment/assets/

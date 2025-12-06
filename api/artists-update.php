@@ -73,32 +73,39 @@ try {
         $params[] = $input['picture'];
     }
     if (isset($input['pressKitUrl']) || isset($input['press_kit_url'])) {
+        $value = trim($input['pressKitUrl'] ?? $input['press_kit_url'] ?? '');
         $updateFields[] = "press_kit_url = ?";
-        $params[] = $input['pressKitUrl'] ?? $input['press_kit_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['song1Url']) || isset($input['song1_url'])) {
+        $value = trim($input['song1Url'] ?? $input['song1_url'] ?? '');
         $updateFields[] = "song1_url = ?";
-        $params[] = $input['song1Url'] ?? $input['song1_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['song2Url']) || isset($input['song2_url'])) {
+        $value = trim($input['song2Url'] ?? $input['song2_url'] ?? '');
         $updateFields[] = "song2_url = ?";
-        $params[] = $input['song2Url'] ?? $input['song2_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['song3Url']) || isset($input['song3_url'])) {
+        $value = trim($input['song3Url'] ?? $input['song3_url'] ?? '');
         $updateFields[] = "song3_url = ?";
-        $params[] = $input['song3Url'] ?? $input['song3_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['stream1Url']) || isset($input['stream1_url'])) {
+        $value = trim($input['stream1Url'] ?? $input['stream1_url'] ?? '');
         $updateFields[] = "stream1_url = ?";
-        $params[] = $input['stream1Url'] ?? $input['stream1_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['stream2Url']) || isset($input['stream2_url'])) {
+        $value = trim($input['stream2Url'] ?? $input['stream2_url'] ?? '');
         $updateFields[] = "stream2_url = ?";
-        $params[] = $input['stream2Url'] ?? $input['stream2_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['stream3Url']) || isset($input['stream3_url'])) {
+        $value = trim($input['stream3Url'] ?? $input['stream3_url'] ?? '');
         $updateFields[] = "stream3_url = ?";
-        $params[] = $input['stream3Url'] ?? $input['stream3_url'] ?? null;
+        $params[] = $value === '' ? null : $value;
     }
     if (isset($input['genre'])) {
         $updateFields[] = "genre = ?";
@@ -125,8 +132,17 @@ try {
     $params[] = $artistId;
     $sql = "UPDATE artists SET " . implode(', ', $updateFields) . " WHERE id = ?";
     
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    } catch (PDOException $e) {
+        // Check if error is due to missing column
+        if (strpos($e->getMessage(), 'Unknown column') !== false) {
+            error_log("Database column missing: " . $e->getMessage());
+            throw new Exception('Database column missing. Please run the migration: database/artists-add-press-kit.sql and database/artists-add-songs-streams.sql');
+        }
+        throw $e;
+    }
 
     // Fetch updated artist
     $stmt = $pdo->prepare("SELECT * FROM artists WHERE id = ?");
@@ -141,6 +157,13 @@ try {
     
     $artist['socialLinks'] = $socialMedia;
     $artist['bioKey'] = $artist['bio_key'] ?? '';
+    $artist['pressKitUrl'] = $artist['press_kit_url'] ?? null;
+    $artist['song1Url'] = $artist['song1_url'] ?? null;
+    $artist['song2Url'] = $artist['song2_url'] ?? null;
+    $artist['song3Url'] = $artist['song3_url'] ?? null;
+    $artist['stream1Url'] = $artist['stream1_url'] ?? null;
+    $artist['stream2Url'] = $artist['stream2_url'] ?? null;
+    $artist['stream3Url'] = $artist['stream3_url'] ?? null;
     
     // Parse bio translations from JSON
     $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
@@ -151,7 +174,9 @@ try {
     
     $artist['createdAt'] = $artist['created_at'];
     $artist['updatedAt'] = $artist['updated_at'];
-    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations']);
+    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations'],
+          $artist['press_kit_url'], $artist['song1_url'], $artist['song2_url'], $artist['song3_url'],
+          $artist['stream1_url'], $artist['stream2_url'], $artist['stream3_url']);
 
     echo json_encode([
         'success' => true,

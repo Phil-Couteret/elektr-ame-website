@@ -1,0 +1,19 @@
+# FTP Deployment Configuration Template
+# 
+# To use FTP credentials in deployment scripts:
+# 1. Copy this file to .env (or create .env manually)
+# 2. Fill in your actual FTP credentials
+# 3. The .env file is already in .gitignore, so it won't be committed
+#
+# Format:
+# FTP_HOST=ftp.cluster129.hosting.ovh.net
+# FTP_USER=elektry
+# FTP_PASSWORD=your_ftp_password_here
+#
+# All deployment scripts (deploy.sh, upload-*.sh) will automatically
+# read from .env if it exists, otherwise they will prompt for the password.
+
+FTP_HOST=ftp.cluster129.hosting.ovh.net
+FTP_USER=elektry
+FTP_PASSWORD=92Alcolea2025
+

@@ -82,6 +82,13 @@ export const usePublicData = () => {
           bioKey: artist.bioKey || artist.bio_key || '',
           bioTranslations: artist.bioTranslations || { en: '', es: '', ca: '' },
           picture: artist.picture || '',
+          pressKitUrl: artist.pressKitUrl || null,
+          song1Url: artist.song1Url || null,
+          song2Url: artist.song2Url || null,
+          song3Url: artist.song3Url || null,
+          stream1Url: artist.stream1Url || null,
+          stream2Url: artist.stream2Url || null,
+          stream3Url: artist.stream3Url || null,
           socialLinks: artist.socialLinks || {},
           createdAt: artist.createdAt || new Date().toISOString(),
           updatedAt: artist.updatedAt || new Date().toISOString()

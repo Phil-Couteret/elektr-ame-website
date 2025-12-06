@@ -71,13 +71,13 @@ try {
         $input['bioKey'] ?? $input['bio_key'] ?? '',
         $bioTranslationsJson,
         $input['picture'] ?? '',
-        $input['pressKitUrl'] ?? $input['press_kit_url'] ?? null,
-        $input['song1Url'] ?? $input['song1_url'] ?? null,
-        $input['song2Url'] ?? $input['song2_url'] ?? null,
-        $input['song3Url'] ?? $input['song3_url'] ?? null,
-        $input['stream1Url'] ?? $input['stream1_url'] ?? null,
-        $input['stream2Url'] ?? $input['stream2_url'] ?? null,
-        $input['stream3Url'] ?? $input['stream3_url'] ?? null,
+        ($input['pressKitUrl'] ?? $input['press_kit_url'] ?? '') === '' ? null : trim($input['pressKitUrl'] ?? $input['press_kit_url'] ?? ''),
+        ($input['song1Url'] ?? $input['song1_url'] ?? '') === '' ? null : trim($input['song1Url'] ?? $input['song1_url'] ?? ''),
+        ($input['song2Url'] ?? $input['song2_url'] ?? '') === '' ? null : trim($input['song2Url'] ?? $input['song2_url'] ?? ''),
+        ($input['song3Url'] ?? $input['song3_url'] ?? '') === '' ? null : trim($input['song3Url'] ?? $input['song3_url'] ?? ''),
+        ($input['stream1Url'] ?? $input['stream1_url'] ?? '') === '' ? null : trim($input['stream1Url'] ?? $input['stream1_url'] ?? ''),
+        ($input['stream2Url'] ?? $input['stream2_url'] ?? '') === '' ? null : trim($input['stream2Url'] ?? $input['stream2_url'] ?? ''),
+        ($input['stream3Url'] ?? $input['stream3_url'] ?? '') === '' ? null : trim($input['stream3Url'] ?? $input['stream3_url'] ?? ''),
         $input['genre'] ?? null,
         $input['website'] ?? null,
         $socialMediaJson,
@@ -99,6 +99,13 @@ try {
     
     $artist['socialLinks'] = $socialMedia;
     $artist['bioKey'] = $artist['bio_key'] ?? '';
+    $artist['pressKitUrl'] = $artist['press_kit_url'] ?? null;
+    $artist['song1Url'] = $artist['song1_url'] ?? null;
+    $artist['song2Url'] = $artist['song2_url'] ?? null;
+    $artist['song3Url'] = $artist['song3_url'] ?? null;
+    $artist['stream1Url'] = $artist['stream1_url'] ?? null;
+    $artist['stream2Url'] = $artist['stream2_url'] ?? null;
+    $artist['stream3Url'] = $artist['stream3_url'] ?? null;
     
     // Parse bio translations from JSON
     $bioTranslations = json_decode($artist['bio_translations'] ?? '{}', true);
@@ -109,7 +116,9 @@ try {
     
     $artist['createdAt'] = $artist['created_at'];
     $artist['updatedAt'] = $artist['updated_at'];
-    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations']);
+    unset($artist['created_at'], $artist['updated_at'], $artist['social_media'], $artist['bio_key'], $artist['bio_translations'],
+          $artist['press_kit_url'], $artist['song1_url'], $artist['song2_url'], $artist['song3_url'],
+          $artist['stream1_url'], $artist['stream2_url'], $artist['stream3_url']);
 
     echo json_encode([
         'success' => true,
