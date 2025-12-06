@@ -19,6 +19,7 @@ const NotFound = () => {
         description="The page you're looking for doesn't exist. Return to the Elektr-Âme homepage."
         url={`https://www.elektr-ame.com${location.pathname}`}
         keywords="404, page not found, Elektr-Âme"
+        robots="noindex, nofollow"
       />
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">404</h1>

@@ -23,6 +23,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 // Form validation schema
 const consultancySchema = z.object({
@@ -111,6 +112,13 @@ const ConsultancyPage = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
+      <SEO 
+        title="Consultancy Services | Elektr-Âme Portal"
+        description="Get professional consultancy services for your music business. Legal, financial, strategic, and general business advice for artists and music professionals in Barcelona."
+        url="https://www.elektr-ame.com/portal/consultancy"
+        keywords="music consultancy, business advice, legal advice, financial consulting, music industry, Barcelona, artists"
+        robots="noindex, nofollow"
+      />
       <Card>
         <CardHeader>
           <CardTitle>Consultancy Inquiry</CardTitle>

@@ -15,6 +15,7 @@ interface SEOProps {
   modifiedTime?: string;
   section?: string;
   tags?: string[];
+  robots?: string;
 }
 
 export const SEO = ({
@@ -31,7 +32,8 @@ export const SEO = ({
   publishedTime,
   modifiedTime,
   section,
-  tags = []
+  tags = [],
+  robots = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
 }: SEOProps) => {
   useEffect(() => {
     // Update document title
@@ -56,6 +58,12 @@ export const SEO = ({
     if (author) {
       updateMetaTag('author', author);
     }
+    
+    // Additional important meta tags
+    updateMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=5.0');
+    updateMetaTag('theme-color', '#00D9FF');
+    updateMetaTag('format-detection', 'telephone=no');
+    updateMetaTag('robots', robots);
 
     // Open Graph tags
     updateMetaTag('og:title', title, 'property');
@@ -63,8 +71,13 @@ export const SEO = ({
     updateMetaTag('og:type', type, 'property');
     updateMetaTag('og:url', url, 'property');
     updateMetaTag('og:image', image, 'property');
+    updateMetaTag('og:image:width', '1200', 'property');
+    updateMetaTag('og:image:height', '630', 'property');
+    updateMetaTag('og:image:alt', title, 'property');
     updateMetaTag('og:site_name', siteName, 'property');
     updateMetaTag('og:locale', locale, 'property');
+    updateMetaTag('og:locale:alternate', 'es_ES', 'property');
+    updateMetaTag('og:locale:alternate', 'ca_ES', 'property');
     
     if (publishedTime) {
       updateMetaTag('article:published_time', publishedTime, 'property');
@@ -84,7 +97,9 @@ export const SEO = ({
     updateMetaTag('twitter:title', title);
     updateMetaTag('twitter:description', description);
     updateMetaTag('twitter:image', image);
+    updateMetaTag('twitter:image:alt', title);
     updateMetaTag('twitter:site', '@elektr_ame');
+    updateMetaTag('twitter:creator', '@elektr_ame');
 
     // Canonical URL
     let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
@@ -124,7 +139,7 @@ export const SEO = ({
         document.head.appendChild(script);
       });
     }
-  }, [title, description, image, url, type, keywords, structuredData, locale, siteName, author, publishedTime, modifiedTime, section, tags]);
+  }, [title, description, image, url, type, keywords, structuredData, locale, siteName, author, publishedTime, modifiedTime, section, tags, robots]);
 
   return null;
 };

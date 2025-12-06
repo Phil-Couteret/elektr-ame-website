@@ -108,53 +108,55 @@ const StreamModal = ({ isOpen, onClose, streamUrl, streamTitle }: StreamModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-full h-[90vh] bg-black/95 border-white/20 text-white">
-        <DialogHeader>
-          <DialogTitle className="text-white flex items-center justify-between">
-            <span>{streamTitle}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="text-white hover:bg-white/10"
-            >
-              <X className="h-5 w-5" />
-            </Button>
+      <DialogContent className="max-w-4xl w-full h-[90vh] bg-black/95 border-white/20 text-white p-0 flex flex-col">
+        {/* Header with close button - minimal spacing */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-3 border-b border-white/10">
+          <DialogTitle className="text-white text-sm font-medium">
+            {streamTitle}
           </DialogTitle>
-        </DialogHeader>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            className="text-white hover:bg-white/10 h-7 w-7 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
         
-        <div className="flex flex-col h-full">
-          {/* Action Buttons */}
-          <div className="flex gap-2 mb-4 pb-4 border-b border-white/10">
-            <Button
-              onClick={handleToggleFavorite}
-              variant={isFavorite ? "default" : "outline"}
-              className={isFavorite 
-                ? "bg-red-500 hover:bg-red-600 text-white" 
-                : "border-white/20 text-white hover:bg-white/10"
-              }
-            >
-              <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-              {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
-            </Button>
-            <Button
-              onClick={handleOpenInNewTab}
-              variant="outline"
-              className="border-white/20 text-white hover:bg-white/10"
-              disabled={!url || isLoading || !!error}
-            >
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Open in New Tab
-            </Button>
-          </div>
+        {/* Action Buttons - compact */}
+        <div className="flex gap-2 px-6 py-3 border-b border-white/10">
+          <Button
+            onClick={handleToggleFavorite}
+            variant={isFavorite ? "default" : "outline"}
+            size="sm"
+            className={isFavorite 
+              ? "bg-red-500 hover:bg-red-600 text-white border-red-500" 
+              : "border-white/30 text-white hover:bg-white/20 hover:border-white/50 bg-transparent"
+            }
+          >
+            <Heart className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
+            {isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+          </Button>
+          <Button
+            onClick={handleOpenInNewTab}
+            variant="outline"
+            size="sm"
+            className="border-white/30 text-white hover:bg-white/20 hover:border-white/50 bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!url || isLoading || !!error}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Open in New Tab
+          </Button>
+        </div>
 
-          {/* Content Area */}
-          <div className="flex-1 relative border border-white/10 rounded-lg overflow-hidden bg-black/50">
+        {/* Video Container - takes remaining space */}
+        <div className="flex-1 relative overflow-hidden bg-black/50 min-h-0">
             {/* Show iframe immediately - it will load in background */}
             {embedUrl && (
               <iframe
                 src={embedUrl}
-                className="w-full h-full border-0"
+                className="absolute inset-0 w-full h-full border-0"
                 title={streamTitle}
                 onLoad={() => {
                   console.log('StreamModal - iframe loaded successfully');
@@ -211,7 +213,6 @@ const StreamModal = ({ isOpen, onClose, streamUrl, streamTitle }: StreamModalPro
                 </div>
               </div>
             )}
-          </div>
         </div>
       </DialogContent>
     </Dialog>

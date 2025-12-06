@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -66,6 +67,13 @@ const ForgotPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20 flex items-center justify-center">
+      <SEO 
+        title="Forgot Password | Elektr-Âme"
+        description="Reset your Elektr-Âme member account password. Enter your email to receive password reset instructions."
+        url="https://www.elektr-ame.com/forgot-password"
+        keywords="password reset, forgot password, account recovery, Elektr-Âme"
+        robots="noindex, nofollow"
+      />
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-md mx-auto bg-black/50 backdrop-blur-md border-white/10">
           <CardHeader className="text-center">

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContextNew";
+import { PublicDataProvider } from "@/contexts/PublicDataContext";
 import Index from "./pages/Index";
 import Initiatives from "./pages/Initiatives";
 import Contact from "./pages/Contact";
@@ -32,10 +33,11 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <LanguageProvider>
-          <Toaster />
-          <Sonner />
-          <PWAInstallPrompt />
-          <BrowserRouter>
+          <PublicDataProvider>
+            <Toaster />
+            <Sonner />
+            <PWAInstallPrompt />
+            <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/initiatives" element={<Initiatives />} />
@@ -63,6 +65,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
+          </PublicDataProvider>
         </LanguageProvider>
       </AuthProvider>
     </TooltipProvider>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle, Mail } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const VerifyEmail = () => {
   const { t } = useLanguage();
@@ -81,6 +82,13 @@ const VerifyEmail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20 flex items-center justify-center">
+      <SEO 
+        title="Verify Email | Elektr-Âme"
+        description="Verify your email address for your Elektr-Âme member account."
+        url="https://www.elektr-ame.com/verify-email"
+        keywords="email verification, verify account, Elektr-Âme"
+        robots="noindex, nofollow"
+      />
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-md mx-auto bg-black/50 backdrop-blur-md border-white/10">
           <CardHeader className="text-center">
