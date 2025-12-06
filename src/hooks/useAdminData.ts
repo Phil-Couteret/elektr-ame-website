@@ -76,6 +76,13 @@ export const useAdminData = () => {
           bioKey: artist.bioKey || artist.bio_key || '',
           bioTranslations: artist.bioTranslations || { en: '', es: '', ca: '' },
           picture: artist.picture || '',
+          pressKitUrl: artist.pressKitUrl || null,
+          song1Url: artist.song1Url || null,
+          song2Url: artist.song2Url || null,
+          song3Url: artist.song3Url || null,
+          stream1Url: artist.stream1Url || null,
+          stream2Url: artist.stream2Url || null,
+          stream3Url: artist.stream3Url || null,
           socialLinks: artist.socialLinks || {},
           createdAt: artist.createdAt || new Date().toISOString(),
           updatedAt: artist.updatedAt || new Date().toISOString()
@@ -266,6 +273,13 @@ export const useAdminData = () => {
         bioKey: artist.bioKey || '',
         bioTranslations: artist.bioTranslations || { en: '', es: '', ca: '' },
         picture: artist.picture || '',
+        pressKitUrl: artist.pressKitUrl || null,
+        song1Url: artist.song1Url || null,
+        song2Url: artist.song2Url || null,
+        song3Url: artist.song3Url || null,
+        stream1Url: artist.stream1Url || null,
+        stream2Url: artist.stream2Url || null,
+        stream3Url: artist.stream3Url || null,
         socialLinks: artist.socialLinks || {},
         createdAt: artist.createdAt || new Date().toISOString(),
         updatedAt: artist.updatedAt || new Date().toISOString()
@@ -296,11 +310,26 @@ export const useAdminData = () => {
         throw new Error(result.message || 'Failed to update artist');
       }
 
+      // Log the API response to see what was returned
+      console.log('Update API response:', result);
+      if (result.artist) {
+        console.log('Updated artist data from API:', {
+          id: result.artist.id,
+          pressKitUrl: result.artist.pressKitUrl,
+          stream1Url: result.artist.stream1Url
+        });
+      }
+
       // Reload artists from API
       const artistsResponse = await fetch('/api/artists-list.php', {
         credentials: 'include'
       });
       const artistsData = await artistsResponse.json();
+      
+      const reloadedArtist = artistsData.artists?.find((a: any) => a.id.toString() === id);
+      console.log('Reloaded artists data (raw):', reloadedArtist);
+      console.log('Reloaded pressKitUrl (raw):', reloadedArtist?.pressKitUrl);
+      console.log('Reloaded press_kit_url (raw):', reloadedArtist?.press_kit_url);
       
       const artists: Artist[] = (artistsData.artists || []).map((artist: any) => ({
         id: artist.id.toString(),
@@ -310,6 +339,13 @@ export const useAdminData = () => {
         bioKey: artist.bioKey || '',
         bioTranslations: artist.bioTranslations || { en: '', es: '', ca: '' },
         picture: artist.picture || '',
+        pressKitUrl: artist.pressKitUrl || null,
+        song1Url: artist.song1Url || null,
+        song2Url: artist.song2Url || null,
+        song3Url: artist.song3Url || null,
+        stream1Url: artist.stream1Url || null,
+        stream2Url: artist.stream2Url || null,
+        stream3Url: artist.stream3Url || null,
         socialLinks: artist.socialLinks || {},
         createdAt: artist.createdAt || new Date().toISOString(),
         updatedAt: artist.updatedAt || new Date().toISOString()
