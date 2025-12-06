@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Download } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { usePublicData } from "@/hooks/usePublicData";
+import { usePublicDataContext } from "@/contexts/PublicDataContext";
 import { MusicEvent } from "@/types/admin";
 import { generateGoogleCalendarUrl, downloadCalendarFile, generateOutlookCalendarUrl, CalendarEvent } from "@/utils/calendar";
 
@@ -180,7 +180,7 @@ const EventCard = ({ event }: { event: MusicEvent }) => {
 
 const EventsSection = () => {
   const { t } = useLanguage();
-  const { events } = usePublicData();
+  const { events } = usePublicDataContext();
   const [allEvents, setAllEvents] = React.useState<MusicEvent[]>([]);
   
   React.useEffect(() => {

@@ -4,7 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { usePublicData } from "@/hooks/usePublicData";
+import { usePublicDataContext } from "@/contexts/PublicDataContext";
 import { Artist } from "@/types/admin";
 
 const ArtistCard = ({ artist }: { artist: Artist }) => {
@@ -186,7 +186,7 @@ const ArtistCard = ({ artist }: { artist: Artist }) => {
 
 const ArtistSection = () => {
   const { t } = useLanguage();
-  const { artists } = usePublicData();
+  const { artists } = usePublicDataContext();
   
   return (
     <section id="artists" className="py-24 bg-gradient-to-b from-gray-900 to-black">

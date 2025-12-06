@@ -29,6 +29,7 @@ import {
   UserPlus,
   Users
 } from "lucide-react";
+import { SEO } from "@/components/SEO";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MemberCard from "@/components/MemberCard";
@@ -527,6 +528,13 @@ const MemberPortal = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black py-12">
+      <SEO 
+        title="Member Portal | Elektr-Âme"
+        description="Access your Elektr-Âme member portal. Manage your profile, view membership details, and stay connected with the community."
+        url="https://www.elektr-ame.com/member-portal"
+        keywords="member portal, member account, Elektr-Âme, membership"
+        robots="noindex, nofollow"
+      />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Header */}
         <div className="mb-8">

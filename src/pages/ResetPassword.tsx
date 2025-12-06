@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { SEO } from "@/components/SEO";
 
 const resetPasswordSchema = z.object({
   new_password: z.string().min(8, { message: "Password must be at least 8 characters" }),
@@ -95,6 +96,13 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-deep-purple via-black to-electric-blue pt-20 flex items-center justify-center">
+      <SEO 
+        title="Reset Password | Elektr-Âme"
+        description="Set a new password for your Elektr-Âme member account."
+        url="https://www.elektr-ame.com/reset-password"
+        keywords="reset password, new password, account security, Elektr-Âme"
+        robots="noindex, nofollow"
+      />
       <div className="container mx-auto px-4 py-8">
         <Card className="max-w-md mx-auto bg-black/50 backdrop-blur-md border-white/10">
           <CardHeader className="text-center">

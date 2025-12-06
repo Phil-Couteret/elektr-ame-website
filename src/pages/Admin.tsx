@@ -14,6 +14,7 @@ import NewsletterManager from "@/components/admin/NewsletterManager";
 import EmailAutomationManager from "@/components/admin/EmailAutomationManager";
 import InvitationsManager from "@/components/admin/InvitationsManager";
 import LanguageSelector from "@/components/LanguageSelector";
+import { SEO } from "@/components/SEO";
 
 const Admin = () => {
   const { logout, user, isSuperAdmin } = useAuth();
@@ -30,6 +31,13 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-deep-purple">
+      <SEO 
+        title="Admin Dashboard | Elektr-Âme"
+        description="Elektr-Âme admin dashboard for managing events, artists, members, and content."
+        url="https://www.elektr-ame.com/admin"
+        keywords="admin, dashboard, Elektr-Âme"
+        robots="noindex, nofollow"
+      />
       {/* Admin Header */}
       <header className="bg-black/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">

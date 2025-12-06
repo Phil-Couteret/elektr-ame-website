@@ -34,6 +34,7 @@ import {
   Check,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SEO } from "@/components/SEO";
 
 // Multi-step form validation schemas
 const step1Schema = z.object({
@@ -197,6 +198,13 @@ const CompanyCreationPage = () => {
   if (isSuccess) {
     return (
       <div className="max-w-2xl mx-auto">
+        <SEO 
+          title="Company Creation Services | Elektr-Âme Portal"
+          description="Professional company creation services for music professionals. Get help setting up your music business, record label, or production company in Spain."
+          url="https://www.elektr-ame.com/portal/company-creation"
+          keywords="company creation, business setup, record label, production company, music business, Spain, Barcelona"
+          robots="noindex, nofollow"
+        />
         <Card>
           <CardContent className="pt-6">
             <div className="text-center space-y-4">

@@ -11,10 +11,12 @@ Disallow: /admin
 Disallow: /member-portal
 Disallow: /api/
 
-# Allow API endpoints that should be indexed (if any)
-# User-agent: *
-# Allow: /api/events-list.php
-# Allow: /api/artists-list.php
+# Allow Googlebot to access public API endpoints needed for structured data
+User-agent: Googlebot
+Allow: /api/events-list.php
+Allow: /api/artists-list.php
+Allow: /api/galleries-list.php
+Allow: /api/sitemap.php
 
 # Sitemap location
 Sitemap: https://www.elektr-ame.com/api/sitemap.php

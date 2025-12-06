@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Image, X, Calendar, User, Folder } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { usePublicData } from "@/hooks/usePublicData";
+import { usePublicDataContext } from "@/contexts/PublicDataContext";
 import { GalleryItem } from "@/types/admin";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -75,7 +75,7 @@ interface GalleryGroup {
 
 const GallerySection = () => {
   const { t } = useLanguage();
-  const { gallery } = usePublicData();
+  const { gallery } = usePublicDataContext();
   const location = useLocation();
   const [showFullGallery, setShowFullGallery] = useState(false);
   const [galleries, setGalleries] = useState<GalleryGroup[]>([]);
