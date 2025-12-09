@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
@@ -33,6 +34,8 @@ import { SEO } from "@/components/SEO";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MemberCard from "@/components/MemberCard";
+import PaymentHistory from "@/components/portal/PaymentHistory";
+import MemberStats from "@/components/portal/MemberStats";
 
 interface PendingEmailChange {
   new_email: string;
@@ -46,6 +49,18 @@ interface MemberData {
   first_name: string;
   second_name: string;
   artist_name?: string;
+  profile_picture?: string;
+  bio?: string;
+  social_links?: {
+    instagram?: string;
+    soundcloud?: string;
+    spotify?: string;
+    youtube?: string;
+    facebook?: string;
+    twitter?: string;
+    website?: string;
+    [key: string]: string | undefined;
+  };
   phone?: string;
   address?: string;
   city?: string;
@@ -80,8 +95,19 @@ const MemberPortal = () => {
     address: '',
     city: '',
     postal_code: '',
-    country: ''
+    country: '',
+    bio: '',
+    social_links: {
+      instagram: '',
+      soundcloud: '',
+      spotify: '',
+      youtube: '',
+      facebook: '',
+      twitter: '',
+      website: ''
+    }
   });
+  const [uploadingPicture, setUploadingPicture] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
     current_password: '',
@@ -217,7 +243,17 @@ const MemberPortal = () => {
         address: memberData.address || '',
         city: memberData.city || '',
         postal_code: memberData.postal_code || '',
-        country: memberData.country || ''
+        country: memberData.country || '',
+        bio: memberData.bio || '',
+        social_links: memberData.social_links || {
+          instagram: '',
+          soundcloud: '',
+          spotify: '',
+          youtube: '',
+          facebook: '',
+          twitter: '',
+          website: ''
+        }
       });
       setIsEditing(true);
     }
@@ -234,8 +270,66 @@ const MemberPortal = () => {
       address: '',
       city: '',
       postal_code: '',
-      country: ''
+      country: '',
+      bio: '',
+      social_links: {
+        instagram: '',
+        soundcloud: '',
+        spotify: '',
+        youtube: '',
+        facebook: '',
+        twitter: '',
+        website: ''
+      }
     });
+  };
+
+  const handleProfilePictureUpload = async (file: File) => {
+    setUploadingPicture(true);
+    try {
+      const formData = new FormData();
+      formData.append('profile_picture', file);
+
+      const response = await fetch('/api/member-profile-picture-upload.php', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      });
+
+      // Check if response is OK before trying to parse JSON
+      if (!response.ok) {
+        let errorMessage = 'Failed to upload profile picture';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Success',
+          description: 'Profile picture uploaded successfully',
+        });
+        // Reload member data to get updated profile picture
+        fetchMemberData();
+      } else {
+        throw new Error(data.message || 'Failed to upload profile picture');
+      }
+    } catch (error) {
+      console.error('Profile picture upload error:', error);
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to upload profile picture',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploadingPicture(false);
+    }
   };
 
   const saveProfile = async () => {
@@ -247,7 +341,10 @@ const MemberPortal = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(editFormData),
+        body: JSON.stringify({
+          ...editFormData,
+          social_links: editFormData.social_links
+        }),
       });
 
       const data = await response.json();
@@ -386,11 +483,26 @@ const MemberPortal = () => {
     }
   };
 
-  const isExpiringSoon = () => {
-    if (!memberData?.membership_end_date) return false;
+  const getMembershipStatus = () => {
+    if (!memberData?.membership_end_date) return null;
     const expiryDate = new Date(memberData.membership_end_date);
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    expiryDate.setHours(0, 0, 0, 0);
     const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 3600 * 24));
+    
+    if (daysUntilExpiry < 0) {
+      return { status: 'expired', days: Math.abs(daysUntilExpiry) };
+    } else if (daysUntilExpiry <= 30) {
+      return { status: 'expiring_soon', days: daysUntilExpiry };
+    } else {
+      return { status: 'active', days: daysUntilExpiry };
+    }
+  };
+
+  const isExpiringSoon = () => {
+    const membershipStatus = getMembershipStatus();
+    return membershipStatus && (membershipStatus.status === 'expiring_soon' || membershipStatus.status === 'expired');
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   };
 
@@ -536,8 +648,8 @@ const MemberPortal = () => {
         robots="noindex, nofollow"
       />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        {/* Header */}
-        <div className="mb-8">
+        {/* Header - Hidden when nested in MemberAreaLayout */}
+        <div className="mb-8 hidden">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
@@ -608,10 +720,11 @@ const MemberPortal = () => {
 
         {/* Main Content Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 bg-black/40 border-white/10">
+          <TabsList className="grid w-full grid-cols-5 bg-black/40 border-white/10">
             <TabsTrigger value="overview">{t('portal.tabs.overview')}</TabsTrigger>
             <TabsTrigger value="card">{t('portal.tabs.card')}</TabsTrigger>
             <TabsTrigger value="profile">{t('portal.tabs.profile')}</TabsTrigger>
+            <TabsTrigger value="payments">{t('portal.tabs.payments')}</TabsTrigger>
             <TabsTrigger value="sponsorship">{t('portal.tabs.sponsorship')}</TabsTrigger>
           </TabsList>
 
@@ -675,29 +788,96 @@ const MemberPortal = () => {
               </CardContent>
             </Card>
 
-            {/* Renewal Reminder */}
-            {isExpiringSoon() && (
-              <Card className="bg-orange-500/10 border-orange-500/50">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-3">
-                    <RefreshCw className="h-5 w-5 text-orange-400 mt-0.5" />
-                    <div className="flex-1">
-                      <h3 className="text-white font-semibold mb-1">{t('portal.renewal.title')}</h3>
-                      <p className="text-white/70 text-sm mb-4">
-                        {t('portal.renewal.message', { date: memberData.membership_end_date ? new Date(memberData.membership_end_date).toLocaleDateString() : '' })}
-                      </p>
-                      <Button
-                        onClick={handleRenewal}
-                        className="bg-orange-500 hover:bg-orange-600 text-white"
-                      >
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                        {t('portal.renewal.button')}
-                      </Button>
+            {/* Membership Status & Renewal Reminder */}
+            {(() => {
+              const membershipStatus = getMembershipStatus();
+              if (!membershipStatus) return null;
+
+              if (membershipStatus.status === 'expired') {
+                return (
+                  <Card className="bg-red-500/10 border-red-500/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-3">
+                        <XCircle className="h-5 w-5 text-red-400 mt-0.5" />
+                        <div className="flex-1">
+                          <h3 className="text-white font-semibold mb-1">Membership Expired</h3>
+                          <p className="text-white/70 text-sm mb-2">
+                            Your membership expired {membershipStatus.days} day{membershipStatus.days !== 1 ? 's' : ''} ago on {memberData.membership_end_date ? new Date(memberData.membership_end_date).toLocaleDateString() : ''}.
+                          </p>
+                          <p className="text-white/60 text-xs mb-4">
+                            Renew your membership to continue enjoying all member benefits.
+                          </p>
+                          <Button
+                            onClick={handleRenewal}
+                            className="bg-red-500 hover:bg-red-600 text-white"
+                            disabled
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Renew Membership (Coming Soon)
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              if (membershipStatus.status === 'expiring_soon') {
+                return (
+                  <Card className="bg-orange-500/10 border-orange-500/50">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-3">
+                        <Clock className="h-5 w-5 text-orange-400 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-white font-semibold">Membership Expiring Soon</h3>
+                            <Badge className="bg-orange-500/20 text-orange-400 border-orange-500/50">
+                              {membershipStatus.days} day{membershipStatus.days !== 1 ? 's' : ''} left
+                            </Badge>
+                          </div>
+                          <p className="text-white/70 text-sm mb-2">
+                            Your membership expires on <strong>{memberData.membership_end_date ? new Date(memberData.membership_end_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</strong>.
+                          </p>
+                          <p className="text-white/60 text-xs mb-4">
+                            Renew now to continue enjoying all member benefits without interruption.
+                          </p>
+                          <Button
+                            onClick={handleRenewal}
+                            className="bg-orange-500 hover:bg-orange-600 text-white"
+                            disabled
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Renew Membership (Coming Soon)
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              }
+
+              // Active membership with countdown
+              return (
+                <Card className="bg-green-500/10 border-green-500/50">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-white font-semibold">Membership Active</h3>
+                          <Badge className="bg-green-500/20 text-green-400 border-green-500/50">
+                            {membershipStatus.days} day{membershipStatus.days !== 1 ? 's' : ''} remaining
+                          </Badge>
+                        </div>
+                        <p className="text-white/70 text-sm">
+                          Your membership is active until <strong>{memberData.membership_end_date ? new Date(memberData.membership_end_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}</strong>.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  </CardContent>
+                </Card>
+              );
+            })(            )}
 
             {memberData.status === 'pending' && (
               <Card className="bg-yellow-500/10 border-yellow-500/50">
@@ -713,6 +893,13 @@ const MemberPortal = () => {
                   </div>
                 </CardContent>
               </Card>
+            )}
+
+            {/* Member Statistics */}
+            {memberData.status === 'approved' && (
+              <div className="mt-6">
+                <MemberStats />
+              </div>
             )}
           </TabsContent>
 
@@ -842,6 +1029,76 @@ const MemberPortal = () => {
                       </div>
                     )}
 
+                    {/* Profile Picture */}
+                    <div className="pb-4 border-b border-white/10">
+                      <p className="text-white/70 text-sm mb-3">Profile Picture</p>
+                      {memberData.profile_picture ? (
+                        <div className="flex items-center gap-4">
+                          <img 
+                            src={memberData.profile_picture} 
+                            alt="Profile" 
+                            className="w-24 h-24 rounded-full object-cover border-2 border-white/20"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+                          <User className="h-12 w-12 text-white/30" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bio */}
+                    {memberData.bio && (
+                      <div className="pb-4 border-b border-white/10">
+                        <p className="text-white/70 text-sm mb-2">Bio</p>
+                        <p className="text-white whitespace-pre-wrap">{memberData.bio}</p>
+                      </div>
+                    )}
+
+                    {/* Social Links */}
+                    {memberData.social_links && Object.keys(memberData.social_links).some(key => memberData.social_links![key]) && (
+                      <div className="pb-4 border-b border-white/10">
+                        <p className="text-white/70 text-sm mb-3">Social Links</p>
+                        <div className="flex flex-wrap gap-2">
+                          {memberData.social_links.instagram && (
+                            <a href={memberData.social_links.instagram} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              Instagram
+                            </a>
+                          )}
+                          {memberData.social_links.soundcloud && (
+                            <a href={memberData.social_links.soundcloud} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              SoundCloud
+                            </a>
+                          )}
+                          {memberData.social_links.spotify && (
+                            <a href={memberData.social_links.spotify} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              Spotify
+                            </a>
+                          )}
+                          {memberData.social_links.youtube && (
+                            <a href={memberData.social_links.youtube} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              YouTube
+                            </a>
+                          )}
+                          {memberData.social_links.facebook && (
+                            <a href={memberData.social_links.facebook} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              Facebook
+                            </a>
+                          )}
+                          {memberData.social_links.twitter && (
+                            <a href={memberData.social_links.twitter} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              Twitter
+                            </a>
+                          )}
+                          {memberData.social_links.website && (
+                            <a href={memberData.social_links.website} target="_blank" rel="noopener noreferrer" className="text-blue-light hover:underline">
+                              Website
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-3">
                       <Calendar className="h-5 w-5 text-white/50" />
                       <div className="flex-1">
@@ -948,6 +1205,160 @@ const MemberPortal = () => {
                           onChange={(e) => setEditFormData({...editFormData, country: e.target.value})}
                           className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                         />
+                      </div>
+                    </div>
+
+                    {/* Profile Picture Upload */}
+                    <div className="space-y-2">
+                      <Label className="text-white">Profile Picture</Label>
+                      <div className="flex items-center gap-4">
+                        {memberData.profile_picture ? (
+                          <img 
+                            src={memberData.profile_picture} 
+                            alt="Profile" 
+                            className="w-20 h-20 rounded-full object-cover border-2 border-white/20"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-white/10 border-2 border-white/20 flex items-center justify-center">
+                            <User className="h-10 w-10 text-white/30" />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <Input
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                handleProfilePictureUpload(file);
+                              }
+                            }}
+                            className="bg-white/10 border-white/20 text-white"
+                            disabled={uploadingPicture}
+                          />
+                          <p className="text-white/50 text-xs mt-1">JPEG, PNG, or WebP (max 5MB)</p>
+                        </div>
+                        {uploadingPicture && (
+                          <Loader2 className="h-5 w-5 text-blue-light animate-spin" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Bio */}
+                    <div className="space-y-2">
+                      <Label htmlFor="bio" className="text-white">Bio</Label>
+                      <Textarea
+                        id="bio"
+                        value={editFormData.bio}
+                        onChange={(e) => setEditFormData({...editFormData, bio: e.target.value})}
+                        className="bg-white/10 border-white/20 text-white placeholder:text-white/50 min-h-[100px]"
+                        placeholder="Tell us about yourself..."
+                        rows={4}
+                      />
+                    </div>
+
+                    {/* Social Links */}
+                    <div className="space-y-3">
+                      <Label className="text-white">Social Links</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="social_instagram" className="text-white text-sm">Instagram</Label>
+                          <Input
+                            id="social_instagram"
+                            type="url"
+                            value={editFormData.social_links.instagram}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, instagram: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://instagram.com/yourusername"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_soundcloud" className="text-white text-sm">SoundCloud</Label>
+                          <Input
+                            id="social_soundcloud"
+                            type="url"
+                            value={editFormData.social_links.soundcloud}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, soundcloud: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://soundcloud.com/yourusername"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_spotify" className="text-white text-sm">Spotify</Label>
+                          <Input
+                            id="social_spotify"
+                            type="url"
+                            value={editFormData.social_links.spotify}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, spotify: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://open.spotify.com/artist/..."
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_youtube" className="text-white text-sm">YouTube</Label>
+                          <Input
+                            id="social_youtube"
+                            type="url"
+                            value={editFormData.social_links.youtube}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, youtube: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://youtube.com/@yourusername"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_facebook" className="text-white text-sm">Facebook</Label>
+                          <Input
+                            id="social_facebook"
+                            type="url"
+                            value={editFormData.social_links.facebook}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, facebook: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://facebook.com/yourusername"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="social_twitter" className="text-white text-sm">Twitter/X</Label>
+                          <Input
+                            id="social_twitter"
+                            type="url"
+                            value={editFormData.social_links.twitter}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, twitter: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://twitter.com/yourusername"
+                          />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="social_website" className="text-white text-sm">Website</Label>
+                          <Input
+                            id="social_website"
+                            type="url"
+                            value={editFormData.social_links.website}
+                            onChange={(e) => setEditFormData({
+                              ...editFormData,
+                              social_links: {...editFormData.social_links, website: e.target.value}
+                            })}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="https://yourwebsite.com"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -1085,6 +1496,11 @@ const MemberPortal = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Payment History Tab */}
+          <TabsContent value="payments" className="mt-6">
+            <PaymentHistory />
           </TabsContent>
 
           {/* Sponsorship Tab */}

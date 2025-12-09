@@ -21,7 +21,7 @@ export default {
   
   // About
   'about.title': 'Sobre Elektr-Âme',
-  'about.description': 'Fundada el 2025, Elektr-Âme és una organització impulsada per la comunitat dedicada a promoure la cultura de la música electrònica a Barcelona mitjançant esdeveniments, educació i suport als artistes.',
+  'about.description': 'Fundada el 2025, Elektr‑Âme és una associació comunitària que impulsa la cultura de la música electrònica i la innovació artística. A través d\'esdeveniments, tallers i suport als artistes, creem experiències úniques que connecten música, creativitat i benestar.',
   'about.mission': 'La Nostra Visió',
   'about.mission.text': 'Elektr-Âme té com a objectiu promoure la música electrònica, les arts digitals i les pràctiques culturals associades a través d\'esdeveniments, tallers, residències d\'artistes i activitats educatives que celebren la vibrant cultura de Barcelona.',
   'about.values': 'Els Nostres Valors:',
@@ -33,17 +33,17 @@ export default {
   
   // Features
   'feature.community': 'Comunitat Primer',
-  'feature.community.text': 'Construïm una comunitat de suport on artistes, productors i fans de música electrònica poden connectar-se, col·laborar i créixer junts.',
+  'feature.community.text': 'Més que un col·lectiu, som una xarxa de suport on artistes, productors i amants de la música electrònica es troben, col·laboren i creixen junts. La unió fa la força.',
   'feature.workshops': 'Tallers Educatius',
-  'feature.workshops.text': 'Tallers regulars sobre producció musical, tècniques de DJ i negocis de música electrònica per ajudar a desenvolupar habilitats.',
-  'feature.venues': 'Millors Locals de Barcelona',
-  'feature.venues.text': 'Ens associem amb els locals més emblemàtics de Barcelona per oferir-te experiències inoblidables de música electrònica.',
-  'feature.therapy': 'Musicoteràpia',
-  'feature.therapy.text': 'Explorant el poder curatiu de la música electrònica a través de sessions i tallers alternatius de musicoteràpia.',
+  'feature.workshops.text': 'Oferim tallers regulars de producció musical, tècniques de DJ i gestió artística, dissenyats per desenvolupar talent i habilitats dins de l\'escena electrònica.',
+  'feature.venues': 'Llocs i Experiències',
+  'feature.venues.text': 'Els nostres esdeveniments es realitzen en llocs variats, des de sales urbanes fins a grans espais inesperats, oferint experiències underground úniques i freqüentment sorprenents.',
+  'feature.therapy': 'Musicoteràpia i Benestar',
+  'feature.therapy.text': 'Explorem el poder curatiu de la música electrònica combinada amb pràctiques de medicina tradicional xinesa, acupuntura i benestar, oferint tallers i sessions que harmonitzen cos i ment.',
   'feature.innovation': 'Arts Digitals i Innovació',
-  'feature.innovation.text': 'Recerca i experimentació amb noves tecnologies creatives incloent IA, XR i blockchain aplicades a l\'expressió artística.',
+  'feature.innovation.text': 'Investiguem i experimentem amb tecnologies creatives emergents, incloent IA, XR i blockchain, per expandir els límits de l\'expressió artística en la música i l\'art digital.',
   'feature.eco': 'Esdeveniments Eco-Responsables',
-  'feature.eco.text': 'Promovent la sostenibilitat ambiental en totes les nostres produccions amb pràctiques ecològiques i esdeveniments de mínim impacte.',
+  'feature.eco.text': 'Promovem la sostenibilitat ambiental en totes les nostres produccions, organitzant esdeveniments de mínim impacte que respecten la ciutat i el seu entorn.',
   
   // Newsletter
   'newsletter.title': 'Mantingues-te Connectat',
@@ -473,6 +473,7 @@ export default {
   'portal.tabs.overview': 'Resum',
   'portal.tabs.card': 'Targeta Digital',
   'portal.tabs.profile': 'Perfil',
+  'portal.tabs.payments': 'Pagaments',
   'portal.tabs.sponsorship': 'Patrocini',
   
   // Pestanya Resum

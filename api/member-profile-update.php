@@ -84,6 +84,28 @@ try {
 
     $pdo->beginTransaction();
 
+    // Get bio and social_links from input
+    $bio = isset($input['bio']) ? trim($input['bio']) : null;
+    $socialLinks = isset($input['social_links']) ? $input['social_links'] : null;
+    
+    // Validate social_links is JSON if provided
+    if ($socialLinks !== null && !is_array($socialLinks)) {
+        // Try to decode if it's a JSON string
+        if (is_string($socialLinks)) {
+            $decoded = json_decode($socialLinks, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $socialLinks = $decoded;
+            } else {
+                $socialLinks = null;
+            }
+        } else {
+            $socialLinks = null;
+        }
+    }
+    
+    // Convert social_links array to JSON string for storage
+    $socialLinksJson = $socialLinks ? json_encode($socialLinks) : null;
+
     // Update profile fields (excluding email for now)
     $stmt = $pdo->prepare("
         UPDATE members 
@@ -95,7 +117,9 @@ try {
             street = ?,
             city = ?,
             zip_code = ?,
-            country = ?
+            country = ?,
+            bio = ?,
+            social_links = ?
         WHERE id = ?
     ");
 
@@ -108,6 +132,8 @@ try {
         $city ?: null,
         $postalCode ?: null,
         $country ?: null,
+        $bio ?: null,
+        $socialLinksJson,
         $member_id
     ]);
 

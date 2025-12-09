@@ -21,7 +21,7 @@ export default {
   
   // About
   'about.title': 'About Elektr-Âme',
-  'about.description': 'Founded in 2025, Elektr-Âme is a community-driven organization dedicated to promoting electronic music culture in Barcelona through events, education, and artist support.',
+  'about.description': 'Founded in 2025, Elektr‑Âme is a community association that drives electronic music culture and artistic innovation. Through events, workshops, and artist support, we create unique experiences that connect music, creativity, and well-being.',
   'about.mission': 'Our Vision',
   'about.mission.text': 'Elektr-Âme aims to promote electronic music, digital arts, and associated cultural practices through events, workshops, artist residencies, and educational activities that celebrate Barcelona\'s vibrant culture.',
   'about.values': 'Our Values:',
@@ -33,17 +33,17 @@ export default {
   
   // Features
   'feature.community': 'Community First',
-  'feature.community.text': 'We build a supportive community where electronic music artists, producers, and fans can connect, collaborate, and grow together.',
+  'feature.community.text': 'More than a collective, we are a support network where artists, producers, and electronic music lovers come together, collaborate, and grow together. Unity makes strength.',
   'feature.workshops': 'Educational Workshops',
-  'feature.workshops.text': 'Regular workshops on music production, DJing techniques, and the business of electronic music to help develop skills.',
-  'feature.venues': 'Barcelona\'s Best Venues',
-  'feature.venues.text': 'We partner with Barcelona\'s most iconic venues to bring you unforgettable electronic music experiences.',
-  'feature.therapy': 'Music Therapy',
-  'feature.therapy.text': 'Exploring the healing power of electronic music through alternative music therapy sessions and workshops.',
+  'feature.workshops.text': 'We offer regular workshops on music production, DJ techniques, and artistic management, designed to develop talent and skills within the electronic scene.',
+  'feature.venues': 'Places and Experiences',
+  'feature.venues.text': 'Our events take place in varied locations, from urban venues to large unexpected spaces, offering unique and often surprising underground experiences.',
+  'feature.therapy': 'Music Therapy and Well-being',
+  'feature.therapy.text': 'We explore the healing power of electronic music combined with traditional Chinese medicine practices, acupuncture, and well-being, offering workshops and sessions that harmonize body and mind.',
   'feature.innovation': 'Digital Arts & Innovation',
-  'feature.innovation.text': 'Research and experimentation with new creative technologies including AI, XR, and blockchain applied to artistic expression.',
+  'feature.innovation.text': 'We research and experiment with emerging creative technologies, including AI, XR, and blockchain, to expand the boundaries of artistic expression in music and digital art.',
   'feature.eco': 'Eco-Responsible Events',
-  'feature.eco.text': 'Promoting environmental sustainability in all our productions with eco-friendly practices and minimal impact events.',
+  'feature.eco.text': 'We promote environmental sustainability in all our productions, organizing minimal impact events that respect the city and its environment.',
   
   // Newsletter
   'newsletter.title': 'Stay Connected',
@@ -476,6 +476,7 @@ export default {
   'portal.tabs.overview': 'Overview',
   'portal.tabs.card': 'Digital Card',
   'portal.tabs.profile': 'Profile',
+  'portal.tabs.payments': 'Payments',
   'portal.tabs.sponsorship': 'Sponsorship',
   
   // Overview Tab

@@ -4,7 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus, Trash2, Key } from "lucide-react";
+import { Download, Users, Loader2, CheckCircle, XCircle, Clock, CreditCard, Calendar, Edit, AlertTriangle, UserPlus, Trash2, Key, Search, Filter, X, Mail, CheckSquare } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import MembershipDialog from "./MembershipDialog";
@@ -54,6 +57,19 @@ const MembersManager = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [settingPasswordFor, setSettingPasswordFor] = useState<number | null>(null);
   const [generatedPassword, setGeneratedPassword] = useState<{memberId: number, password: string, memberName: string, memberEmail: string} | null>(null);
+  
+  // Advanced search and filters
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    city: '',
+    membershipType: 'all',
+    paymentStatus: 'all',
+    roles: [] as string[],
+  });
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [isBulkActioning, setIsBulkActioning] = useState(false);
+  
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -62,32 +78,78 @@ const MembersManager = () => {
   }, []);
 
   useEffect(() => {
-    // Apply status filter
-    if (statusFilter === 'all') {
-      setFilteredMembers(members);
-    } else if (statusFilter === 'expiring_soon') {
-      // Show members expiring in the next 30 days
+    // Apply all filters and search
+    let filtered = [...members];
+    
+    // Status filter
+    if (statusFilter === 'expiring_soon') {
       const today = new Date();
       const thirtyDaysLater = new Date(today);
       thirtyDaysLater.setDate(today.getDate() + 30);
-      
-      setFilteredMembers(members.filter(m => {
+      filtered = filtered.filter(m => {
         if (!m.membership_end_date) return false;
         const endDate = new Date(m.membership_end_date);
         return endDate > today && endDate <= thirtyDaysLater && m.status === 'approved';
-      }));
+      });
     } else if (statusFilter === 'expired') {
-      // Show members with expired memberships
       const today = new Date();
-      setFilteredMembers(members.filter(m => {
+      filtered = filtered.filter(m => {
         if (!m.membership_end_date) return false;
         const endDate = new Date(m.membership_end_date);
         return endDate < today && m.status === 'approved';
-      }));
-    } else {
-      setFilteredMembers(members.filter(m => m.status === statusFilter));
+      });
+    } else if (statusFilter !== 'all') {
+      filtered = filtered.filter(m => m.status === statusFilter);
     }
-  }, [members, statusFilter]);
+    
+    // Search query (name, email, artist name)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(m => 
+        m.first_name.toLowerCase().includes(query) ||
+        m.last_name.toLowerCase().includes(query) ||
+        m.second_name?.toLowerCase().includes(query) ||
+        m.email.toLowerCase().includes(query) ||
+        m.artist_name?.toLowerCase().includes(query)
+      );
+    }
+    
+    // City filter
+    if (filters.city.trim()) {
+      filtered = filtered.filter(m => 
+        m.city.toLowerCase().includes(filters.city.toLowerCase())
+      );
+    }
+    
+    // Membership type filter
+    if (filters.membershipType !== 'all') {
+      filtered = filtered.filter(m => m.membership_type === filters.membershipType);
+    }
+    
+    // Payment status filter
+    if (filters.paymentStatus !== 'all') {
+      filtered = filtered.filter(m => m.payment_status === filters.paymentStatus);
+    }
+    
+    // Role filters
+    if (filters.roles.length > 0) {
+      filtered = filtered.filter(m => {
+        return filters.roles.some(role => {
+          switch(role) {
+            case 'dj': return m.is_dj;
+            case 'producer': return m.is_producer;
+            case 'vj': return m.is_vj;
+            case 'visual_artist': return m.is_visual_artist;
+            case 'fan': return m.is_fan;
+            default: return false;
+          }
+        });
+      });
+    }
+    
+    setFilteredMembers(filtered);
+    setSelectedMembers([]); // Clear selections when filters change
+  }, [members, statusFilter, searchQuery, filters]);
 
   const fetchMembers = async () => {
     try {
@@ -240,6 +302,108 @@ const MembersManager = () => {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedMembers.length === 0) return;
+    setIsBulkActioning(true);
+    try {
+      const promises = selectedMembers.map(id => 
+        fetch('/api/members-update-status.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ member_id: id, status: 'approved' })
+        })
+      );
+      await Promise.all(promises);
+      toast({
+        title: 'Success',
+        description: `${selectedMembers.length} member(s) approved successfully`,
+      });
+      setSelectedMembers([]);
+      fetchMembers();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to approve members',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBulkActioning(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedMembers.length === 0) return;
+    setIsBulkActioning(true);
+    try {
+      const promises = selectedMembers.map(id => 
+        fetch('/api/members-update-status.php', {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ member_id: id, status: 'rejected' })
+        })
+      );
+      await Promise.all(promises);
+      toast({
+        title: 'Success',
+        description: `${selectedMembers.length} member(s) rejected successfully`,
+      });
+      setSelectedMembers([]);
+      fetchMembers();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to reject members',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBulkActioning(false);
+    }
+  };
+
+  const handleBulkExport = async () => {
+    if (selectedMembers.length === 0) return;
+    setIsBulkActioning(true);
+    try {
+      const selected = filteredMembers.filter(m => selectedMembers.includes(m.id));
+      const csv = [
+        ['Name', 'Email', 'City', 'Status', 'Membership Type', 'Payment Status'].join(','),
+        ...selected.map(m => [
+          `"${m.first_name} ${m.second_name || ''} ${m.last_name}"`.trim(),
+          m.email,
+          m.city,
+          m.status,
+          m.membership_type || '',
+          m.payment_status || ''
+        ].join(','))
+      ].join('\n');
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `elektr-ame-members-selected-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: 'Success',
+        description: 'Selected members exported successfully',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to export members',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsBulkActioning(false);
     }
   };
 
@@ -419,19 +583,6 @@ const MembersManager = () => {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px] bg-black/40 border-white/10 text-white">
-                  <SelectValue placeholder="Filter" />
-                </SelectTrigger>
-                <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="all" className="text-white">{t('admin.filter.all')} ({counts.total})</SelectItem>
-                  <SelectItem value="pending" className="text-white">{t('admin.filter.pending')} ({counts.pending})</SelectItem>
-                  <SelectItem value="approved" className="text-white">{t('admin.filter.approved')} ({counts.approved})</SelectItem>
-                  <SelectItem value="rejected" className="text-white">{t('admin.filter.rejected')} ({counts.rejected})</SelectItem>
-                  <SelectItem value="expiring_soon" className="text-yellow-400">{t('admin.filter.expiringSoon')} ({counts.expiring_soon})</SelectItem>
-                  <SelectItem value="expired" className="text-red-400">{t('admin.filter.expired')} ({counts.expired})</SelectItem>
-                </SelectContent>
-              </Select>
               <Button
                 onClick={() => setIsAddDialogOpen(true)}
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -460,6 +611,191 @@ const MembersManager = () => {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Search and Filters */}
+          <div className="space-y-4 mb-6">
+            {/* Search Bar */}
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-white/50" />
+                <Input
+                  type="text"
+                  placeholder="Search by name, email, or artist name..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-black/40 border-white/10 text-white placeholder:text-white/50"
+                />
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0 text-white/50 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[200px] bg-black/40 border-white/10 text-white">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent className="bg-deep-purple border-white/10">
+                  <SelectItem value="all" className="text-white">{t('admin.filter.all')} ({counts.total})</SelectItem>
+                  <SelectItem value="pending" className="text-white">{t('admin.filter.pending')} ({counts.pending})</SelectItem>
+                  <SelectItem value="approved" className="text-white">{t('admin.filter.approved')} ({counts.approved})</SelectItem>
+                  <SelectItem value="rejected" className="text-white">{t('admin.filter.rejected')} ({counts.rejected})</SelectItem>
+                  <SelectItem value="expiring_soon" className="text-yellow-400">{t('admin.filter.expiringSoon')} ({counts.expiring_soon})</SelectItem>
+                  <SelectItem value="expired" className="text-red-400">{t('admin.filter.expired')} ({counts.expired})</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Advanced Filters
+              </Button>
+            </div>
+
+            {/* Advanced Filters */}
+            {showAdvancedFilters && (
+              <Card className="bg-black/60 border-white/10 p-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">City</Label>
+                    <Input
+                      type="text"
+                      placeholder="Filter by city..."
+                      value={filters.city}
+                      onChange={(e) => setFilters({...filters, city: e.target.value})}
+                      className="bg-black/40 border-white/10 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">Membership Type</Label>
+                    <Select value={filters.membershipType} onValueChange={(value) => setFilters({...filters, membershipType: value})}>
+                      <SelectTrigger className="bg-black/40 border-white/10 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-deep-purple border-white/10">
+                        <SelectItem value="all" className="text-white">All Types</SelectItem>
+                        <SelectItem value="free_trial" className="text-white">Free Trial</SelectItem>
+                        <SelectItem value="monthly" className="text-white">Monthly</SelectItem>
+                        <SelectItem value="yearly" className="text-white">Yearly</SelectItem>
+                        <SelectItem value="lifetime" className="text-white">Lifetime</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-white text-sm">Payment Status</Label>
+                    <Select value={filters.paymentStatus} onValueChange={(value) => setFilters({...filters, paymentStatus: value})}>
+                      <SelectTrigger className="bg-black/40 border-white/10 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-deep-purple border-white/10">
+                        <SelectItem value="all" className="text-white">All</SelectItem>
+                        <SelectItem value="paid" className="text-white">Paid</SelectItem>
+                        <SelectItem value="unpaid" className="text-white">Unpaid</SelectItem>
+                        <SelectItem value="overdue" className="text-white">Overdue</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="mt-4 space-y-2">
+                  <Label className="text-white text-sm">Roles</Label>
+                  <div className="flex flex-wrap gap-4">
+                    {['dj', 'producer', 'vj', 'visual_artist', 'fan'].map((role) => (
+                      <div key={role} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`role-${role}`}
+                          checked={filters.roles.includes(role)}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setFilters({...filters, roles: [...filters.roles, role]});
+                            } else {
+                              setFilters({...filters, roles: filters.roles.filter(r => r !== role)});
+                            }
+                          }}
+                        />
+                        <Label htmlFor={`role-${role}`} className="text-white text-sm capitalize cursor-pointer">
+                          {role.replace('_', ' ')}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setFilters({ city: '', membershipType: 'all', paymentStatus: 'all', roles: [] });
+                      setSearchQuery('');
+                    }}
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Clear Filters
+                  </Button>
+                </div>
+              </Card>
+            )}
+
+            {/* Bulk Actions */}
+            {selectedMembers.length > 0 && (
+              <Card className="bg-blue-500/10 border-blue-500/50 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckSquare className="h-5 w-5 text-blue-400" />
+                    <span className="text-white font-semibold">
+                      {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
+                    </span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={handleBulkApprove}
+                      disabled={isBulkActioning}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Approve Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleBulkReject}
+                      disabled={isBulkActioning}
+                      className="border-red-500/50 text-red-400 hover:bg-red-500/20"
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reject Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleBulkExport}
+                      disabled={isBulkActioning}
+                      className="border-white/20 text-white hover:bg-white/10"
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Selected
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSelectedMembers([])}
+                      className="text-white/70 hover:text-white"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+          </div>
+
           {filteredMembers.length === 0 ? (
             <div className="text-center py-8 text-white/60">
               <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
@@ -470,6 +806,18 @@ const MembersManager = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="border-white/10 hover:bg-white/5">
+                    <TableHead className="w-12">
+                      <Checkbox
+                        checked={selectedMembers.length === filteredMembers.length && filteredMembers.length > 0}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedMembers(filteredMembers.map(m => m.id));
+                          } else {
+                            setSelectedMembers([]);
+                          }
+                        }}
+                      />
+                    </TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.name')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.email')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.status')}</TableHead>
@@ -486,12 +834,13 @@ const MembersManager = () => {
                       {/* Roles Row */}
                       {(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
                         <TableRow key={`${member.id}-roles`} className="border-white/5 hover:bg-white/5">
+                          <TableCell></TableCell>
                           <TableCell className="text-white">
                             <div className="font-medium">{member.first_name} {member.second_name && `${member.second_name} `}{member.last_name}</div>
                             {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
                             <div className="text-xs text-white/40">{member.city}</div>
                           </TableCell>
-                          <TableCell colSpan={7}>
+                          <TableCell colSpan={8}>
                             <div className="flex gap-1 flex-wrap">
                               {member.is_dj && <span className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded">DJ</span>}
                               {member.is_producer && <span className="text-xs bg-blue-600/30 text-blue-300 px-1.5 py-0.5 rounded">Producer</span>}
@@ -504,6 +853,18 @@ const MembersManager = () => {
                       )}
                       {/* Main Data Row */}
                       <TableRow key={member.id} className="border-white/10 hover:bg-white/5">
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedMembers.includes(member.id)}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedMembers([...selectedMembers, member.id]);
+                              } else {
+                                setSelectedMembers(selectedMembers.filter(id => id !== member.id));
+                              }
+                            }}
+                          />
+                        </TableCell>
                         <TableCell className="text-white">
                           {!(member.is_dj || member.is_producer || member.is_vj || member.is_visual_artist || member.is_fan) && (
                             <>
