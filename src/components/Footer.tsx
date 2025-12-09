@@ -42,6 +42,14 @@ const Footer = () => {
         <hr className="border-white/10 mb-8" />
         
         <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="flex flex-wrap gap-4 text-white/50 text-sm mb-4 md:mb-0">
+            <Link to="/legal-notice" className="hover:text-white transition-colors">
+              {t('footer.legalNotice')}
+            </Link>
+            <Link to="/terms-and-conditions" className="hover:text-white transition-colors">
+              {t('footer.terms')}
+            </Link>
+          </div>
           <div className="text-white/50 text-sm mb-4 md:mb-0">
             {t('footer.rights')}
           </div>

@@ -26,6 +26,8 @@ import PortalLayout from "./components/portal/PortalLayout";
 import ConsultancyPage from "./pages/portal/ConsultancyPage";
 import CompanyCreationPage from "./pages/portal/CompanyCreationPage";
 import MemberAreaLayout from "./components/portal/MemberAreaLayout";
+import LegalNotice from "./pages/LegalNotice";
+import TermsAndConditions from "./pages/TermsAndConditions";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,8 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/initiatives" element={<Initiatives />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/legal-notice" element={<LegalNotice />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
               <Route path="/join-us" element={<JoinUs />} />
               <Route path="/member-login" element={<MemberLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
