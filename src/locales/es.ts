@@ -21,7 +21,7 @@ export default {
   
   // About
   'about.title': 'Sobre Elektr-Âme',
-  'about.description': 'Fundada en 2025, Elektr-Âme es una organización impulsada por la comunidad dedicada a promover la cultura de la música electrónica en Barcelona a través de eventos, educación y apoyo a artistas.',
+  'about.description': 'Fundada en 2025, Elektr‑Âme es una asociación comunitaria que impulsa la cultura de la música electrónica y la innovación artística. A través de eventos, talleres y apoyo a artistas, creamos experiencias únicas que conectan música, creatividad y bienestar.',
   'about.mission': 'Nuestra Visión',
   'about.mission.text': 'Elektr-Âme tiene como objetivo promover la música electrónica, las artes digitales y las prácticas culturales asociadas a través de eventos, talleres, residencias de artistas y actividades educativas que celebran la vibrante cultura de Barcelona.',
   'about.values': 'Nuestros Valores:',
@@ -33,17 +33,17 @@ export default {
   
   // Features
   'feature.community': 'Comunidad Primero',
-  'feature.community.text': 'Construimos una comunidad de apoyo donde artistas, productores y fans de música electrónica pueden conectarse, colaborar y crecer juntos.',
+  'feature.community.text': 'Más que un colectivo, somos una red de apoyo donde artistas, productores y amantes de la música electrónica se encuentran, colaboran y crecen juntos. La unión hace la fuerza.',
   'feature.workshops': 'Talleres Educativos',
-  'feature.workshops.text': 'Talleres regulares sobre producción musical, técnicas de DJ y negocios de música electrónica para ayudar a desarrollar habilidades.',
-  'feature.venues': 'Mejores Locales de Barcelona',
-  'feature.venues.text': 'Nos asociamos con los locales más emblemáticos de Barcelona para ofrecerte experiencias inolvidables de música electrónica.',
-  'feature.therapy': 'Musicoterapia',
-  'feature.therapy.text': 'Explorando el poder curativo de la música electrónica a través de sesiones y talleres alternativos de musicoterapia.',
+  'feature.workshops.text': 'Ofrecemos talleres regulares de producción musical, técnicas de DJ y gestión artística, diseñados para desarrollar talento y habilidades dentro de la escena electrónica.',
+  'feature.venues': 'Lugares y Experiencias',
+  'feature.venues.text': 'Nuestros eventos se realizan en lugares variados, desde salas urbanas hasta grandes espacios inesperados, ofreciendo experiencias underground únicas y frecuentemente sorprendentes.',
+  'feature.therapy': 'Musicoterapia y Bienestar',
+  'feature.therapy.text': 'Exploramos el poder curativo de la música electrónica combinada con prácticas de medicina tradicional china, acupuntura y bienestar, ofreciendo talleres y sesiones que armonizan cuerpo y mente.',
   'feature.innovation': 'Artes Digitales e Innovación',
-  'feature.innovation.text': 'Investigación y experimentación con nuevas tecnologías creativas incluyendo IA, XR y blockchain aplicadas a la expresión artística.',
+  'feature.innovation.text': 'Investigamos y experimentamos con tecnologías creativas emergentes, incluyendo IA, XR y blockchain, para expandir los límites de la expresión artística en la música y el arte digital.',
   'feature.eco': 'Eventos Eco-Responsables',
-  'feature.eco.text': 'Promoviendo la sostenibilidad ambiental en todas nuestras producciones con prácticas ecológicas y eventos de mínimo impacto.',
+  'feature.eco.text': 'Promovemos la sostenibilidad ambiental en todas nuestras producciones, organizando eventos de mínimo impacto que respetan la ciudad y su entorno.',
   
   // Newsletter
   'newsletter.title': 'Mantente Conectado',
@@ -473,6 +473,7 @@ export default {
   'portal.tabs.overview': 'Resumen',
   'portal.tabs.card': 'Tarjeta Digital',
   'portal.tabs.profile': 'Perfil',
+  'portal.tabs.payments': 'Pagos',
   'portal.tabs.sponsorship': 'Patrocinio',
   
   // Pestaña Resumen

@@ -25,6 +25,7 @@ import PWAInstallPrompt from "./components/PWAInstallPrompt";
 import PortalLayout from "./components/portal/PortalLayout";
 import ConsultancyPage from "./pages/portal/ConsultancyPage";
 import CompanyCreationPage from "./pages/portal/CompanyCreationPage";
+import MemberAreaLayout from "./components/portal/MemberAreaLayout";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +49,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/resend-verification" element={<ResendVerification />} />
-              <Route path="/member-portal" element={<MemberPortal />} />
+              <Route path="/member-portal" element={<MemberAreaLayout />} />
               <Route path="/artist/:id" element={<ArtistDetail />} />
               <Route path="/admin" element={
                 <ProtectedRoute>

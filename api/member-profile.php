@@ -39,6 +39,9 @@ try {
             first_name,
             second_name,
             artist_name,
+            profile_picture,
+            bio,
+            social_links,
             phone,
             street as address,
             city,
@@ -91,6 +94,14 @@ try {
     ");
     $pendingStmt->execute([$member_id]);
     $pendingEmailChange = $pendingStmt->fetch(PDO::FETCH_ASSOC);
+
+    // Parse social_links JSON if it exists
+    if (!empty($member['social_links'])) {
+        $decoded = json_decode($member['social_links'], true);
+        $member['social_links'] = $decoded ?: [];
+    } else {
+        $member['social_links'] = [];
+    }
 
     // Don't send internal notes to member
     unset($member['notes']);
