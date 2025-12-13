@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 session_start();
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/classes/EmailAutomation.php';
 
 try {
     // Check if member is logged in
@@ -141,30 +142,54 @@ try {
     $inviter = $stmt->fetch(PDO::FETCH_ASSOC);
     $inviterName = $inviter ? ($inviter['first_name'] . ' ' . $inviter['second_name']) : 'A friend';
 
-    // Send invitation email
+    // Send invitation email using template system
     try {
         $joinLink = "https://www.elektr-ame.com/join-us?invite=" . $invitationToken;
-        $subject = "You've been invited to join Elektr-Âme! 🎵";
         
-        $message = "Hello {$inviteeFirstName},\n\n";
-        $message .= "{$inviterName} has invited you to join Elektr-Âme, an electronic music community and association based in Barcelona.\n\n";
-        $message .= "**About Elektr-Âme:**\n";
-        $message .= "We're a community focused on developing electronic music projects, hosting events, and building a network of artists and enthusiasts.\n\n";
-        $message .= "**What you'll get:**\n";
-        $message .= "- Access to exclusive events and workshops\n";
-        $message .= "- Networking opportunities with artists and producers\n";
-        $message .= "- Digital membership card\n";
-        $message .= "- Support for the electronic music community\n\n";
-        $message .= "**Join us now:**\n";
-        $message .= "Click here to register: {$joinLink}\n\n";
-        $message .= "This link includes a special invitation code from {$inviterName}.\n\n";
-        $message .= "If you have any questions, feel free to reach out to us at contact@elektr-ame.com.\n\n";
-        $message .= "We hope to see you soon!\n\n";
-        $message .= "Best regards,\n";
-        $message .= "The Elektr-Âme Team\n\n";
-        $message .= "---\n";
-        $message .= "This invitation was sent by {$inviterName}.\n";
-        $message .= "If you didn't expect this invitation, you can safely ignore this email.\n";
+        // Get the invitation template
+        $stmt = $pdo->prepare("SELECT * FROM email_templates WHERE template_key = 'member_invitation' AND active = 1");
+        $stmt->execute();
+        $template = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$template) {
+            // Fallback to hardcoded email if template doesn't exist
+            $subject = "You've been invited to join Elektr-Âme! 🎵";
+            $message = "Hello {$inviteeFirstName},\n\n";
+            $message .= "{$inviterName} has invited you to join Elektr-Âme, an electronic music community and association based in Barcelona.\n\n";
+            $message .= "**About Elektr-Âme:**\n";
+            $message .= "We're a community focused on developing electronic music projects, hosting events, and building a network of artists and enthusiasts.\n\n";
+            $message .= "**What you'll get:**\n";
+            $message .= "- Access to exclusive events and workshops\n";
+            $message .= "- Networking opportunities with artists and producers\n";
+            $message .= "- Digital membership card\n";
+            $message .= "- Support for the electronic music community\n\n";
+            $message .= "**Join us now:**\n";
+            $message .= "Click here to register: {$joinLink}\n\n";
+            $message .= "This link includes a special invitation code from {$inviterName}.\n\n";
+            $message .= "If you have any questions, feel free to reach out to us at contact@elektr-ame.com.\n\n";
+            $message .= "We hope to see you soon!\n\n";
+            $message .= "Best regards,\n";
+            $message .= "The Elektr-Âme Team\n\n";
+            $message .= "---\n";
+            $message .= "This invitation was sent by {$inviterName}.\n";
+            $message .= "If you didn't expect this invitation, you can safely ignore this email.\n";
+        } else {
+            // Use template - default to English for invitations (invitee language not known yet)
+            $lang = 'en';
+            
+            // Replace variables in subject and body
+            $subject = str_replace(
+                ['{{invitee_first_name}}', '{{inviter_name}}', '{{invitation_link}}'],
+                [$inviteeFirstName, $inviterName, $joinLink],
+                $template["subject_$lang"]
+            );
+            
+            $message = str_replace(
+                ['{{invitee_first_name}}', '{{inviter_name}}', '{{invitation_link}}'],
+                [$inviteeFirstName, $inviterName, $joinLink],
+                $template["body_$lang"]
+            );
+        }
         
         $headers = "From: Elektr-Âme <noreply@elektr-ame.com>\r\n";
         $headers .= "Reply-To: contact@elektr-ame.com\r\n";

@@ -274,12 +274,18 @@ class EmailAutomation {
             $variables['net_cost'] = number_format($taxCalc['netCost'], 2);
             $variables['discount_percent'] = number_format($taxCalc['effectiveDiscount'], 1);
             
+            // Calculate deduction above €250 for detailed breakdown
+            $amount = floatval($member['payment_amount']);
+            $above250Amount = max(0, $amount - 250);
+            $above250Deduction = $above250Amount * ($taxCalc['recurringBonus'] ? 0.45 : 0.40);
+            $variables['tax_deduction_above_250'] = number_format($above250Deduction, 2);
+            
             $variables['tax_deduction_info'] = "As a sponsor, you can deduct €{$variables['tax_deduction']} from your taxes (80% on first €250, 40% above).";
             
             if ($taxCalc['recurringBonus']) {
-                $variables['recurring_bonus_info'] = "🎁 Recurring donor bonus: You now get 45% deduction on amounts above €250!";
+                $variables['recurring_bonus_info'] = "⭐ RECURRING DONOR BONUS: You qualify for 45% deduction on amounts above €250 (3+ consecutive years).";
             } else {
-                $variables['recurring_bonus_info'] = "💡 Tip: Donate for 3 consecutive years to unlock 45% deduction on amounts above €250!";
+                $variables['recurring_bonus_info'] = "";
             }
             
             $variables['tax_receipt_info'] = "A separate tax receipt email has been sent for your records.";
@@ -287,6 +293,7 @@ class EmailAutomation {
             $variables['tax_deduction_info'] = '';
             $variables['tax_receipt_info'] = '';
             $variables['recurring_bonus_info'] = '';
+            $variables['tax_deduction_above_250'] = '0.00';
         }
 
         return $variables;

@@ -235,11 +235,47 @@ try {
     $_SESSION['member_email'] = $input['email'];
     $_SESSION['member_name'] = $input['firstName'] . ' ' . $input['lastName'];
     
-    // Trigger welcome email automation
+    // Send appropriate welcome email based on member roles
     try {
         require_once __DIR__ . '/classes/EmailAutomation.php';
         $emailAutomation = new EmailAutomation($pdo);
-        $emailAutomation->triggerAutomation('member_registered', $memberId);
+        
+        // Check if member is DJ or Producer
+        if ($isDj || $isProducer) {
+            // Send DJ/Producer artist invitation email
+            $roles = [];
+            if ($isDj) $roles[] = 'DJ';
+            if ($isProducer) $roles[] = 'Producer';
+            $rolesText = implode(' and/or ', $roles);
+            
+            // Queue the DJ/Producer artist invitation email
+            // The EmailAutomation class will handle variable replacement and language detection
+            $queued = $emailAutomation->queueEmail(
+                $input['email'],
+                $input['firstName'] . ' ' . $input['lastName'],
+                'dj_producer_artist_invitation',
+                [
+                    'first_name' => $input['firstName'],
+                    'roles' => $rolesText
+                ],
+                $memberId,
+                'normal',
+                null
+            );
+            
+            if ($queued) {
+                // Process queue immediately to send the email
+                $emailAutomation->processQueue(1);
+                error_log("DJ/Producer artist invitation email sent to: {$input['email']} (Member ID: $memberId, Roles: $rolesText)");
+            } else {
+                // Fallback: send regular welcome email if template doesn't exist or queueing failed
+                error_log("DJ/Producer template not found or queueing failed, sending regular welcome email");
+                $emailAutomation->triggerAutomation('member_registered', $memberId);
+            }
+        } else {
+            // Send regular welcome email for non-DJ/Producer members
+            $emailAutomation->triggerAutomation('member_registered', $memberId);
+        }
     } catch (Exception $e) {
         error_log("Welcome email automation failed: " . $e->getMessage());
         // Don't fail the registration if email fails
