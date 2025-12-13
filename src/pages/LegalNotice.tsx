@@ -1,3 +1,7 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,6 +10,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LegalNotice = () => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  const handleBack = () => {
+    navigate('/');
+  };
 
   return (
     <>
@@ -20,9 +33,20 @@ const LegalNotice = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <Card className="bg-black/40 border-white/10">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-white">
-                {t('legal.title')}
-              </CardTitle>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <CardTitle className="text-3xl font-bold text-white">
+                  {t('legal.title')}
+                </CardTitle>
+                <Button
+                  onClick={handleBack}
+                  variant="ghost"
+                  size="sm"
+                  className="text-white hover:bg-white/10 flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6 text-white/80">
               <div>

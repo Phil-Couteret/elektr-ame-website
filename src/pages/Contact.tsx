@@ -54,7 +54,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <h3 className="font-medium text-white">Tesorero</h3>
-                    <p className="text-white/70">Phil</p>
+                    <p className="text-white/70">Jérome</p>
                     <p className="text-electric-blue">tesorero at elektr-ame.com</p>
                   </div>
                 </div>
@@ -64,9 +64,9 @@ const Contact = () => {
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">Secretaria</h3>
-                    <p className="text-white/70">Rakel</p>
-                    <p className="text-electric-blue">secretaria at elektr-ame.com</p>
+                    <h3 className="font-medium text-white">Secretario</h3>
+                    <p className="text-white/70">Phil</p>
+                    <p className="text-electric-blue">secretario at elektr-ame.com</p>
                   </div>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -34,6 +34,7 @@ const ArtistsManager = () => {
   const [translating, setTranslating] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState<{ [key: string]: boolean }>({});
   const [uploadingPressKit, setUploadingPressKit] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -108,6 +109,15 @@ const ArtistsManager = () => {
     setIsEditing(true);
     setShowForm(true);
   };
+
+  // Scroll to form when it opens
+  useEffect(() => {
+    if (showForm && formRef.current) {
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [showForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -267,7 +277,7 @@ const ArtistsManager = () => {
 
       {/* Add/Edit Form */}
       {showForm && (
-        <Card className="bg-black/40 border-white/10">
+        <Card ref={formRef} className="bg-black/40 border-white/10">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <User className="h-5 w-5 text-electric-blue" />
