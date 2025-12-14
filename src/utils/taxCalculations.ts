@@ -69,10 +69,10 @@ export function formatTaxDeduction(result: TaxDeductionResult): string {
 }
 
 /**
- * Determine if an amount qualifies as sponsor (>€40)
+ * Determine if an amount qualifies as sponsor (>€20)
  */
 export function isSponsorAmount(amount: number): boolean {
-  return amount > 40;
+  return amount > 20;
 }
 
 /**
@@ -80,8 +80,8 @@ export function isSponsorAmount(amount: number): boolean {
  */
 export function getMembershipTypeFromAmount(amount: number): 'free' | 'basic' | 'sponsor' {
   if (amount === 0) return 'free';
-  if (amount === 40) return 'basic';
-  if (amount > 40) return 'sponsor';
+  if (amount === 20) return 'basic';
+  if (amount > 20) return 'sponsor';
   return 'free';
 }
 
@@ -90,8 +90,8 @@ export function getMembershipTypeFromAmount(amount: number): 'free' | 'basic' | 
  */
 export const MEMBERSHIP_PRICES = {
   free: 0,
-  basic: 40,
-  sponsor: 40, // minimum, but any amount above qualifies
+  basic: 20,
+  sponsor: 20, // minimum, but any amount above qualifies
   lifetime: 500 // suggested price, can be adjusted
 } as const;
 

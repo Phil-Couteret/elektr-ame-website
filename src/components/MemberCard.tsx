@@ -43,8 +43,8 @@ const MemberCard = ({
   const getMembershipLabel = (type: string) => {
     switch (type) {
       case 'free': return 'Free Member';
-      case 'basic': return 'Basic Member (€40/year)';
-      case 'sponsor': return 'Sponsor Member (>€40/year)';
+      case 'basic': return 'Basic Member (€20/year)';
+      case 'sponsor': return 'Sponsor Member (>€20/year)';
       case 'lifetime': return 'Lifetime Member';
       default: return 'Member';
     }

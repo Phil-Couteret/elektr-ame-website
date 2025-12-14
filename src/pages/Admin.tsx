@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send, UserCheck } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send, UserCheck, CreditCard } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
@@ -13,6 +13,7 @@ import MembersManager from "@/components/admin/MembersManager";
 import NewsletterManager from "@/components/admin/NewsletterManager";
 import EmailAutomationManager from "@/components/admin/EmailAutomationManager";
 import InvitationsManager from "@/components/admin/InvitationsManager";
+import PaymentConfigManager from "@/components/admin/PaymentConfigManager";
 import LanguageSelector from "@/components/LanguageSelector";
 import { SEO } from "@/components/SEO";
 
@@ -75,7 +76,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-8' : 'grid-cols-7'} bg-black/40 border-white/10`}>
+          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-9' : 'grid-cols-8'} bg-black/40 border-white/10`}>
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -125,6 +126,13 @@ const Admin = () => {
               <UserCheck className="h-4 w-4 mr-2" />
               {t('admin.tabs.invitations')}
             </TabsTrigger>
+            <TabsTrigger 
+              value="payment-config"
+              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Payment
+            </TabsTrigger>
             {isSuperAdmin && (
               <TabsTrigger 
                 value="users"
@@ -162,6 +170,10 @@ const Admin = () => {
 
           <TabsContent value="invitations" className="mt-6">
             <InvitationsManager />
+          </TabsContent>
+
+          <TabsContent value="payment-config" className="mt-6">
+            <PaymentConfigManager />
           </TabsContent>
 
           {isSuperAdmin && (

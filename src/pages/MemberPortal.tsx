@@ -36,6 +36,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import MemberCard from "@/components/MemberCard";
 import PaymentHistory from "@/components/portal/PaymentHistory";
 import MemberStats from "@/components/portal/MemberStats";
+import PaymentCheckout from "@/components/payment/PaymentCheckout";
+import MembershipRenewal from "@/components/payment/MembershipRenewal";
+import PaymentAllocation from "@/components/payment/PaymentAllocation";
 
 interface PendingEmailChange {
   new_email: string;
@@ -808,12 +811,11 @@ const MemberPortal = () => {
                             Renew your membership to continue enjoying all member benefits.
                           </p>
                           <Button
-                            onClick={handleRenewal}
+                            onClick={() => setActiveTab('payments')}
                             className="bg-red-500 hover:bg-red-600 text-white"
-                            disabled
                           >
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Renew Membership (Coming Soon)
+                            Renew Membership
                           </Button>
                         </div>
                       </div>
@@ -842,12 +844,11 @@ const MemberPortal = () => {
                             Renew now to continue enjoying all member benefits without interruption.
                           </p>
                           <Button
-                            onClick={handleRenewal}
+                            onClick={() => setActiveTab('payments')}
                             className="bg-orange-500 hover:bg-orange-600 text-white"
-                            disabled
                           >
                             <RefreshCw className="h-4 w-4 mr-2" />
-                            Renew Membership (Coming Soon)
+                            Renew Membership
                           </Button>
                         </div>
                       </div>
@@ -1499,7 +1500,44 @@ const MemberPortal = () => {
           </TabsContent>
 
           {/* Payment History Tab */}
-          <TabsContent value="payments" className="mt-6">
+          <TabsContent value="payments" className="mt-6 space-y-6">
+            {/* Payment Allocation - Show if there's unallocated balance */}
+            <PaymentAllocation />
+            
+            {/* Payment Checkout / Renewal */}
+            {memberData && (
+              <>
+                {(memberData.payment_status === 'unpaid' || 
+                  memberData.payment_status === 'overdue' ||
+                  (memberData.membership_end_date && new Date(memberData.membership_end_date) < new Date())) && (
+                  <PaymentCheckout
+                    memberId={memberData.id}
+                    currentMembershipType={memberData.membership_type}
+                    currentPaymentStatus={memberData.payment_status}
+                    onPaymentSuccess={() => {
+                      fetchMemberData();
+                      toast({
+                        title: "Redirecting to Payment",
+                        description: "You will be redirected to Stripe to complete your payment",
+                      });
+                    }}
+                  />
+                )}
+                
+                {memberData.payment_status === 'paid' && 
+                 memberData.membership_end_date && 
+                 new Date(memberData.membership_end_date) > new Date() && (
+                  <MembershipRenewal
+                    currentMembershipType={memberData.membership_type}
+                    membershipEndDate={memberData.membership_end_date}
+                    onRenewalComplete={() => {
+                      fetchMemberData();
+                    }}
+                  />
+                )}
+              </>
+            )}
+            
             <PaymentHistory />
           </TabsContent>
 

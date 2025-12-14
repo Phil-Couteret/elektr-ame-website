@@ -45,15 +45,35 @@ const PaymentHistory = () => {
         credentials: 'include'
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch payment history');
+      const responseText = await response.text();
+      let data;
+      
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Payment history JSON parse error:', e, 'Response:', responseText);
+        throw new Error('Invalid response from server');
       }
 
-      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Failed to fetch payment history');
+      }
+
       setPaymentData(data);
     } catch (err) {
       console.error('Payment history error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load payment history');
+      // Don't show error if it's just "no payment history" - that's expected
+      if (err instanceof Error && err.message.includes('No payment history')) {
+        setPaymentData({
+          success: true,
+          payments: [],
+          total_payments: 0,
+          total_amount: 0,
+          message: 'No payment history available.'
+        });
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to load payment history');
+      }
     } finally {
       setLoading(false);
     }
