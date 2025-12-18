@@ -80,6 +80,37 @@ const TermsAndConditions = () => {
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
+                  {t('terms.shippingPolicy')}
+                </h2>
+                <div className="space-y-3">
+                  <p>{t('terms.shippingPolicyText')}</p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>{t('terms.shippingPolicyItem1')}</li>
+                    <li>{t('terms.shippingPolicyItem2')}</li>
+                    <li>{t('terms.shippingPolicyItem3')}</li>
+                    <li>{t('terms.shippingPolicyItem4')}</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  {t('terms.returnsPolicy')}
+                </h2>
+                <div className="space-y-3">
+                  <p>{t('terms.returnsPolicyText')}</p>
+                  <ul className="list-disc list-inside space-y-2 ml-4">
+                    <li>{t('terms.returnsPolicyItem1')}</li>
+                    <li>{t('terms.returnsPolicyItem2')}</li>
+                    <li>{t('terms.returnsPolicyItem3')}</li>
+                    <li>{t('terms.returnsPolicyItem4')}</li>
+                  </ul>
+                  <p className="mt-3">{t('terms.refundPolicyContact')}</p>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-3">
                   {t('terms.refundPolicy')}
                 </h2>
                 <div className="space-y-3">

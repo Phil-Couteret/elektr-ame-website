@@ -27,10 +27,10 @@ const Footer = () => {
             <a href="#artists" className="text-white/70 hover:text-blue-light transition-colors">
               {t('nav.artists')}
             </a>
-            <a href="#" className="text-white/70 hover:text-blue-light transition-colors">
-              Membership
-            </a>
-            <a href="#" className="text-white/70 hover:text-blue-light transition-colors">
+            <Link to="/membership" className="text-white/70 hover:text-blue-light transition-colors">
+              {t('nav.membership')}
+            </Link>
+            <a href="#gallery" className="text-white/70 hover:text-blue-light transition-colors">
               Gallery
             </a>
             <Link to="/contact" className="text-white/70 hover:text-blue-light transition-colors">
@@ -48,6 +48,9 @@ const Footer = () => {
             </Link>
             <Link to="/terms-and-conditions" className="hover:text-white transition-colors">
               {t('footer.terms')}
+            </Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">
+              Privacy Policy
             </Link>
           </div>
           <div className="text-white/50 text-sm mb-4 md:mb-0">

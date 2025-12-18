@@ -1,7 +1,7 @@
 {
   "name": "elektr-ame-website",
   "private": true,
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,8 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "npm run build && cp -r dist/* deployment/ && ./deploy-safe.sh",
-    "deploy:quick": "npm run build && cp -r dist/* deployment/ && ./deploy-now.sh",
-    "deploy:godaddy": "npm run build && node deploy.js"
+    "deploy:quick": "npm run build && cp -r dist/* deployment/ && ./deploy-now.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

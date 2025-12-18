@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const LegalNotice = () => {
+const PrivacyPolicy = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
@@ -23,10 +23,10 @@ const LegalNotice = () => {
   return (
     <>
       <SEO 
-        title={t('legal.title')}
-        description={t('legal.description')}
-        url="https://www.elektr-ame.com/legal-notice"
-        keywords="legal notice, aviso legal, terms, Elektr-Âme"
+        title={t('privacy.title')}
+        description={t('privacy.description')}
+        url="https://www.elektr-ame.com/privacy-policy"
+        keywords="privacy policy, data protection, GDPR, Elektr-Âme"
       />
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-deep-purple via-black to-deep-purple py-12">
@@ -35,7 +35,7 @@ const LegalNotice = () => {
             <CardHeader>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <CardTitle className="text-3xl font-bold text-white">
-                  {t('legal.title')}
+                  {t('privacy.title')}
                 </CardTitle>
                 <Button
                   onClick={handleBack}
@@ -51,53 +51,90 @@ const LegalNotice = () => {
             <CardContent className="space-y-6 text-white/80">
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.companyInfo')}
+                  {t('privacy.intro')}
                 </h2>
-                <div className="space-y-2">
+                <p>{t('privacy.introText')}</p>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  {t('privacy.dataController')}
+                </h2>
+                <p className="mb-2">{t('privacy.dataControllerText')}</p>
+                <div className="space-y-2 ml-4">
                   <p><strong>{t('legal.commercialName')}:</strong> {t('legal.commercialNameValue')}</p>
                   <p><strong>{t('legal.identification')}:</strong> {t('legal.identificationValue')}</p>
                   <p><strong>{t('legal.address')}:</strong> {t('legal.addressValue')}</p>
-                  <p><strong>{t('legal.country')}:</strong> {t('legal.countryValue')}</p>
-                  <p><strong>{t('legal.legalRepresentative')}:</strong> {t('legal.legalRepresentativeValue')}</p>
-                  <p><strong>{t('legal.phone')}:</strong> {t('legal.phoneValue')}</p>
                   <p><strong>{t('legal.email')}:</strong> {t('legal.emailValue')}</p>
-                  <p><strong>{t('legal.contact')}:</strong> {t('legal.contactValue')}</p>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.object')}
+                  {t('privacy.dataCollection')}
                 </h2>
-                <p>{t('legal.objectText')}</p>
+                <p className="mb-2">{t('privacy.dataCollectionText')}</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>{t('privacy.dataCollectionItem1')}</li>
+                  <li>{t('privacy.dataCollectionItem2')}</li>
+                  <li>{t('privacy.dataCollectionItem3')}</li>
+                  <li>{t('privacy.dataCollectionItem4')}</li>
+                </ul>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.intellectualProperty')}
+                  {t('privacy.dataUse')}
                 </h2>
-                <p>{t('legal.intellectualPropertyText')}</p>
+                <p className="mb-2">{t('privacy.dataUseText')}</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>{t('privacy.dataUseItem1')}</li>
+                  <li>{t('privacy.dataUseItem2')}</li>
+                  <li>{t('privacy.dataUseItem3')}</li>
+                  <li>{t('privacy.dataUseItem4')}</li>
+                </ul>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.responsibility')}
+                  {t('privacy.dataRetention')}
                 </h2>
-                <p>{t('legal.responsibilityText')}</p>
+                <p>{t('privacy.dataRetentionText')}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.modifications')}
+                  {t('privacy.dataRights')}
                 </h2>
-                <p>{t('legal.modificationsText')}</p>
+                <p className="mb-2">{t('privacy.dataRightsText')}</p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>{t('privacy.dataRightsItem1')}</li>
+                  <li>{t('privacy.dataRightsItem2')}</li>
+                  <li>{t('privacy.dataRightsItem3')}</li>
+                  <li>{t('privacy.dataRightsItem4')}</li>
+                  <li>{t('privacy.dataRightsItem5')}</li>
+                </ul>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('legal.applicableLaw')}
+                  {t('privacy.cookies')}
                 </h2>
-                <p>{t('legal.applicableLawText')}</p>
+                <p>{t('privacy.cookiesText')}</p>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  {t('privacy.security')}
+                </h2>
+                <p>{t('privacy.securityText')}</p>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-white mb-3">
+                  {t('privacy.contact')}
+                </h2>
+                <p>{t('privacy.contactText')}</p>
               </div>
             </CardContent>
           </Card>
@@ -108,5 +145,5 @@ const LegalNotice = () => {
   );
 };
 
-export default LegalNotice;
+export default PrivacyPolicy;
 

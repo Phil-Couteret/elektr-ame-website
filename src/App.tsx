@@ -28,6 +28,8 @@ import CompanyCreationPage from "./pages/portal/CompanyCreationPage";
 import MemberAreaLayout from "./components/portal/MemberAreaLayout";
 import LegalNotice from "./pages/LegalNotice";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import MembershipProducts from "./pages/MembershipProducts";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 
@@ -49,6 +51,8 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/legal-notice" element={<LegalNotice />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/membership" element={<MembershipProducts />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-cancelled" element={<PaymentFailure />} />
               <Route path="/join-us" element={<JoinUs />} />
