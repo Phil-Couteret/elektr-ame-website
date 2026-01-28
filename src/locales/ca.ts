@@ -70,6 +70,7 @@ export default {
   'footer.disclaimer': 'Lloc dissenyat per a Elektr-Âme. Totes les imatges utilitzades són només per a fins demostratius.',
   'footer.legalNotice': 'Avís Legal',
   'footer.terms': 'Termes i Condicions',
+  'footer.craftedBy': 'Creat per Phil C',
   
   // Initiatives
   'initiatives.title': 'Les Nostres Iniciatives',

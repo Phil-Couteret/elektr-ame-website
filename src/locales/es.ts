@@ -70,6 +70,7 @@ export default {
   'footer.disclaimer': 'Sitio diseñado para Elektr-Âme. Todas las imágenes utilizadas son solo para fines demostrativos.',
   'footer.legalNotice': 'Aviso Legal',
   'footer.terms': 'Términos y Condiciones',
+  'footer.craftedBy': 'Creado por Phil C',
   
   // Initiatives
   'initiatives.title': 'Nuestras Iniciativas',

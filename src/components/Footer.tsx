@@ -81,6 +81,7 @@ const Footer = () => {
         <div className="mt-8 text-center text-white/30 text-xs">
           <p>{t('footer.disclaimer')}</p>
           <p className="mt-2">www.elektr-ame.com</p>
+          <p className="mt-1 text-white/25">{t('footer.craftedBy')}</p>
           <Link 
             to="/admin" 
             className="inline-block mt-2 text-white/20 hover:text-white/40 transition-colors"
