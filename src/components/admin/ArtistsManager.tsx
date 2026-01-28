@@ -138,14 +138,6 @@ const ArtistsManager = () => {
         if (!updateData.picture || !updateData.picture.startsWith('data:')) {
           delete updateData.picture;
         }
-        // Debug: Log what we're sending
-        console.log('Updating artist with data:', {
-          id: editingArtist.id,
-          pressKitUrl: updateData.pressKitUrl,
-          stream1Url: updateData.stream1Url,
-          stream2Url: updateData.stream2Url,
-          stream3Url: updateData.stream3Url
-        });
         await updateArtist(editingArtist.id, updateData);
       } else {
         await addArtist(formData);
@@ -453,14 +445,11 @@ const ArtistsManager = () => {
                         const result = await response.json();
                         
                         if (result.success) {
-                          console.log('Press-kit uploaded successfully:', result);
                           setFormData(prev => ({ ...prev, pressKitUrl: result.filepath }));
                         } else {
-                          console.error('Press-kit upload failed:', result);
                           alert(result.message || 'Failed to upload press-kit');
                         }
                       } catch (error) {
-                        console.error('Error uploading press-kit:', error);
                         alert('Failed to upload press-kit');
                       } finally {
                         setUploadingPressKit(false);
@@ -750,8 +739,6 @@ const ArtistsManager = () => {
                       <ArtistImageUpload
                         artistId={artist.id}
                         onImagesUploaded={() => {
-                          console.log('Images uploaded successfully');
-                          // Force re-render to show new images
                           setShowImageUpload(prev => ({ ...prev, [artist.id]: true }));
                         }}
                       />

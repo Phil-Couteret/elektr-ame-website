@@ -2,17 +2,10 @@ import React, { useState, useRef } from 'react';
 import { Upload, X, Image as ImageIcon, CheckCircle, AlertCircle } from 'lucide-react';
 
 const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
-  console.log('🔵 MultiImageUpload component loaded - version with logging');
-  
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState({});
   const fileInputRef = useRef(null);
-  
-  // Log when component mounts
-  React.useEffect(() => {
-    console.log('🔵 MultiImageUpload mounted. Max files:', maxFiles);
-  }, []);
 
   const imageCategories = [
     { value: 'events', label: 'Events' },
@@ -24,16 +17,11 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
 
   const handleFileSelect = (event) => {
     const files = Array.from(event.target.files);
-    console.log('Files selected:', files.length, files.map(f => f.name));
-    
     const imageFiles = files.filter(file => file.type.startsWith('image/'));
-    console.log('Image files filtered:', imageFiles.length);
-    
     if (selectedFiles.length + imageFiles.length > maxFiles) {
       alert(`Maximum ${maxFiles} files allowed`);
       return;
     }
-    
     const newFiles = imageFiles.map(file => ({
       id: Date.now() + Math.random(),
       file,
@@ -41,8 +29,6 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       description: '',
       preview: URL.createObjectURL(file)
     }));
-    
-    console.log('Adding files to selection. Total files now:', selectedFiles.length + newFiles.length);
     setSelectedFiles(prev => [...prev, ...newFiles]);
   };
 
@@ -110,9 +96,6 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       formData.append('categories[]', fileData.category);
       formData.append('descriptions[]', fileData.description || '');
     });
-    
-    // Debug: Log what we're sending
-    console.log(`Uploading ${selectedFiles.length} image(s):`, selectedFiles.map(f => f.file.name));
 
     try {
       const response = await fetch('/api/upload-gallery-images.php', {
@@ -121,8 +104,6 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       });
 
       const result = await response.json();
-      
-      console.log('Upload response:', result);
 
       if (result.success) {
         setUploadStatus({ type: 'success', message: `${result.uploaded_count} image${result.uploaded_count !== 1 ? 's' : ''} uploaded successfully!` });
@@ -133,10 +114,8 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
       } else {
         const errorMsg = result.message || result.debug || 'Upload failed';
         setUploadStatus({ type: 'error', message: errorMsg });
-        console.error('Upload error:', result);
       }
     } catch (error) {
-      console.error('Upload error caught:', error);
       setUploadStatus({ type: 'error', message: `Network error: ${error.message}` });
     } finally {
       setUploading(false);
@@ -234,7 +213,6 @@ const MultiImageUpload = ({ onImagesUploaded, maxFiles = 20 }) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                console.log('Upload button clicked. Files to upload:', selectedFiles.length);
                 uploadImages();
               }}
               disabled={uploading || selectedFiles.length === 0}

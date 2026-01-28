@@ -51,13 +51,9 @@ const StreamModal = ({ isOpen, onClose, streamUrl, streamTitle }: StreamModalPro
       const favorites = JSON.parse(localStorage.getItem('favoriteStreams') || '[]');
       setIsFavorite(favorites.includes(streamUrl));
       
-      // Debug logging
       const url = getStreamUrl();
       const embedUrl = getEmbedUrl(url);
-      console.log('StreamModal - streamUrl:', streamUrl);
-      console.log('StreamModal - normalized URL:', url);
-      console.log('StreamModal - embed URL:', embedUrl);
-      
+
       // Show loading for a brief moment, then show iframe immediately
       // YouTube embeds load better when visible
       setIsLoading(true);
@@ -158,12 +154,8 @@ const StreamModal = ({ isOpen, onClose, streamUrl, streamTitle }: StreamModalPro
                 src={embedUrl}
                 className="absolute inset-0 w-full h-full border-0"
                 title={streamTitle}
-                onLoad={() => {
-                  console.log('StreamModal - iframe loaded successfully');
-                  setIsLoading(false);
-                }}
-                onError={(e) => {
-                  console.error('StreamModal - iframe error:', e);
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
                   setError('Failed to load stream. The URL may be invalid or blocked.');
                   setIsLoading(false);
                 }}

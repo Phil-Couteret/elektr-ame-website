@@ -8,11 +8,6 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
   const imageInputRef = useRef(null);
   const videoInputRef = useRef(null);
   
-  // Debug: Log when component mounts
-  React.useEffect(() => {
-    console.log('ArtistImageUpload mounted for artist ID:', artistId);
-  }, [artistId]);
-
   const imageCategories = [
     { value: 'profile', label: 'Profile Picture' },
     { value: 'stage', label: 'On Stage' },
@@ -24,14 +19,9 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
 
   const handleFileSelect = (event, isVideo = false) => {
     const files = Array.from(event.target.files);
-    console.log('Files selected:', files.length, 'isVideo:', isVideo);
-    
     const mediaFiles = isVideo 
       ? files.filter(file => file.type.startsWith('video/'))
       : files.filter(file => file.type.startsWith('image/'));
-    
-    console.log('Filtered media files:', mediaFiles.length);
-    
     const newFiles = mediaFiles.map(file => {
       const isVideoFile = file.type.startsWith('video/');
       return {
@@ -41,11 +31,9 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
         category: 'other',
         description: '',
         isProfilePicture: false,
-        preview: isVideoFile ? null : URL.createObjectURL(file) // Videos don't have preview URLs easily
+        preview: isVideoFile ? null : URL.createObjectURL(file)
       };
     });
-    
-    console.log('New files to add:', newFiles);
     setSelectedFiles(prev => [...prev, ...newFiles]);
   };
 
@@ -115,12 +103,7 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
   };
 
   const uploadImages = async () => {
-    console.log('uploadImages called, selectedFiles:', selectedFiles.length);
-    
-    if (selectedFiles.length === 0) {
-      console.warn('No files selected');
-      return;
-    }
+    if (selectedFiles.length === 0) return;
 
     setUploading(true);
     const formData = new FormData();
@@ -154,8 +137,6 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
       });
 
       const result = await response.json();
-      
-      console.log('Upload response:', result);
 
       if (result.success) {
         setUploadStatus({ type: 'success', message: `${result.uploaded_count} file(s) uploaded successfully!` });
@@ -167,10 +148,8 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
         const errorMessage = result.message || 'Upload failed';
         const errors = result.errors ? '\n' + result.errors.join('\n') : '';
         setUploadStatus({ type: 'error', message: errorMessage + errors });
-        console.error('Upload failed:', result);
       }
     } catch (error) {
-      console.error('Upload error:', error);
       setUploadStatus({ type: 'error', message: 'Network error during upload: ' + error.message });
     } finally {
       setUploading(false);
@@ -318,7 +297,6 @@ const ArtistImageUpload = ({ artistId, onImagesUploaded }) => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                console.log('Upload button clicked, files:', selectedFiles.length);
                 uploadImages();
               }}
               disabled={uploading || selectedFiles.length === 0}

@@ -118,14 +118,7 @@ export const usePublicData = () => {
         setEvents(events);
         setArtists(artists);
         setGallery(galleries);
-
-        console.log('Loaded data from API:', { 
-          events: events.length, 
-          artists: artists.length,
-          galleries: galleries.length
-        });
-      } catch (error) {
-        console.error('Failed to load public data:', error);
+      } catch (_error) {
         // Fallback to empty arrays on error
         setEvents([]);
         setArtists([]);

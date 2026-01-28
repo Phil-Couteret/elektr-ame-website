@@ -116,17 +116,12 @@ const GalleryManager = () => {
       }
 
       const result = await response.json();
-      console.log('Gallery images fetch result for gallery', galleryId, ':', result);
 
       if (result.success) {
         const imageList = result.data?.images || result.images || [];
-        console.log('Setting images for gallery', galleryId, ':', imageList.length, 'images');
         setImages(prev => ({ ...prev, [galleryId]: imageList }));
-      } else {
-        console.error('API returned success=false:', result);
       }
-    } catch (err) {
-      console.error('Error fetching gallery images:', err);
+    } catch (_err) {
     }
   };
 

@@ -310,16 +310,6 @@ export const useAdminData = () => {
         throw new Error(result.message || 'Failed to update artist');
       }
 
-      // Log the API response to see what was returned
-      console.log('Update API response:', result);
-      if (result.artist) {
-        console.log('Updated artist data from API:', {
-          id: result.artist.id,
-          pressKitUrl: result.artist.pressKitUrl,
-          stream1Url: result.artist.stream1Url
-        });
-      }
-
       // Reload artists from API
       const artistsResponse = await fetch('/api/artists-list.php', {
         credentials: 'include'
@@ -327,10 +317,7 @@ export const useAdminData = () => {
       const artistsData = await artistsResponse.json();
       
       const reloadedArtist = artistsData.artists?.find((a: any) => a.id.toString() === id);
-      console.log('Reloaded artists data (raw):', reloadedArtist);
-      console.log('Reloaded pressKitUrl (raw):', reloadedArtist?.pressKitUrl);
-      console.log('Reloaded press_kit_url (raw):', reloadedArtist?.press_kit_url);
-      
+
       const artists: Artist[] = (artistsData.artists || []).map((artist: any) => ({
         id: artist.id.toString(),
         name: artist.name,

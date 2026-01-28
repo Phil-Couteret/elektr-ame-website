@@ -75,10 +75,7 @@ const PaymentConfigManager = () => {
         credentials: 'include',
       });
 
-      // Get response text first to see what we're getting
       const responseText = await response.text();
-      console.log('Payment config response status:', response.status);
-      console.log('Payment config response text:', responseText);
 
       if (!response.ok) {
         // Try to parse as JSON for error message

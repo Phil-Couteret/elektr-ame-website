@@ -68,10 +68,7 @@ const PWAInstallPrompt = () => {
     // Show the install prompt
     await deferredPrompt.prompt();
 
-    // Wait for the user's response
     const { outcome } = await deferredPrompt.userChoice;
-
-    console.log(`[PWA] User ${outcome} the install prompt`);
 
     // Clear the deferredPrompt
     setDeferredPrompt(null);

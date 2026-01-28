@@ -58,23 +58,10 @@ const ArtistDetail = () => {
       if (result.success) {
         const foundArtist = result.artists.find((a: any) => a.id.toString() === artistId);
         if (foundArtist) {
-          console.log('Artist data (full):', foundArtist);
-          console.log('Press-kit URL:', foundArtist.pressKitUrl);
-          console.log('Press-kit URL (raw):', foundArtist.press_kit_url);
-          console.log('Press-kit URL truthy check:', !!foundArtist.pressKitUrl);
-          console.log('Stream URLs:', {
-            stream1: foundArtist.stream1Url,
-            stream2: foundArtist.stream2Url,
-            stream3: foundArtist.stream3Url
-          });
-          console.log('Artist status:', foundArtist.status);
           setArtist(foundArtist);
-        } else {
-          console.error('Artist not found in list. Available artists:', result.artists.map((a: any) => ({ id: a.id, name: a.name, status: a.status })));
         }
       }
-    } catch (error) {
-      console.error('Error fetching artist:', error);
+    } catch (_error) {
     } finally {
       setLoading(false);
     }
