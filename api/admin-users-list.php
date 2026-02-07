@@ -1,7 +1,7 @@
 <?php
 /**
  * List Admin Users API
- * Only accessible by superadmin
+ * Accessible by any admin. Superadmin account is never returned (hidden from the list).
  */
 
 session_start();
@@ -24,22 +24,15 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-// Check if user is superadmin
-if ($_SESSION['admin_role'] !== 'superadmin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Access denied. Superadmin only.']);
-    exit();
-}
-
 // Include database configuration
 require_once __DIR__ . '/config.php';
 
 try {
-    
-    // Get all admin users (exclude password_hash from response)
+    // Superadmin account is never shown in the list
     $stmt = $pdo->prepare("
         SELECT id, email, name, role, is_active, created_at, last_login
         FROM admin_users
+        WHERE role != 'superadmin'
         ORDER BY role DESC, email ASC
     ");
     $stmt->execute();

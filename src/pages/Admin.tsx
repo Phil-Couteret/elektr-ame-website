@@ -76,7 +76,7 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className={`grid w-full ${isSuperAdmin ? 'grid-cols-9' : 'grid-cols-8'} bg-black/40 border-white/10`}>
+          <TabsList className="grid w-full grid-cols-9 bg-black/40 border-white/10">
             <TabsTrigger 
               value="events" 
               className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
@@ -133,15 +133,13 @@ const Admin = () => {
               <CreditCard className="h-4 w-4 mr-2" />
               Payment
             </TabsTrigger>
-            {isSuperAdmin && (
-              <TabsTrigger 
-                value="users"
-                className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-              >
-                <UserCog className="h-4 w-4 mr-2" />
-                {t('admin.tabs.users')}
-              </TabsTrigger>
-            )}
+            <TabsTrigger 
+              value="users"
+              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
+            >
+              <UserCog className="h-4 w-4 mr-2" />
+              {t('admin.tabs.users')}
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="events" className="mt-6">
@@ -176,11 +174,9 @@ const Admin = () => {
             <PaymentConfigManager />
           </TabsContent>
 
-          {isSuperAdmin && (
-            <TabsContent value="users" className="mt-6">
-              <UsersManager />
-            </TabsContent>
-          )}
+          <TabsContent value="users" className="mt-6">
+            <UsersManager />
+          </TabsContent>
         </Tabs>
       </main>
     </div>

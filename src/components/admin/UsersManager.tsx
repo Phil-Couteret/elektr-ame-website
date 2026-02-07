@@ -25,7 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, Shield, User as UserIcon, CheckCircle, XCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { UserPlus, Shield, User as UserIcon, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface AdminUser {
@@ -43,6 +52,11 @@ const UsersManager = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", password: "" });
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   // Form state for new user
@@ -127,6 +141,71 @@ const UsersManager = () => {
       });
     } finally {
       setIsCreating(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      const response = await fetch('/api/admin-users-delete.php', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ id: deleteTarget.id }),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        toast({ title: "Success", description: "Admin user deleted successfully" });
+        setDeleteTarget(null);
+        fetchUsers();
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to delete user", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Network error occurred", variant: "destructive" });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleOpenEdit = (user: AdminUser) => {
+    setEditingUser(user);
+    setEditForm({ name: user.name, email: user.email, password: "" });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingUser) return;
+    if (!editForm.name.trim() || !editForm.email.trim()) {
+      toast({ title: "Validation Error", description: "Name and email are required", variant: "destructive" });
+      return;
+    }
+    setIsSaving(true);
+    try {
+      const body: { id: number; name: string; email: string; password?: string } = {
+        id: editingUser.id,
+        name: editForm.name.trim(),
+        email: editForm.email.trim(),
+      };
+      if (editForm.password) body.password = editForm.password;
+      const response = await fetch('/api/admin-users-update.php', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        toast({ title: "Success", description: "User updated successfully" });
+        setEditingUser(null);
+        fetchUsers();
+      } else {
+        toast({ title: "Error", description: data.message || "Failed to update user", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Error", description: "Network error occurred", variant: "destructive" });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -236,11 +315,32 @@ const UsersManager = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleToggleActive(user.id, user.is_active)}
-                        className="border-white/20 text-white hover:bg-white/10"
+                        onClick={() => handleOpenEdit(user)}
+                        className="bg-transparent border-white/40 text-white hover:bg-white/10 hover:border-white/60"
+                        title="Edit name, email, password"
                       >
-                        {user.is_active ? 'Deactivate' : 'Activate'}
+                        <Pencil className="h-4 w-4" />
                       </Button>
+                      {user.role !== 'superadmin' && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleToggleActive(user.id, user.is_active)}
+                            className="bg-transparent border-white/40 text-white hover:bg-white/10 hover:border-white/60"
+                          >
+                            {user.is_active ? 'Deactivate' : 'Activate'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDeleteTarget(user)}
+                            className="bg-transparent border-red-400/60 text-red-400 hover:bg-red-400/20"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -326,6 +426,79 @@ const UsersManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Edit User Dialog */}
+      <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+        <DialogContent className="bg-deep-purple border-white/10">
+          <DialogHeader>
+            <DialogTitle className="text-white">Edit admin user</DialogTitle>
+            <DialogDescription className="text-white/70">
+              Update name, email, or password. Leave password blank to keep the current one.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-white">Full Name</Label>
+              <Input
+                value={editForm.name}
+                onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                placeholder="Full name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-white">Email (@elektr-ame.com)</Label>
+              <Input
+                type="email"
+                value={editForm.email}
+                onChange={(e) => setEditForm((f) => ({ ...f, email: e.target.value }))}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                placeholder="user@elektr-ame.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-white">New password (optional)</Label>
+              <Input
+                type="password"
+                value={editForm.password}
+                onChange={(e) => setEditForm((f) => ({ ...f, password: e.target.value }))}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                placeholder="Leave blank to keep current"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingUser(null)} className="border-white/20 text-white hover:bg-white/10">
+              Cancel
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={isSaving} className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple">
+              {isSaving ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent className="bg-deep-purple border-white/10">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-white">Delete admin user?</AlertDialogTitle>
+            <AlertDialogDescription className="text-white/70">
+              This will permanently remove {deleteTarget?.name} ({deleteTarget?.email}) from the admin portal. They will no longer be able to log in.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-white/20 text-white hover:bg-white/10" disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <Button
+              onClick={handleDeleteUser}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

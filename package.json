@@ -1,9 +1,10 @@
 {
   "name": "elektr-ame-website",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.1",
   "type": "module",
   "scripts": {
+    "generate-hash": "node scripts/generate-password-hash.js",
     "dev": "vite",
     "build": "vite build",
     "build:ovh": "vite build && cp -r dist/* . && cp -r api . && cp -r database . && cp ovh-deployment/.htaccess .htaccess",
@@ -67,6 +68,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
+    "bcryptjs": "^2.4.3",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",

@@ -1,7 +1,7 @@
 <?php
 /**
  * Update Admin User API
- * Only accessible by superadmin
+ * Accessible by any admin. Superadmin account cannot be modified (prevents accidental lockout).
  */
 
 session_start();
@@ -30,13 +30,6 @@ if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== tru
     exit();
 }
 
-// Check if user is superadmin
-if ($_SESSION['admin_role'] !== 'superadmin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Access denied. Superadmin only.']);
-    exit();
-}
-
 // Include database configuration
 require_once __DIR__ . '/config.php';
 
@@ -49,6 +42,36 @@ try {
     }
     
     $userId = (int)$input['id'];
+    $isSelf = ($_SESSION['admin_id'] == $userId);
+    
+    $checkStmt = $pdo->prepare("SELECT role FROM admin_users WHERE id = :id");
+    $checkStmt->execute([':id' => $userId]);
+    $target = $checkStmt->fetch(PDO::FETCH_ASSOC);
+    if (!$target) {
+        throw new Exception('User not found');
+    }
+    
+    // Superadmin account: only the owner can update it, and only name/email/password (no deactivate, no role change)
+    if ($target['role'] === 'superadmin') {
+        if (!$isSelf) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Cannot modify superadmin account.']);
+            exit();
+        }
+        $input['is_active'] = null;
+        $input['role'] = null;
+    }
+    
+    // Only superadmin can assign superadmin role (and cannot change own role)
+    if (isset($input['role']) && $input['role'] === 'superadmin' && $_SESSION['admin_role'] !== 'superadmin') {
+        unset($input['role']);
+    }
+    if ($isSelf && isset($input['role'])) {
+        unset($input['role']);
+    }
+    if ($isSelf && isset($input['is_active'])) {
+        unset($input['is_active']);
+    }
     
     // Build update query dynamically based on provided fields
     $updates = [];
@@ -57,6 +80,24 @@ try {
     if (isset($input['name']) && !empty($input['name'])) {
         $updates[] = "name = :name";
         $params[':name'] = trim($input['name']);
+    }
+    
+    if (isset($input['email']) && !empty($input['email'])) {
+        $email = filter_var(trim($input['email']), FILTER_SANITIZE_EMAIL);
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            throw new Exception('Invalid email format');
+        }
+        $emailDomain = substr(strrchr($email, "@"), 1);
+        if (strtolower($emailDomain) !== 'elektr-ame.com') {
+            throw new Exception('Only @elektr-ame.com email addresses are allowed');
+        }
+        $dupStmt = $pdo->prepare("SELECT id FROM admin_users WHERE email = :email AND id != :id");
+        $dupStmt->execute([':email' => $email, ':id' => $userId]);
+        if ($dupStmt->fetch()) {
+            throw new Exception('Email already in use');
+        }
+        $updates[] = "email = :email";
+        $params[':email'] = $email;
     }
     
     if (isset($input['is_active'])) {

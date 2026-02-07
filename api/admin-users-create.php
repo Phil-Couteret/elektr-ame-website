@@ -1,7 +1,7 @@
 <?php
 /**
  * Create Admin User API
- * Only accessible by superadmin
+ * Accessible by any admin. Only superadmin can create another superadmin.
  */
 
 session_start();
@@ -27,13 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit();
-}
-
-// Check if user is superadmin
-if ($_SESSION['admin_role'] !== 'superadmin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Access denied. Superadmin only.']);
     exit();
 }
 
@@ -64,9 +57,12 @@ try {
         throw new Exception('Only @elektr-ame.com email addresses are allowed');
     }
     
-    // Validate role
+    // Validate role; only superadmin can create another superadmin
     if (!in_array($role, ['admin', 'superadmin'])) {
         throw new Exception('Invalid role');
+    }
+    if ($role === 'superadmin' && $_SESSION['admin_role'] !== 'superadmin') {
+        $role = 'admin';
     }
     
     // Check if email already exists
