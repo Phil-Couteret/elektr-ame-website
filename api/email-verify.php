@@ -192,11 +192,8 @@ try {
     $message .= "Best regards,\n";
     $message .= "The Elektr-Âme Team";
     
-    $headers = "From: noreply@elektr-ame.com\r\n";
-    $headers .= "Reply-To: info@elektr-ame.com\r\n";
-    $headers .= "X-Mailer: PHP/" . phpversion();
-    
-    mail($member['email'], $subject, $message, $headers);
+    require_once __DIR__ . '/classes/Mailer.php';
+    Mailer::send($member['email'], $subject, $message, ['toName' => $member['first_name'] ?? '']);
     
     // Return success
     echo json_encode([

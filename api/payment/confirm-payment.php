@@ -4,11 +4,10 @@ ob_start();
 
 session_start();
 
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../cors-headers.php';
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Credentials: true');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -18,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Clear any output that might have been generated
 ob_clean();
 
-require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../classes/StripePayment.php';
 require_once __DIR__ . '/../classes/EmailAutomation.php';
 
@@ -70,14 +68,15 @@ try {
         throw new Exception('Payment not completed. Status: ' . $session['payment_status']);
     }
     
-    // Get metadata
+    // Get metadata - payment results in yearly (basic/sponsor) or lifetime
     $metadata = $session['metadata'] ?? [];
     $memberId = isset($metadata['member_id']) ? (int)$metadata['member_id'] : null;
-    $membershipType = $metadata['membership_type'] ?? null;
+    $txMembershipType = $metadata['membership_type'] ?? null;
+    $membershipType = ($txMembershipType === 'lifetime') ? 'lifetime' : 'yearly';
     $membershipStartDate = $metadata['membership_start_date'] ?? date('Y-m-d');
     $membershipEndDate = $metadata['membership_end_date'] ?? null;
     
-    if (!$memberId || !$membershipType) {
+    if (!$memberId || !$txMembershipType) {
         throw new Exception('Invalid session metadata');
     }
     
@@ -170,20 +169,18 @@ try {
             'high'
         );
         
-        // If sponsor, send tax receipt
-        if ($membershipType === 'sponsor' && $amount > 40) {
-            $emailAutomation->queueEmail(
-                $member['email'],
-                $member['first_name'] . ' ' . $member['last_name'],
-                'sponsor_tax_receipt',
-                [
-                    'first_name' => $member['first_name'],
-                    'amount' => number_format($amount, 2),
-                    'date' => date('Y-m-d'),
-                ],
-                $memberId,
-                'normal'
-            );
+        // Tax receipt PDF for Spain residents only (IRPF applies in Spain)
+        $memberCountry = $member['country'] ?? '';
+        $isSpain = $emailAutomation->isSpainResident($memberCountry);
+        if ($amount >= 20 && $isSpain) {
+            $memberForTax = array_merge($member, ['payment_amount' => $amount, 'membership_type' => $membershipType]);
+            $variables = $emailAutomation->preparePaymentTaxVariables($memberForTax);
+            $sent = $emailAutomation->sendTaxReceiptPdf($memberId, $variables);
+            if (!$sent) {
+                error_log("Tax receipt send failed for member_id=$memberId, email={$member['email']}");
+            }
+        } else {
+            error_log("Tax receipt skipped: member_id=$memberId, country=" . ($memberCountry ?: 'empty') . ", isSpain=" . ($isSpain ? 'yes' : 'no') . ", amount=$amount");
         }
         
         // Process email queue

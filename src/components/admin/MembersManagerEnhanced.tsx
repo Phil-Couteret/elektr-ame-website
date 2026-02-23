@@ -20,7 +20,7 @@ interface Member {
   city: string;
   country: string;
   status: 'pending' | 'approved' | 'rejected';
-  membership_type?: 'free_trial' | 'monthly' | 'yearly' | 'lifetime';
+  membership_type?: 'in_progress' | 'yearly' | 'lifetime';
   membership_start_date?: string;
   membership_end_date?: string;
   payment_status?: 'unpaid' | 'paid' | 'overdue';
@@ -205,8 +205,7 @@ const MembersManager = () => {
     if (!type) return <span className="text-white/40">-</span>;
     
     const config: Record<string, { label: string, color: string }> = {
-      free_trial: { label: 'Free Trial', color: 'bg-gray-500' },
-      monthly: { label: 'Monthly', color: 'bg-blue-500' },
+      in_progress: { label: 'In Progress', color: 'bg-gray-500' },
       yearly: { label: 'Yearly', color: 'bg-purple-500' },
       lifetime: { label: 'Lifetime', color: 'bg-green-500' }
     };

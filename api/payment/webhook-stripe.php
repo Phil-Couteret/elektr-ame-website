@@ -92,6 +92,10 @@ try {
             case 'charge.refunded':
                 $processed = handleChargeRefunded($pdo, $stripe, $event['data']['object']);
                 break;
+
+            case 'checkout.session.expired':
+                $processed = handleCheckoutExpired($pdo, $stripe, $event['data']['object']);
+                break;
                 
             default:
                 // Unknown event type, log but don't error
@@ -129,6 +133,7 @@ try {
 
 /**
  * Handle checkout.session.completed event
+ * Also sends emails (confirmation, tax receipt) - webhook is reliable vs confirm-payment which can fail if session is lost after Stripe redirect
  */
 function handleCheckoutCompleted($pdo, $stripe, $session) {
     $sessionId = $session['id'];
@@ -147,12 +152,14 @@ function handleCheckoutCompleted($pdo, $stripe, $session) {
         json_encode($session)
     );
     
-    // Update member
-    $membershipType = $metadata['membership_type'] ?? null;
+    // Update member - payment results in yearly (basic/sponsor) or lifetime (admin-only type, but can be paid)
+    $txMembershipType = $metadata['membership_type'] ?? null;
+    $membershipType = ($txMembershipType === 'lifetime') ? 'lifetime' : 'yearly';
     $membershipStartDate = $metadata['membership_start_date'] ?? date('Y-m-d');
     $membershipEndDate = $metadata['membership_end_date'] ?? null;
     $amount = $session['amount_total'] / 100;
     
+    $termsVersion = '2026-01';
     $updateStmt = $pdo->prepare("
         UPDATE members SET
             membership_type = ?,
@@ -161,6 +168,9 @@ function handleCheckoutCompleted($pdo, $stripe, $session) {
             payment_status = 'paid',
             payment_amount = ?,
             last_payment_date = CURDATE(),
+            payment_method = 'stripe',
+            terms_accepted_at = COALESCE(terms_accepted_at, NOW()),
+            terms_version = COALESCE(terms_version, ?),
             updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
     ");
@@ -170,8 +180,38 @@ function handleCheckoutCompleted($pdo, $stripe, $session) {
         $membershipStartDate,
         $membershipEndDate,
         $amount,
+        $termsVersion,
         $memberId
     ]);
+    
+    // Send emails (webhook is reliable - confirm-payment can fail if session lost after Stripe redirect)
+    try {
+        $memberStmt = $pdo->prepare("SELECT * FROM members WHERE id = ?");
+        $memberStmt->execute([$memberId]);
+        $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
+        if ($member) {
+            $emailAutomation = new EmailAutomation($pdo);
+            $recipientName = $member['first_name'] . ' ' . ($member['last_name'] ?? $member['second_name'] ?? '');
+            $isFirstPayment = empty($member['last_payment_date']) || $member['payment_status'] !== 'paid';
+            if ($isFirstPayment) {
+                $emailAutomation->queueEmail($member['email'], $recipientName, 'member_welcome', ['first_name' => $member['first_name'], 'membership_type' => ucfirst($membershipType)], $memberId, 'high');
+            }
+            $emailAutomation->queueEmail($member['email'], $recipientName, 'payment_confirmation', [
+                'first_name' => $member['first_name'],
+                'amount' => number_format($amount, 2),
+                'membership_type' => ucfirst($membershipType),
+                'date' => date('Y-m-d'),
+            ], $memberId, 'high');
+            if ($amount >= 20 && $emailAutomation->isSpainResident($member['country'] ?? '')) {
+                $memberForTax = array_merge($member, ['payment_amount' => $amount, 'membership_type' => $membershipType]);
+                $variables = $emailAutomation->preparePaymentTaxVariables($memberForTax);
+                $emailAutomation->sendTaxReceiptPdf($memberId, $variables);
+            }
+            $emailAutomation->processQueue(10);
+        }
+    } catch (Exception $e) {
+        error_log("Webhook email send error: " . $e->getMessage());
+    }
     
     return true;
 }
@@ -215,13 +255,29 @@ function handlePaymentIntentFailed($pdo, $stripe, $paymentIntent) {
 }
 
 /**
+ * Handle checkout.session.expired event (user abandoned checkout)
+ */
+function handleCheckoutExpired($pdo, $stripe, $session) {
+    $sessionId = $session['id'];
+    $stripe->updateTransactionStatus(
+        $sessionId,
+        'cancelled',
+        'Checkout session expired',
+        json_encode($session)
+    );
+    return true;
+}
+
+/**
  * Handle charge.refunded event
+ * Charge provides payment_intent (pi_xxx); Checkout Sessions store session_id (cs_xxx).
+ * Use updateTransactionStatusByPaymentIntent to find by payment_intent_id column.
  */
 function handleChargeRefunded($pdo, $stripe, $charge) {
     $paymentIntentId = $charge['payment_intent'] ?? null;
     
     if ($paymentIntentId) {
-        $stripe->updateTransactionStatus(
+        $stripe->updateTransactionStatusByPaymentIntent(
             $paymentIntentId,
             'refunded',
             'Charge refunded',

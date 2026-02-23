@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Link } from "react-router-dom";
 import { CreditCard, Loader2, AlertCircle, CheckCircle, Euro, Calendar, Info, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -25,6 +26,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
   const [currentStep, setCurrentStep] = useState<PaymentStep>('selection');
   const [isProcessing, setIsProcessing] = useState(false);
   const [taxCalculation, setTaxCalculation] = useState<TaxDeductionResult | null>(null);
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
 
@@ -117,6 +119,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
         body: JSON.stringify({
           membership_type: membershipType,
           amount: amount,
+          terms_accepted: acceptTerms,
         }),
       });
 
@@ -165,31 +168,57 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
         {currentStep === 'selection' && (
           <>
             <div>
-              <Label className="text-white mb-2 block">Membership Type</Label>
-              <Select 
-                value={selectedType} 
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <span className="bg-electric-blue/20 px-2 py-0.5 rounded text-electric-blue">1</span>
+                Membership Type
+              </h3>
+              <RadioGroup
+                value={selectedType}
                 onValueChange={(value: 'basic' | 'custom') => {
                   setSelectedType(value);
                   if (value === 'basic') {
                     setCustomAmount('');
                   }
                 }}
+                className="grid gap-3"
               >
-                <SelectTrigger className="bg-black/40 border-white/10 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-deep-purple border-white/10">
-                  <SelectItem value="basic" className="text-white">
-                    Basic - €{BASIC_MEMBERSHIP_PRICE.toFixed(2)}/year
-                  </SelectItem>
-                  <SelectItem value="custom" className="text-white">
-                    Free Amount (minimum €{MINIMUM_CUSTOM_AMOUNT.toFixed(2)})
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-white/60 text-sm mt-2">
-                {getMembershipDescription(selectedType)}
-              </p>
+                <label
+                  htmlFor="basic"
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    selectedType === 'basic'
+                      ? 'border-electric-blue bg-electric-blue/10'
+                      : 'border-white/20 bg-black/20 hover:border-white/40 hover:bg-black/30'
+                  }`}
+                >
+                  <RadioGroupItem value="basic" id="basic" className="mt-1 text-electric-blue border-white/40" />
+                  <div className="flex-1">
+                    <span className="font-semibold text-white block">
+                      Basic - €{BASIC_MEMBERSHIP_PRICE.toFixed(2)}/year
+                    </span>
+                    <span className="text-white/70 text-sm mt-1 block">
+                      {getMembershipDescription('basic')}
+                    </span>
+                  </div>
+                </label>
+                <label
+                  htmlFor="custom"
+                  className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                    selectedType === 'custom'
+                      ? 'border-electric-blue bg-electric-blue/10'
+                      : 'border-white/20 bg-black/20 hover:border-white/40 hover:bg-black/30'
+                  }`}
+                >
+                  <RadioGroupItem value="custom" id="custom" className="mt-1 text-electric-blue border-white/40" />
+                  <div className="flex-1">
+                    <span className="font-semibold text-white block">
+                      Free Amount (minimum €{MINIMUM_CUSTOM_AMOUNT.toFixed(2)})
+                    </span>
+                    <span className="text-white/70 text-sm mt-1 block">
+                      {getMembershipDescription('custom')}
+                    </span>
+                  </div>
+                </label>
+              </RadioGroup>
             </div>
 
             {/* Amount Input (for custom) */}
@@ -350,6 +379,28 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                   </AlertDescription>
                 </Alert>
               )}
+
+              {/* Terms acceptance */}
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                    className="mt-1 rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                  />
+                  <span className="text-white/90 text-sm">
+                    {t('payment.acceptTerms')}{' '}
+                    <Link to="/terms-and-conditions" className="text-electric-blue hover:underline" target="_blank">
+                      {t('payment.termsLink')}
+                    </Link>
+                    {' '}{t('payment.and')}{' '}
+                    <Link to="/privacy-policy" className="text-electric-blue hover:underline" target="_blank">
+                      {t('payment.privacyLink')}
+                    </Link>
+                  </span>
+                </label>
+              </div>
             </div>
 
             {/* Action Buttons - Step 2 */}
@@ -364,8 +415,8 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
               </Button>
               <Button
                 onClick={handlePayment}
-                disabled={isProcessing}
-                className="flex-1 bg-electric-blue hover:bg-electric-blue/80 text-deep-purple"
+                disabled={isProcessing || !acceptTerms}
+                className="flex-1 bg-electric-blue hover:bg-electric-blue/80 text-deep-purple disabled:opacity-50"
               >
                 {isProcessing ? (
                   <>

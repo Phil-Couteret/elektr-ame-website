@@ -54,6 +54,8 @@ try {
             payment_status,
             payment_amount,
             inviter_id,
+            terms_accepted_at,
+            terms_version,
             is_dj,
             is_producer,
             is_vj,

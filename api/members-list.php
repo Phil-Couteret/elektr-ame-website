@@ -23,8 +23,15 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
 require_once __DIR__ . '/config.php';
 
 try {
-    
+    // Check if payment_method column exists (for backward compatibility)
+    $hasPaymentMethod = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'payment_method'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasPaymentMethod = true;
+    }
+
     // Get all members ordered by creation date (newest first)
+    $paymentMethodCol = $hasPaymentMethod ? ', payment_method' : '';
     $stmt = $pdo->query("
         SELECT 
             id,
@@ -44,7 +51,8 @@ try {
             membership_end_date,
             payment_status,
             last_payment_date,
-            payment_amount,
+            payment_amount
+            $paymentMethodCol,
             is_dj,
             is_producer,
             is_vj,

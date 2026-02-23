@@ -59,14 +59,36 @@ const Contact = () => {
                   </div>
                 </div>
                 
+                <div className="flex items-start gap-4 border-b border-white/10 pb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-electric-blue/20 text-electric-blue">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-white">Secretaria</h3>
+                    <p className="text-white/70">Valérie</p>
+                    <a href="mailto:secretaria@elektr-ame.com" className="text-electric-blue hover:underline">secretaria at elektr-ame.com</a>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-4 border-b border-white/10 pb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-electric-blue/20 text-electric-blue">
+                    <Mail className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-white">Vice presidente</h3>
+                    <p className="text-white/70">Phil</p>
+                    <a href="mailto:vice-presidente@elektr-ame.com" className="text-electric-blue hover:underline">vice-presidente at elektr-ame.com</a>
+                  </div>
+                </div>
+                
                 <div className="flex items-start gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-electric-blue/20 text-electric-blue">
                     <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="font-medium text-white">Secretario</h3>
-                    <p className="text-white/70">Phil</p>
-                    <p className="text-electric-blue">secretario at elektr-ame.com</p>
+                    <h3 className="font-medium text-white">Communication and Public Relation</h3>
+                    <p className="text-white/70">Rollie</p>
+                    <a href="mailto:rrpp@elektr-ame.com" className="text-electric-blue hover:underline">rrpp at elektr-ame.com</a>
                   </div>
                 </div>
               </div>

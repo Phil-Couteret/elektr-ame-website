@@ -8,7 +8,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import PaymentCheckout from "./PaymentCheckout";
 
 interface MembershipRenewalProps {
-  currentMembershipType: 'free' | 'basic' | 'sponsor' | 'lifetime';
+  currentMembershipType: 'in_progress' | 'yearly' | 'lifetime';
   membershipEndDate?: string;
   onRenewalComplete?: () => void;
 }
@@ -114,14 +114,11 @@ const MembershipRenewal = ({
         <div className="bg-white/5 rounded-lg p-4 border border-white/10">
           <h3 className="text-white font-semibold mb-2">Renewal Options</h3>
           <div className="space-y-2 text-sm text-white/80">
-            {currentMembershipType === 'free' && (
-              <p>Upgrade to Basic membership (€20/year) to unlock all member benefits.</p>
+            {currentMembershipType === 'in_progress' && (
+              <p>Complete your membership payment (€20/year) to unlock all member benefits.</p>
             )}
-            {currentMembershipType === 'basic' && (
-              <p>Renew your Basic membership (€20/year) or choose a custom amount (€20+) for tax benefits.</p>
-            )}
-            {currentMembershipType === 'sponsor' && (
-              <p>Renew your membership. Choose any amount above €20 to continue receiving tax benefits.</p>
+            {currentMembershipType === 'yearly' && (
+              <p>Renew your yearly membership. Choose €20 for basic or any amount above €20 for tax benefits.</p>
             )}
           </div>
         </div>

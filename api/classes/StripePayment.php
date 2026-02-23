@@ -2,9 +2,13 @@
 /**
  * Stripe Payment Handler
  * Handles all Stripe API interactions for payment processing
+ *
+ * API Version: 2026-01-28.clover (pinned for consistent behavior)
  */
 
 class StripePayment {
+    private const STRIPE_API_VERSION = '2026-01-28.clover';
+
     private $db;
     private $secretKey;
     private $publicKey;
@@ -61,6 +65,7 @@ class StripePayment {
         
         $headers = [
             'Authorization: Bearer ' . $this->secretKey,
+            'Stripe-Version: ' . self::STRIPE_API_VERSION,
         ];
         
         if ($method === 'POST') {
@@ -264,9 +269,9 @@ class StripePayment {
             $successUrl = $baseUrl . '/payment-success?session_id={CHECKOUT_SESSION_ID}';
             $cancelUrl = $baseUrl . '/payment-cancelled';
             
-            // Build session data with nested arrays for Stripe API
+            // Build session data - omit payment_method_types for dynamic methods
+            // (Stripe chooses best options per user: cards, wallets, etc.)
             $sessionData = [
-                'payment_method_types' => ['card'],
                 'line_items' => [[
                     'price_data' => [
                         'currency' => strtolower($currency),
@@ -295,8 +300,9 @@ class StripePayment {
             }
             
             $response = $this->makeRequest('checkout/sessions', 'POST', $sessionData);
-            
-            // Store transaction
+            $paymentIntentId = $response['payment_intent'] ?? null;
+
+            // Store transaction (include payment_intent_id for refund webhook lookup)
             $this->storeTransaction(
                 $memberId,
                 $response['id'],
@@ -306,7 +312,8 @@ class StripePayment {
                 $membershipType,
                 $startDate,
                 $endDate,
-                json_encode($response)
+                json_encode($response),
+                $paymentIntentId
             );
             
             return [
@@ -392,20 +399,22 @@ class StripePayment {
     
     /**
      * Store transaction in database
+     * @param string|null $paymentIntentId Optional - for refund webhook lookup (charge.refunded uses pi_xxx)
      */
-    private function storeTransaction($memberId, $transactionId, $amount, $currency, $status, $membershipType, $startDate, $endDate, $gatewayResponse) {
+    private function storeTransaction($memberId, $transactionId, $amount, $currency, $status, $membershipType, $startDate, $endDate, $gatewayResponse, $paymentIntentId = null) {
         try {
             $stmt = $this->db->prepare("
                 INSERT INTO payment_transactions (
-                    member_id, transaction_id, payment_gateway, amount, currency,
+                    member_id, transaction_id, payment_intent_id, payment_gateway, amount, currency,
                     status, membership_type, membership_start_date, membership_end_date,
                     gateway_response
-                ) VALUES (?, ?, 'stripe', ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, 'stripe', ?, ?, ?, ?, ?, ?, ?)
             ");
             
             $stmt->execute([
                 $memberId,
                 $transactionId,
+                $paymentIntentId,
                 $amount,
                 $currency,
                 $status,
@@ -417,13 +426,28 @@ class StripePayment {
             
             return $this->db->lastInsertId();
         } catch (PDOException $e) {
+            if ($paymentIntentId !== null && strpos($e->getMessage(), 'payment_intent_id') !== false) {
+                // Fallback for DBs without migration - insert without payment_intent_id
+                $stmt = $this->db->prepare("
+                    INSERT INTO payment_transactions (
+                        member_id, transaction_id, payment_gateway, amount, currency,
+                        status, membership_type, membership_start_date, membership_end_date,
+                        gateway_response
+                    ) VALUES (?, ?, 'stripe', ?, ?, ?, ?, ?, ?, ?)
+                ");
+                $stmt->execute([
+                    $memberId, $transactionId, $amount, $currency, $status,
+                    $membershipType, $startDate, $endDate, $gatewayResponse
+                ]);
+                return $this->db->lastInsertId();
+            }
             error_log("Store transaction error: " . $e->getMessage());
             throw $e;
         }
     }
     
     /**
-     * Update transaction status
+     * Update transaction status by transaction_id (session_id or payment_intent_id)
      */
     public function updateTransactionStatus($transactionId, $status, $errorMessage = null, $gatewayResponse = null) {
         try {
@@ -441,6 +465,37 @@ class StripePayment {
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             error_log("Update transaction error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Update transaction status by payment_intent_id (for charge.refunded webhook)
+     * Checkout Sessions store session_id; charge.refunded provides payment_intent
+     */
+    public function updateTransactionStatusByPaymentIntent($paymentIntentId, $status, $errorMessage = null, $gatewayResponse = null) {
+        try {
+            $stmt = $this->db->prepare("
+                UPDATE payment_transactions 
+                SET status = ?, 
+                    error_message = ?,
+                    gateway_response = COALESCE(?, gateway_response),
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE payment_intent_id = ?
+            ");
+            
+            $stmt->execute([$status, $errorMessage, $gatewayResponse, $paymentIntentId]);
+            
+            if ($stmt->rowCount() > 0) {
+                return true;
+            }
+            // Fallback: for PaymentIntent flow, transaction_id IS the payment_intent_id
+            return $this->updateTransactionStatus($paymentIntentId, $status, $errorMessage, $gatewayResponse);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'payment_intent_id') !== false) {
+                return $this->updateTransactionStatus($paymentIntentId, $status, $errorMessage, $gatewayResponse);
+            }
+            error_log("Update transaction by payment_intent error: " . $e->getMessage());
             throw $e;
         }
     }

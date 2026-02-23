@@ -24,6 +24,7 @@ const joinUsSchema = z.object({
   zipCode: z.string().optional(),
   city: z.string().min(2, "City must be at least 2 characters"),
   country: z.string().min(2, "Country must be at least 2 characters"),
+  acceptTerms: z.literal(true, { errorMap: () => ({ message: "You must accept the terms and conditions" }) }),
   isDj: z.boolean().optional(),
   isProducer: z.boolean().optional(),
   isVj: z.boolean().optional(),
@@ -366,6 +367,30 @@ const JoinUs = () => {
                       <p className="text-red-400 text-sm">{errors.country.message}</p>
                     )}
                   </div>
+                </div>
+
+                {/* Terms acceptance */}
+                <div className="space-y-3 pt-2">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      {...register('acceptTerms')}
+                      className="mt-1 rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                    />
+                    <span className="text-white/90 text-sm">
+                      {t('joinUs.acceptTerms')}{' '}
+                      <Link to="/terms-and-conditions" className="text-electric-blue hover:underline" target="_blank">
+                        {t('joinUs.termsLink')}
+                      </Link>
+                      {' '}{t('joinUs.and')}{' '}
+                      <Link to="/privacy-policy" className="text-electric-blue hover:underline" target="_blank">
+                        {t('joinUs.privacyLink')}
+                      </Link>
+                    </span>
+                  </label>
+                  {errors.acceptTerms && (
+                    <p className="text-red-400 text-sm">{errors.acceptTerms.message}</p>
+                  )}
                 </div>
 
                 {/* Submit button */}

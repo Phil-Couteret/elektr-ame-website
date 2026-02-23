@@ -172,9 +172,9 @@ const PaymentSuccess = () => {
                 <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-4">
                   <p className="text-blue-300 text-sm">
                     ✅ A confirmation email has been sent to your email address.
-                    {paymentData?.membership_type === 'sponsor' && (
+                    {paymentData?.amount >= 20 && (
                       <span className="block mt-2">
-                        📧 Your tax receipt will be sent separately.
+                        📄 Spain residents: your tax receipt PDF has been sent to your email.
                       </span>
                     )}
                   </p>

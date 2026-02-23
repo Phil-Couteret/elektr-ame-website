@@ -106,12 +106,8 @@ try {
         $message .= "Best regards,\n";
         $message .= "The Elektr-Âme Team";
         
-        $headers = "From: noreply@elektr-ame.com\r\n";
-        $headers .= "Reply-To: info@elektr-ame.com\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion();
-        
-        // Send email
-        $emailSent = mail($email, $subject, $message, $headers);
+        require_once __DIR__ . '/classes/Mailer.php';
+        $emailSent = Mailer::send($email, $subject, $message, ['toName' => $member['first_name'] ?? '']);
         
         if (!$emailSent) {
             error_log("Failed to send password reset email to: " . $email);

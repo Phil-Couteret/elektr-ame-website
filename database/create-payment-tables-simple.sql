@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     member_id INT NOT NULL,
     transaction_id VARCHAR(255) UNIQUE NOT NULL,
+    payment_intent_id VARCHAR(255) NULL,
     payment_gateway ENUM('stripe', 'paypal', 'redsys', 'bank_transfer') NOT NULL DEFAULT 'stripe',
     amount DECIMAL(10, 2) NOT NULL,
     currency VARCHAR(3) DEFAULT 'EUR',
@@ -21,6 +22,7 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_member_id (member_id),
     INDEX idx_transaction_id (transaction_id),
+    INDEX idx_payment_intent_id (payment_intent_id),
     INDEX idx_status (status),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

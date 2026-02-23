@@ -101,15 +101,8 @@ try {
 </body>
 </html>";
 
-        // Email headers
-        $headers = "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $headers .= "From: {$fromName} <{$fromEmail}>\r\n";
-        $headers .= "Reply-To: {$replyTo}\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
-
-        // Send email
-        if (mail($subscriber['email'], $subject, $htmlContent, $headers)) {
+        require_once __DIR__ . '/classes/Mailer.php';
+        if (Mailer::send($subscriber['email'], $subject, $htmlContent, ['isHtml' => true])) {
             $sentCount++;
         } else {
             $failedCount++;

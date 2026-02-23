@@ -268,12 +268,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($allocationType === 'membership_years') {
                 $endDate = date('Y-m-d', strtotime("+{$allocationYears} years", strtotime($startDate)));
-                $newMembershipType = 'basic';
             } else {
                 // sponsor_donation - 1 year
                 $endDate = date('Y-m-d', strtotime('+1 year', strtotime($startDate)));
-                $newMembershipType = 'sponsor';
             }
+            $newMembershipType = 'yearly';
             
             $updateMemberStmt = $pdo->prepare("
                 UPDATE members SET

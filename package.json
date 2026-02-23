@@ -1,7 +1,7 @@
 {
   "name": "elektr-ame-website",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "scripts": {
     "generate-hash": "node scripts/generate-password-hash.js",
@@ -68,7 +68,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
-    "bcryptjs": "^2.4.3",
     "@tailwindcss/typography": "^0.5.15",
     "@types/node": "^22.5.5",
     "@types/react": "^18.3.3",
@@ -76,6 +75,7 @@
     "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.20",
     "basic-ftp": "^5.0.5",
+    "bcryptjs": "^2.4.3",
     "eslint": "^9.9.0",
     "eslint-plugin-react-hooks": "^5.1.0-rc.0",
     "eslint-plugin-react-refresh": "^0.4.9",

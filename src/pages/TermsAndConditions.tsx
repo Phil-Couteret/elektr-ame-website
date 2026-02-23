@@ -7,10 +7,12 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getTerms } from "content/terms";
 
 const TermsAndConditions = () => {
-  const { t } = useLanguage();
+  const { language } = useLanguage();
   const navigate = useNavigate();
+  const terms = getTerms(language);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -23,8 +25,8 @@ const TermsAndConditions = () => {
   return (
     <>
       <SEO 
-        title={t('terms.title')}
-        description={t('terms.description')}
+        title={terms.title}
+        description={terms.description}
         url="https://www.elektr-ame.com/terms-and-conditions"
         keywords="terms and conditions, terms of service, purchase policy, refund policy, Elektr-Âme"
       />
@@ -35,7 +37,7 @@ const TermsAndConditions = () => {
             <CardHeader>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <CardTitle className="text-3xl font-bold text-white">
-                  {t('terms.title')}
+                  {terms.title}
                 </CardTitle>
                 <Button
                   onClick={handleBack}
@@ -51,106 +53,106 @@ const TermsAndConditions = () => {
             <CardContent className="space-y-6 text-white/80">
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.acceptance')}
+                  {terms.acceptance}
                 </h2>
-                <p>{t('terms.acceptanceText')}</p>
+                <p>{terms.acceptanceText}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.membership')}
+                  {terms.membership}
                 </h2>
-                <p>{t('terms.membershipText')}</p>
+                <p>{terms.membershipText}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.purchasePolicy')}
+                  {terms.purchasePolicy}
                 </h2>
                 <div className="space-y-3">
-                  <p>{t('terms.purchasePolicyText')}</p>
+                  <p>{terms.purchasePolicyText}</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>{t('terms.purchasePolicyItem1')}</li>
-                    <li>{t('terms.purchasePolicyItem2')}</li>
-                    <li>{t('terms.purchasePolicyItem3')}</li>
-                    <li>{t('terms.purchasePolicyItem4')}</li>
+                    <li>{terms.purchasePolicyItem1}</li>
+                    <li>{terms.purchasePolicyItem2}</li>
+                    <li>{terms.purchasePolicyItem3}</li>
+                    <li>{terms.purchasePolicyItem4}</li>
                   </ul>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.shippingPolicy')}
+                  {terms.shippingPolicy}
                 </h2>
                 <div className="space-y-3">
-                  <p>{t('terms.shippingPolicyText')}</p>
+                  <p>{terms.shippingPolicyText}</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>{t('terms.shippingPolicyItem1')}</li>
-                    <li>{t('terms.shippingPolicyItem2')}</li>
-                    <li>{t('terms.shippingPolicyItem3')}</li>
-                    <li>{t('terms.shippingPolicyItem4')}</li>
+                    <li>{terms.shippingPolicyItem1}</li>
+                    <li>{terms.shippingPolicyItem2}</li>
+                    <li>{terms.shippingPolicyItem3}</li>
+                    <li>{terms.shippingPolicyItem4}</li>
                   </ul>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.returnsPolicy')}
+                  {terms.returnsPolicy}
                 </h2>
                 <div className="space-y-3">
-                  <p>{t('terms.returnsPolicyText')}</p>
+                  <p>{terms.returnsPolicyText}</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>{t('terms.returnsPolicyItem1')}</li>
-                    <li>{t('terms.returnsPolicyItem2')}</li>
-                    <li>{t('terms.returnsPolicyItem3')}</li>
-                    <li>{t('terms.returnsPolicyItem4')}</li>
+                    <li>{terms.returnsPolicyItem1}</li>
+                    <li>{terms.returnsPolicyItem2}</li>
+                    <li>{terms.returnsPolicyItem3}</li>
+                    <li>{terms.returnsPolicyItem4}</li>
                   </ul>
-                  <p className="mt-3">{t('terms.refundPolicyContact')}</p>
+                  <p className="mt-3">{terms.refundPolicyContact}</p>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.refundPolicy')}
+                  {terms.refundPolicy}
                 </h2>
                 <div className="space-y-3">
-                  <p>{t('terms.refundPolicyText')}</p>
+                  <p>{terms.refundPolicyText}</p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>{t('terms.refundPolicyItem1')}</li>
-                    <li>{t('terms.refundPolicyItem2')}</li>
-                    <li>{t('terms.refundPolicyItem3')}</li>
-                    <li>{t('terms.refundPolicyItem4')}</li>
+                    <li>{terms.refundPolicyItem1}</li>
+                    <li>{terms.refundPolicyItem2}</li>
+                    <li>{terms.refundPolicyItem3}</li>
+                    <li>{terms.refundPolicyItem4}</li>
                   </ul>
-                  <p className="mt-3">{t('terms.refundPolicyContact')}</p>
+                  <p className="mt-3">{terms.refundPolicyContact}</p>
                 </div>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.payment')}
+                  {terms.payment}
                 </h2>
-                <p>{t('terms.paymentText')}</p>
+                <p>{terms.paymentText}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.dataProtection')}
+                  {terms.dataProtection}
                 </h2>
-                <p>{t('terms.dataProtectionText')}</p>
+                <p>{terms.dataProtectionText}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.modifications')}
+                  {terms.modifications}
                 </h2>
-                <p>{t('terms.modificationsText')}</p>
+                <p>{terms.modificationsText}</p>
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-white mb-3">
-                  {t('terms.contact')}
+                  {terms.contact}
                 </h2>
-                <p>{t('terms.contactText')}</p>
+                <p>{terms.contactText}</p>
               </div>
             </CardContent>
           </Card>

@@ -175,11 +175,8 @@ try {
         $message .= "This link will expire in 48 hours.\n\n";
         $message .= "Best regards,\nThe Elektr-Âme Team";
 
-        $headers = "From: noreply@elektr-ame.com\r\n";
-        $headers .= "Reply-To: info@elektr-ame.com\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion();
-
-        if (!mail($emailInputRaw, $subject, $message, $headers)) {
+        require_once __DIR__ . '/classes/Mailer.php';
+        if (!Mailer::send($emailInputRaw, $subject, $message, ['toName' => $firstName])) {
             error_log("Failed to send email change confirmation to {$emailInputRaw}");
         }
 
@@ -190,7 +187,7 @@ try {
             $noticeMessage .= "We received a request to change the email associated with your Elektr-Âme membership.\n";
             $noticeMessage .= "If you did not make this request, please contact support immediately.\n\n";
             $noticeMessage .= "Best regards,\nThe Elektr-Âme Team";
-            if (!mail($currentEmail, $noticeSubject, $noticeMessage, $headers)) {
+            if (!Mailer::send($currentEmail, $noticeSubject, $noticeMessage, ['toName' => $currentMember['first_name']])) {
                 error_log("Failed to send email change notice to {$currentEmail}");
             }
         }

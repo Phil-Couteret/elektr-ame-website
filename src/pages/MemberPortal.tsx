@@ -39,6 +39,7 @@ import MemberStats from "@/components/portal/MemberStats";
 import PaymentCheckout from "@/components/payment/PaymentCheckout";
 import MembershipRenewal from "@/components/payment/MembershipRenewal";
 import PaymentAllocation from "@/components/payment/PaymentAllocation";
+import TermsAcceptance from "@/components/portal/TermsAcceptance";
 
 interface PendingEmailChange {
   new_email: string;
@@ -70,7 +71,7 @@ interface MemberData {
   postal_code?: string;
   country?: string;
   status: 'pending' | 'approved' | 'rejected';
-  membership_type: 'free' | 'basic' | 'sponsor' | 'lifetime';
+  membership_type: 'in_progress' | 'yearly' | 'lifetime';
   membership_start_date?: string;
   membership_end_date?: string;
   payment_status: 'unpaid' | 'paid' | 'overdue';
@@ -80,13 +81,18 @@ interface MemberData {
   is_visual_artist: boolean;
   is_fan: boolean;
   created_at: string;
+  terms_accepted_at?: string | null;
+  terms_version?: string | null;
   pending_email_change?: PendingEmailChange;
 }
 
 const MemberPortal = () => {
   const [memberData, setMemberData] = useState<MemberData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
+  // On mobile, default to card tab so QR is visible immediately (avoids tab-switch rendering issues)
+  const [activeTab, setActiveTab] = useState(() =>
+    typeof window !== "undefined" && window.innerWidth < 768 ? "card" : "overview"
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [editFormData, setEditFormData] = useState({
@@ -191,12 +197,11 @@ const MemberPortal = () => {
 
   const getMembershipTypeBadge = (type: string) => {
     const types = {
-      free: { label: t('portal.membership.free'), color: 'bg-gray-500/20 text-gray-400 border-gray-500/50' },
-      basic: { label: t('portal.membership.basic'), color: 'bg-blue-500/20 text-blue-400 border-blue-500/50' },
-      sponsor: { label: t('portal.membership.sponsor'), color: 'bg-purple-500/20 text-purple-400 border-purple-500/50' },
+      in_progress: { label: t('portal.membership.inProgress'), color: 'bg-gray-500/20 text-gray-400 border-gray-500/50' },
+      yearly: { label: t('portal.membership.yearly'), color: 'bg-purple-500/20 text-purple-400 border-purple-500/50' },
       lifetime: { label: t('portal.membership.lifetime'), color: 'bg-gold-500/20 text-yellow-400 border-yellow-500/50' },
     };
-    const typeInfo = types[type as keyof typeof types] || types.free;
+    const typeInfo = types[type as keyof typeof types] || types.in_progress;
     return <Badge className={typeInfo.color}>{typeInfo.label}</Badge>;
   };
 
@@ -733,6 +738,14 @@ const MemberPortal = () => {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="mt-6 space-y-6">
+            {/* Terms and Conditions - set only when member has paid (Stripe, cash, wire, paycomet, other) */}
+            <TermsAcceptance
+              termsAcceptedAt={memberData.terms_accepted_at}
+              paymentStatus={memberData.payment_status}
+              onAccepted={fetchMemberData}
+              onGoToPayments={() => setActiveTab('payments')}
+            />
+
             <Card className="bg-black/40 border-white/10">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
@@ -1716,7 +1729,7 @@ const MemberPortal = () => {
                               </div>
                               <div>
                                 <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.membership')}</p>
-                                {getMembershipTypeBadge(member.membership_type || 'free')}
+                                {getMembershipTypeBadge(member.membership_type || 'in_progress')}
                               </div>
                               <div>
                                 <p className="text-white/70 text-sm mb-1">{t('portal.sponsorship.invitedMembers.joined')}</p>

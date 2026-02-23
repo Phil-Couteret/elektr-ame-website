@@ -114,18 +114,8 @@ try {
             $rowsByInviter = $stmt->rowCount();
         }
         
-        error_log("Invitation approval update: member_id=$memberId, email=$memberEmail, inviter_id=$inviterId, by_member_id=$rowsByMemberId, by_email=$rowsByEmail, by_inviter=$rowsByInviter");
-        
-        // Debug: Check if any invitations exist for this member
         if ($rowsByMemberId === 0 && $rowsByEmail === 0 && $rowsByInviter === 0) {
-            $debugStmt = $pdo->prepare("
-                SELECT id, inviter_id, invitee_email, invitee_member_id, status 
-                FROM member_invitations 
-                WHERE invitee_member_id = ? OR LOWER(TRIM(invitee_email)) = ?
-            ");
-            $debugStmt->execute([$memberId, $memberEmail ?? '']);
-            $debugInvitations = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log("Invitation approval debug: Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
+            error_log("Invitation approval: No invitations found for member_id=$memberId, email=$memberEmail");
         }
     }
     

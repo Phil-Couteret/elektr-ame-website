@@ -18,23 +18,23 @@ const Footer = () => {
           </div>
           
           <div className="flex flex-wrap justify-center gap-6">
+            <a href="#artists" className="text-white/70 hover:text-blue-light transition-colors">
+              {t('nav.artists')}
+            </a>
             <a href="#events" className="text-white/70 hover:text-blue-light transition-colors">
               {t('nav.events')}
+            </a>
+            <a href="#gallery" className="text-white/70 hover:text-blue-light transition-colors">
+              {t('nav.gallery')}
             </a>
             <a href="#about" className="text-white/70 hover:text-blue-light transition-colors">
               {t('nav.about')}
             </a>
-            <a href="#artists" className="text-white/70 hover:text-blue-light transition-colors">
-              {t('nav.artists')}
-            </a>
             <Link to="/membership" className="text-white/70 hover:text-blue-light transition-colors">
               {t('nav.membership')}
             </Link>
-            <a href="#gallery" className="text-white/70 hover:text-blue-light transition-colors">
-              Gallery
-            </a>
             <Link to="/contact" className="text-white/70 hover:text-blue-light transition-colors">
-              Contact
+              {t('nav.contact')}
             </Link>
           </div>
         </div>

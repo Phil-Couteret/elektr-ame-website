@@ -36,7 +36,7 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
     is_visual_artist: false,
     is_fan: false,
     status: 'approved',
-    membership_type: 'free_trial',
+    membership_type: 'in_progress',
     membership_start_date: '',
     membership_end_date: '',
     payment_status: 'unpaid',
@@ -86,7 +86,7 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
           is_visual_artist: false,
           is_fan: false,
           status: 'approved',
-          membership_type: 'free_trial',
+          membership_type: 'in_progress',
           membership_start_date: '',
           membership_end_date: '',
           payment_status: 'unpaid',
@@ -319,8 +319,7 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-deep-purple border-white/10">
-                    <SelectItem value="free_trial" className="text-white">{t('admin.membership.freeTrial')}</SelectItem>
-                    <SelectItem value="monthly" className="text-white">{t('admin.membership.monthly')}</SelectItem>
+                    <SelectItem value="in_progress" className="text-white">{t('admin.membership.inProgress')}</SelectItem>
                     <SelectItem value="yearly" className="text-white">{t('admin.membership.yearly')}</SelectItem>
                     <SelectItem value="lifetime" className="text-white">{t('admin.membership.lifetime')}</SelectItem>
                   </SelectContent>

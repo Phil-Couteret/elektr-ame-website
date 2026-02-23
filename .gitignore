@@ -31,6 +31,7 @@ dist-ssr/
 # Database config (local only)
 api/config.php
 api/config-local.php
+api/smtp-config.php
 config.php
 
 # Logs
@@ -55,6 +56,9 @@ Thumbs.db
 # Build artifacts
 *.zip
 !deployment/*.zip
+
+# Cursor / IDE
+cursor_current_working_directory.md
 
 # Local test files
 test-*.html

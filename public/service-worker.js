@@ -1,7 +1,7 @@
 // Elektr-Âme PWA Service Worker
-// Version 1.0.6 - Fix video playback by excluding from cache
+// Version 1.0.8 - New logo, force icon cache refresh
 
-const CACHE_VERSION = 'elektr-ame-v1.0.6';
+const CACHE_VERSION = 'elektr-ame-v1.0.8';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const DYNAMIC_CACHE = `${CACHE_VERSION}-dynamic`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;

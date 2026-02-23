@@ -4,11 +4,10 @@ ob_start();
 
 session_start();
 
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../cors-headers.php';
+
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: https://www.elektr-ame.com');
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-header('Access-Control-Allow-Credentials: true');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -18,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 // Clear any output that might have been generated
 ob_clean();
 
-require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../classes/StripePayment.php';
 
 // Check if user is logged in
@@ -51,6 +49,12 @@ try {
     $memberId = $_SESSION['member_id'];
     $membershipType = $data['membership_type'] ?? null;
     $amount = isset($data['amount']) ? floatval($data['amount']) : null;
+    $termsAccepted = !empty($data['terms_accepted']);
+    
+    // Require terms acceptance before payment (terms_accepted_at is set when payment completes)
+    if (!$termsAccepted) {
+        throw new Exception('You must accept the Terms and Conditions and Privacy Policy to complete your membership payment.');
+    }
     
     // Validate membership type
     $validTypes = ['basic', 'sponsor', 'lifetime'];
@@ -65,7 +69,8 @@ try {
                 $amount = 20.00; // €20/year
                 break;
             case 'sponsor':
-                throw new Exception('Amount is required for sponsor/custom membership');
+            case 'lifetime':
+                throw new Exception('Amount is required for ' . $membershipType . ' membership');
             default:
                 throw new Exception('Invalid membership type');
         }

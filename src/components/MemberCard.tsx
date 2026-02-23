@@ -29,12 +29,13 @@ const MemberCard = ({
   const { toast } = useToast();
 
   const memberIdFormatted = `EA-${String(memberId).padStart(6, '0')}`;
+  // Use external API directly - no session/cookies, works on all mobile browsers
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(memberIdFormatted)}`;
 
   const getMembershipColor = (type: string) => {
     switch (type) {
-      case 'free': return 'from-gray-600 to-gray-800';
-      case 'basic': return 'from-blue-600 to-blue-800';
-      case 'sponsor': return 'from-purple-600 to-purple-800';
+      case 'in_progress': return 'from-gray-600 to-gray-800';
+      case 'yearly': return 'from-purple-600 to-purple-800';
       case 'lifetime': return 'from-yellow-600 to-yellow-800';
       default: return 'from-gray-600 to-gray-800';
     }
@@ -42,19 +43,11 @@ const MemberCard = ({
 
   const getMembershipLabel = (type: string) => {
     switch (type) {
-      case 'free': return 'Free Member';
-      case 'basic': return 'Basic Member (€20/year)';
-      case 'sponsor': return 'Sponsor Member (>€20/year)';
+      case 'in_progress': return 'In Progress';
+      case 'yearly': return 'Yearly Member';
       case 'lifetime': return 'Lifetime Member';
       default: return 'Member';
     }
-  };
-
-  const generateQRCodeDataURL = () => {
-    // Generate QR code as data URL
-    // For now, returning a placeholder
-    // In production, you would use a library like qrcode.react or similar
-    return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(memberIdFormatted)}`;
   };
 
   const downloadCard = async () => {
@@ -176,12 +169,18 @@ const MemberCard = ({
             <p className="text-white/70 text-sm mb-4 text-center">
               Show this QR code at partner venues for member benefits
             </p>
-            <div className="bg-white p-4 rounded-lg mb-6">
-              <img 
-                src={generateQRCodeDataURL()} 
-                alt="Member QR Code"
-                className="w-48 h-48"
-              />
+            <div className="bg-white p-4 rounded-lg mb-6 flex justify-center items-center">
+              <div className="shrink-0 w-[224px] h-[224px] sm:w-[256px] sm:h-[256px] flex items-center justify-center">
+                <img
+                  src={qrUrl}
+                  alt={`QR code for ${memberIdFormatted}`}
+                  width={256}
+                  height={256}
+                  loading="eager"
+                  className="max-w-full max-h-full object-contain"
+                  style={{ minWidth: 200, minHeight: 200 }}
+                />
+              </div>
             </div>
             <p className="text-white/50 text-xs font-mono mb-6">{memberIdFormatted}</p>
             

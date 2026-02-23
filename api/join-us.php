@@ -44,6 +44,11 @@ try {
         }
     }
     
+    // Validate terms acceptance (required for official membership)
+    if (empty($input['acceptTerms'])) {
+        throw new Exception('You must accept the terms and conditions and privacy policy to become a member.');
+    }
+    
     // Validate email format
     if (!filter_var($input['email'], FILTER_VALIDATE_EMAIL)) {
         throw new Exception('Invalid email format: ' . $input['email']);
@@ -83,6 +88,8 @@ try {
             error_log("Registration from invitation: token=$invitationToken, inviter_id=$inviterId");
         }
     }
+    
+    // Terms accepted_at is set only when member pays (Stripe or manual: cash, wire, paycomet, other)
     
     // Prepare SQL statement
     $sql = "INSERT INTO members (
@@ -217,15 +224,7 @@ try {
             if ($rowsUpdated > 0) {
                 error_log("Registration: Updated $rowsUpdated invitation(s) for email: $inviteeEmail (any status), member_id: $memberId");
             } else {
-                // Debug: Check if invitation exists
-                $debugStmt = $pdo->prepare("
-                    SELECT id, invitee_email, invitee_member_id, status 
-                    FROM member_invitations 
-                    WHERE LOWER(TRIM(invitee_email)) = ?
-                ");
-                $debugStmt->execute([$inviteeEmail]);
-                $debugInvitations = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
-                error_log("Registration: No invitation updated for email: $inviteeEmail. Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
+                error_log("Registration: No invitation updated for email: $inviteeEmail");
             }
         }
     }
@@ -297,11 +296,8 @@ try {
         $message .= "Best regards,\n";
         $message .= "The Elektr-Âme Team";
         
-        $headers = "From: noreply@elektr-ame.com\r\n";
-        $headers .= "Reply-To: info@elektr-ame.com\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion();
-        
-        mail($input['email'], $subject, $message, $headers);
+        require_once __DIR__ . '/classes/Mailer.php';
+        Mailer::send($input['email'], $subject, $message, ['toName' => $input['firstName'] ?? '']);
         error_log("Verification email sent to: {$input['email']}");
     } catch (Exception $e) {
         error_log("Failed to send verification email: " . $e->getMessage());

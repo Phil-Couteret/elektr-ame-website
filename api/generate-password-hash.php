@@ -10,7 +10,7 @@
 header('Content-Type: text/plain');
 
 // Change this to your desired password
-$password = '92Alcolea2025';
+$password = '!3081972Pc';
 
 // Generate the hash
 $hash = password_hash($password, PASSWORD_DEFAULT);

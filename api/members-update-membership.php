@@ -71,6 +71,11 @@ try {
         $params[':artist_name'] = $input['artist_name'];
     }
     
+    if (isset($input['country']) && trim((string)$input['country']) !== '') {
+        $updates[] = "country = :country";
+        $params[':country'] = trim($input['country']);
+    }
+    
     if (isset($input['is_dj'])) {
         $updates[] = "is_dj = :is_dj";
         $params[':is_dj'] = $input['is_dj'] ? 1 : 0;
@@ -97,7 +102,7 @@ try {
     }
     
     if (isset($input['membership_type'])) {
-        $validTypes = ['free_trial', 'monthly', 'yearly', 'lifetime'];
+        $validTypes = ['in_progress', 'yearly', 'lifetime'];
         if (!in_array($input['membership_type'], $validTypes)) {
             throw new Exception('Invalid membership type');
         }
@@ -122,6 +127,11 @@ try {
         }
         $updates[] = "payment_status = :payment_status";
         $params[':payment_status'] = $input['payment_status'];
+        // Terms accepted when payment recorded (stripe, cash, wire_transfer, paycomet, other)
+        if ($input['payment_status'] === 'paid') {
+            $updates[] = "terms_accepted_at = COALESCE(terms_accepted_at, NOW())";
+            $updates[] = "terms_version = COALESCE(terms_version, '2026-01')";
+        }
     }
     
     if (isset($input['last_payment_date'])) {
@@ -132,6 +142,16 @@ try {
     if (isset($input['payment_amount'])) {
         $updates[] = "payment_amount = :payment_amount";
         $params[':payment_amount'] = $input['payment_amount'];
+    }
+
+    if (isset($input['payment_method'])) {
+        $validMethods = ['stripe', 'cash', 'wire_transfer', 'paycomet', 'other'];
+        $method = trim($input['payment_method']);
+        if ($method !== '' && !in_array($method, $validMethods)) {
+            $method = 'other';
+        }
+        $updates[] = "payment_method = :payment_method";
+        $params[':payment_method'] = $method !== '' ? $method : null;
     }
     
     if (isset($input['notes'])) {
@@ -226,17 +246,35 @@ try {
             error_log("Invitation payment debug: Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
         }
 
+        // Insert manual payment into payment_transactions (for history and modify/delete)
+        $tableCheck = $pdo->query("SHOW TABLES LIKE 'payment_transactions'");
+        if ($tableCheck && $tableCheck->rowCount() > 0) {
+            $amount = isset($input['payment_amount']) ? floatval($input['payment_amount']) : 0;
+            $membershipType = $input['membership_type'] ?? 'yearly';
+            $startDate = $input['membership_start_date'] ?? date('Y-m-d');
+            $endDate = $input['membership_end_date'] ?? null;
+            $paymentMethod = $input['payment_method'] ?? 'other';
+            if ($amount > 0) {
+                $txType = ($membershipType === 'lifetime') ? 'lifetime' : ($amount > 20 ? 'sponsor' : 'basic');
+                $transactionId = 'manual-' . $memberId . '-' . time() . '-' . bin2hex(random_bytes(4));
+                try {
+                    $pdo->prepare("
+                        INSERT INTO payment_transactions (member_id, transaction_id, payment_gateway, amount, currency, status, membership_type, membership_start_date, membership_end_date, payment_method)
+                        VALUES (?, ?, 'bank_transfer', ?, 'EUR', 'completed', ?, ?, ?, ?)
+                    ")->execute([$memberId, $transactionId, $amount, $txType, $startDate ?: null, $endDate ?: null, $paymentMethod]);
+                } catch (PDOException $e) {
+                    error_log("Insert manual payment transaction failed: " . $e->getMessage());
+                }
+            }
+        }
+
         try {
             require_once __DIR__ . '/classes/EmailAutomation.php';
             $emailAutomation = new EmailAutomation($pdo);
-            $emailAutomation->triggerAutomation('membership_renewed', $memberId);
-            
-            // If sponsor (amount > 40), also send tax receipt
-            if (isset($input['payment_amount']) && $input['payment_amount'] > 40) {
-                $emailAutomation->triggerAutomation('sponsor_tax_receipt', $memberId);
-            }
+            // Send payment confirmation + tax receipt (for any amount >= €20)
+            $emailAutomation->sendPaymentRecordedEmails($memberId);
         } catch (Exception $e) {
-            error_log("Renewal email automation failed: " . $e->getMessage());
+            error_log("Payment recorded emails failed: " . $e->getMessage());
             // Don't fail the update if email fails
         }
     }

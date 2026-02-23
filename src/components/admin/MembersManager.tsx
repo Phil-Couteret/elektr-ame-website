@@ -32,7 +32,7 @@ interface Member {
   is_visual_artist: boolean;
   is_fan: boolean;
   status: 'pending' | 'approved' | 'rejected';
-  membership_type?: 'free_trial' | 'monthly' | 'yearly' | 'lifetime';
+  membership_type?: 'in_progress' | 'yearly' | 'lifetime';
   membership_start_date?: string;
   membership_end_date?: string;
   payment_status?: 'unpaid' | 'paid' | 'overdue';
@@ -465,15 +465,13 @@ const MembersManager = () => {
     if (!type) return <span className="text-white/40">-</span>;
     
     const config: Record<string, { color: string }> = {
-      free_trial: { color: 'bg-gray-500' },
-      monthly: { color: 'bg-blue-500' },
+      in_progress: { color: 'bg-gray-500' },
       yearly: { color: 'bg-purple-500' },
       lifetime: { color: 'bg-green-500' }
     };
     
     const { color } = config[type] || { color: 'bg-gray-500' };
-    const label = type === 'free_trial' ? t('admin.membership.freeTrial') :
-                  type === 'monthly' ? t('admin.membership.monthly') :
+    const label = type === 'in_progress' ? t('admin.membership.inProgress') :
                   type === 'yearly' ? t('admin.membership.yearly') :
                   type === 'lifetime' ? t('admin.membership.lifetime') : type;
     
@@ -680,10 +678,9 @@ const MembersManager = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-deep-purple border-white/10">
                         <SelectItem value="all" className="text-white">All Types</SelectItem>
-                        <SelectItem value="free_trial" className="text-white">Free Trial</SelectItem>
-                        <SelectItem value="monthly" className="text-white">Monthly</SelectItem>
-                        <SelectItem value="yearly" className="text-white">Yearly</SelectItem>
-                        <SelectItem value="lifetime" className="text-white">Lifetime</SelectItem>
+                        <SelectItem value="in_progress" className="text-white">{t('admin.membership.inProgress')}</SelectItem>
+                        <SelectItem value="yearly" className="text-white">{t('admin.membership.yearly')}</SelectItem>
+                        <SelectItem value="lifetime" className="text-white">{t('admin.membership.lifetime')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

@@ -3,6 +3,9 @@
 // Copy this to config.php and update with your real credentials
 // NEVER commit config.php to git!
 
+// CORS: Add origins for local dev (optional - defaults include localhost:5173, localhost:3000)
+// define('ALLOWED_ORIGINS', ['https://www.elektr-ame.com', 'http://localhost:5173']);
+
 // Database configuration
 $host = 'localhost';
 $dbname = 'elektr_ame';

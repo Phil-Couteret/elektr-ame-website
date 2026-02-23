@@ -193,6 +193,61 @@ class EmailAutomation {
     }
 
     /**
+     * Send payment confirmation + tax receipt when admin records a manual payment
+     * (cash, wire transfer, etc.)
+     */
+    public function sendPaymentRecordedEmails($memberId) {
+        try {
+            $member = $this->getMemberDataForEmails($memberId);
+            if (!$member || floatval($member['payment_amount'] ?? 0) <= 0) {
+                return false;
+            }
+            $recipientName = $member['first_name'] . ' ' . ($member['last_name'] ?? $member['second_name'] ?? '');
+            $variables = $this->prepareTemplateVariables($member, 'payment_recorded');
+
+            // Payment confirmation (always)
+            $this->queueEmail(
+                $member['email'],
+                $recipientName,
+                'payment_confirmation',
+                [
+                    'first_name' => $member['first_name'],
+                    'amount' => number_format($member['payment_amount'], 2),
+                    'membership_type' => ucfirst($member['membership_type'] ?? 'Basic'),
+                    'date' => date('Y-m-d'),
+                ],
+                $memberId,
+                'high'
+            );
+
+            // Tax receipt PDF for Spain residents only (IRPF applies in Spain)
+            if (floatval($member['payment_amount'] ?? 0) >= 20 && $this->isSpainResident($member['country'] ?? '')) {
+                $this->sendTaxReceiptPdf($memberId, $variables);
+            }
+
+            $this->processQueue(10);
+            return true;
+        } catch (Exception $e) {
+            error_log("Payment recorded emails error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get member data for emails (alias for getMemberData - can be made public)
+     */
+    private function getMemberDataForEmails($memberId) {
+        return $this->getMemberData($memberId);
+    }
+
+    /**
+     * Build template variables for tax receipt (used by confirm-payment and sendPaymentRecordedEmails)
+     */
+    public function preparePaymentTaxVariables($member) {
+        return $this->prepareTemplateVariables($member, 'payment_recorded');
+    }
+
+    /**
      * Check for expiring memberships and send reminders
      */
     public function checkExpiringMemberships() {
@@ -211,7 +266,7 @@ class EmailAutomation {
                 SELECT m.* 
                 FROM members m
                 WHERE m.status = 'approved'
-                AND m.membership_type IN ('basic', 'sponsor')
+                AND m.membership_type = 'yearly'
                 AND DATE(m.membership_end_date) = DATE(NOW() + INTERVAL :days DAY)
                     AND NOT EXISTS (
                         SELECT 1 FROM email_logs el
@@ -256,9 +311,10 @@ class EmailAutomation {
      * Prepare template variables based on member data and trigger
      */
     private function prepareTemplateVariables($member, $triggerType) {
+        $lastName = $member['last_name'] ?? $member['second_name'] ?? '';
         $variables = [
             'first_name' => $member['first_name'],
-            'full_name' => $member['first_name'] . ' ' . $member['second_name'],
+            'full_name' => $member['first_name'] . ' ' . $lastName,
             'email' => $member['email'],
             'membership_type' => ucfirst($member['membership_type']),
             'end_date' => $member['membership_end_date'] ? date('F j, Y', strtotime($member['membership_end_date'])) : 'N/A',
@@ -267,20 +323,22 @@ class EmailAutomation {
             'receipt_id' => 'EA-' . date('Y') . '-' . str_pad($member['id'], 6, '0', STR_PAD_LEFT)
         ];
 
-        // Add tax deduction info for sponsors
-        if ($member['membership_type'] === 'sponsor' && $member['payment_amount'] > 0) {
-            $taxCalc = $this->taxCalculator->calculate($member['payment_amount']);
+        // Add tax deduction info for any payment >= €20 (Spanish tax law: 80% on first €250)
+        $paymentAmount = floatval($member['payment_amount'] ?? 0);
+        if ($paymentAmount >= 20) {
+            $taxCalc = $this->taxCalculator->calculate($paymentAmount);
             $variables['tax_deduction'] = number_format($taxCalc['deduction'], 2);
             $variables['net_cost'] = number_format($taxCalc['netCost'], 2);
             $variables['discount_percent'] = number_format($taxCalc['effectiveDiscount'], 1);
             
             // Calculate deduction above €250 for detailed breakdown
-            $amount = floatval($member['payment_amount']);
-            $above250Amount = max(0, $amount - 250);
+            $first250Amount = min($paymentAmount, 250);
+            $variables['tax_deduction_first_250'] = number_format($first250Amount * 0.80, 2);
+            $above250Amount = max(0, $paymentAmount - 250);
             $above250Deduction = $above250Amount * ($taxCalc['recurringBonus'] ? 0.45 : 0.40);
             $variables['tax_deduction_above_250'] = number_format($above250Deduction, 2);
             
-            $variables['tax_deduction_info'] = "As a sponsor, you can deduct €{$variables['tax_deduction']} from your taxes (80% on first €250, 40% above).";
+            $variables['tax_deduction_info'] = "You can deduct €{$variables['tax_deduction']} from your taxes (80% on first €250, 40% above).";
             
             if ($taxCalc['recurringBonus']) {
                 $variables['recurring_bonus_info'] = "⭐ RECURRING DONOR BONUS: You qualify for 45% deduction on amounts above €250 (3+ consecutive years).";
@@ -314,20 +372,131 @@ class EmailAutomation {
     }
 
     /**
-     * Send email using PHP mail function
+     * Send email via SMTP (or mail() fallback if SMTP not configured)
      */
     private function sendEmail($to, $toName, $subject, $body) {
+        require_once __DIR__ . '/Mailer.php';
+        $fullBody = $body . "\n\n---\nElektr-Âme - Electronic Music Community\nhttps://www.elektr-ame.com";
+        return Mailer::send($to, $subject, $fullBody, ['toName' => $toName]);
+    }
+
+    /**
+     * Check if member is Spain resident (for tax receipt - IRPF only applies in Spain)
+     */
+    public function isSpainResident($country) {
+        if (empty($country)) return false;
+        $c = strtolower(trim($country));
+        $spainPatterns = ['spain', 'españa', 'espana', 'españa', 'catalonia', 'catalunya', 'cataluña', 'es '];
+        foreach ($spainPatterns as $p) {
+            if (strpos($c, $p) !== false) return true;
+        }
+        if ($c === 'es' || $c === 'esp') return true;
+        return false;
+    }
+
+    /**
+     * Store PDF for secure download and return the download URL
+     * Token expires in 30 days
+     */
+    private function storeTaxReceiptForDownload($memberId, $pdfContent, $receiptId) {
+        $token = bin2hex(random_bytes(32));
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+        $stmt = $this->db->prepare("
+            INSERT INTO tax_receipt_downloads (token, member_id, pdf_content, receipt_id, expires_at)
+            VALUES (:token, :member_id, :pdf_content, :receipt_id, :expires_at)
+        ");
+        $stmt->execute([
+            ':token' => $token,
+            ':member_id' => $memberId,
+            ':pdf_content' => $pdfContent,
+            ':receipt_id' => $receiptId,
+            ':expires_at' => $expiresAt
+        ]);
+        $baseUrl = function_exists('getBaseUrl') ? getBaseUrl() : 'https://www.elektr-ame.com';
+        return $baseUrl . '/api/download-tax-receipt.php?token=' . $token;
+    }
+
+    /**
+     * Send email with PDF attachment (for tax receipt) - kept for reference, not used
+     */
+    public function sendEmailWithPdfAttachment($to, $toName, $subject, $body, $pdfContent, $attachmentFilename = 'tax-receipt.pdf') {
+        if (empty($pdfContent) || substr($pdfContent, 0, 4) !== '%PDF') {
+            error_log("Tax receipt PDF: invalid or empty PDF content");
+            return false;
+        }
+        $boundary = '----=_Part_' . md5(uniqid(mt_rand(), true));
+        $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers = [
-            'From: Elektr-Âme <noreply@elektr-ame.com>',
+            'From: Elektr-Ame <noreply@elektr-ame.com>',
             'Reply-To: contact@elektr-ame.com',
+            'Date: ' . date('r'),
+            'Message-ID: <' . md5(uniqid(mt_rand(), true)) . '@elektr-ame.com>',
             'X-Mailer: PHP/' . phpversion(),
             'MIME-Version: 1.0',
-            'Content-Type: text/plain; charset=UTF-8'
+            'Content-Type: multipart/mixed; boundary="' . $boundary . '"'
         ];
+        $message = "This is a multi-part message in MIME format.\r\n\r\n";
+        $message .= "--$boundary\r\n";
+        $message .= "Content-Type: text/plain; charset=UTF-8\r\n";
+        $message .= "Content-Transfer-Encoding: base64\r\n\r\n";
+        $message .= chunk_split(base64_encode($body)) . "\r\n";
+        $message .= "--$boundary\r\n";
+        $message .= "Content-Type: application/pdf; name=\"" . $attachmentFilename . "\"\r\n";
+        $message .= "Content-Transfer-Encoding: base64\r\n";
+        $message .= "Content-Disposition: attachment; filename=\"" . $attachmentFilename . "\"\r\n\r\n";
+        $message .= chunk_split(base64_encode($pdfContent));
+        $message .= "\r\n--$boundary--\r\n";
+        $result = mail($to, $encodedSubject, $message, implode("\r\n", $headers));
+        if (!$result) {
+            error_log("Tax receipt PDF email failed to send to: $to");
+        }
+        return $result;
+    }
 
-        $fullBody = $body . "\n\n---\nElektr-Âme - Electronic Music Community\nhttps://www.elektr-ame.com";
+    /**
+     * Send tax receipt as PDF download link (Spain residents only)
+     * Uses secure link instead of attachment - plain emails deliver reliably on OVH
+     * Returns true if sent, false if skipped (non-Spain) or failed
+     */
+    public function sendTaxReceiptPdf($memberId, $variables) {
+        $member = $this->getMemberData($memberId);
+        if (!$member) return false;
+        if (!$this->isSpainResident($member['country'] ?? '')) return false;
+        if (floatval($member['payment_amount'] ?? $variables['amount'] ?? 0) < 20) return false;
 
-        return mail($to, $subject, $fullBody, implode("\r\n", $headers));
+        try {
+            // Include payment_method for PDF (stripe, wire_transfer, cash, etc.)
+            $variables['payment_method'] = $member['payment_method'] ?? 'stripe';
+            require_once __DIR__ . '/TaxReceiptPdf.php';
+            $pdf = new TaxReceiptPdf($variables);
+            $pdfContent = $pdf->generate();
+            $receiptId = $variables['receipt_id'] ?? 'EA-' . date('Y') . '-' . str_pad($memberId, 6, '0', STR_PAD_LEFT);
+
+            // Store PDF for download, get secure link (avoids attachment delivery issues)
+            $downloadUrl = $this->storeTaxReceiptForDownload($memberId, $pdfContent, $receiptId);
+
+            $subject = 'Your tax deduction certificate - Elektr-Âme';
+            $lang = $this->getMemberLanguage($memberId);
+            if ($lang === 'es') $subject = 'Tu certificado de deducción fiscal - Elektr-Âme';
+            elseif ($lang === 'ca') $subject = 'El teu certificat de deducció fiscal - Elektr-Âme';
+
+            $firstName = $variables['first_name'] ?? '';
+            $body = "Dear $firstName,\n\nYour official tax deduction certificate for your donation to Elektr-Âme is ready.\n\nDownload your PDF here (link valid 30 days):\n$downloadUrl\n\nYou can use this PDF when filing your IRPF declaration with the Spanish tax authority (Hacienda).\n\nBest regards,\nThe Elektr-Âme Team";
+            if ($lang === 'es') $body = "Estimado/a $firstName,\n\nSu certificado oficial de deducción fiscal por su donación a Elektr-Âme está listo.\n\nDescargue su PDF aquí (enlace válido 30 días):\n$downloadUrl\n\nPuede utilizar este PDF al presentar su declaración de IRPF ante la Agencia Tributaria.\n\nSaludos,\nEl equipo de Elektr-Âme";
+            elseif ($lang === 'ca') $body = "Benvolgut/da $firstName,\n\nEl seu certificat oficial de deducció fiscal per la seva donació a Elektr-Âme està llest.\n\nDescarregueu el PDF aquí (enllaç vàlid 30 dies):\n$downloadUrl\n\nPodeu utilitzar aquest PDF en presentar la declaració d'IRPF.\n\nSalutacions,\nL'equip d'Elektr-Âme";
+
+            $recipientName = $member['first_name'] . ' ' . ($member['last_name'] ?? $member['second_name'] ?? '');
+            $result = $this->sendEmail($member['email'], $recipientName, $subject, $body);
+            if ($result) {
+                $this->logEmail($memberId, $member['email'], 'sponsor_tax_receipt', $subject, 'sent');
+                return true;
+            }
+            error_log("Tax receipt email failed for member $memberId");
+            return false;
+        } catch (Exception $e) {
+            error_log("Tax receipt PDF error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**

@@ -33,7 +33,7 @@ const MembershipProducts = () => {
         keywords="membership, join, pricing, Elektr-Âme, basic membership, support membership"
       />
       <Header />
-      <div className="min-h-screen bg-gradient-to-b from-deep-purple via-black to-deep-purple py-12">
+      <div className="min-h-screen bg-gradient-to-b from-deep-purple via-black to-deep-purple pt-20 pb-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           <div className="mb-8">
             <Button
@@ -86,6 +86,10 @@ const MembershipProducts = () => {
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature4')}</span>
                     </li>
+                    <li className="flex items-start gap-2 text-white/80">
+                      <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
+                      <span>{t('products.basicFeature5')}</span>
+                    </li>
                   </ul>
                 </div>
                 <Button
@@ -135,6 +139,10 @@ const MembershipProducts = () => {
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature4')}</span>
                     </li>
+                    <li className="flex items-start gap-2 text-white/80">
+                      <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
+                      <span>{t('products.basicFeature5')}</span>
+                    </li>
                     <li className="flex items-start gap-2 text-white/80 mt-3 pt-3 border-t border-white/10">
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.supportFeature1')}</span>
@@ -142,10 +150,6 @@ const MembershipProducts = () => {
                     <li className="flex items-start gap-2 text-white/80">
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.supportFeature2')}</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-white/80">
-                      <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
-                      <span>{t('products.supportFeature3')}</span>
                     </li>
                   </ul>
                 </div>

@@ -49,12 +49,21 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 w-full z-[100] bg-black/95 backdrop-blur-md border-b border-white/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between md:justify-center relative">
-          {/* Logo/Brand - visible on mobile */}
-          <div className="flex md:hidden items-center">
-            <Link to="/" onClick={handleHomeClick} className="text-white font-bold text-lg">
-              Elektr-Âme
-            </Link>
-          </div>
+          {/* Logo - top left, super small */}
+          <Link
+            to="/"
+            onClick={handleHomeClick}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex items-center shrink-0"
+            aria-label="Elektr-Âme Home"
+          >
+            <img
+              src="/logo-elektr-ame.png"
+              alt="Elektr-Âme"
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
+          {/* Spacer for mobile layout (logo + menu) */}
+          <div className="flex md:hidden flex-1" aria-hidden />
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

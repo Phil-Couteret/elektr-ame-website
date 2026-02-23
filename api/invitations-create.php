@@ -191,12 +191,8 @@ try {
             );
         }
         
-        $headers = "From: Elektr-Âme <noreply@elektr-ame.com>\r\n";
-        $headers .= "Reply-To: contact@elektr-ame.com\r\n";
-        $headers .= "X-Mailer: PHP/" . phpversion();
-        $headers .= "\r\nContent-Type: text/plain; charset=UTF-8";
-        
-        $mailResult = mail($inviteeEmail, $subject, $message, $headers);
+        require_once __DIR__ . '/classes/Mailer.php';
+        $mailResult = Mailer::send($inviteeEmail, $subject, $message, ['toName' => $inviteeFirstName]);
         
         // Update invitation with email sending status
         if ($mailResult) {

@@ -8,6 +8,7 @@ export default {
   'nav.membership': 'Membresia',
   'nav.joinUs': 'Uneix-te',
   'nav.memberLogin': 'Accés Membres',
+  'nav.contact': 'Contacte',
   
   // Hero
   'hero.title': 'Elektr-Âme',
@@ -129,12 +130,20 @@ export default {
   'joinUs.country': 'País',
   'joinUs.countryPlaceholder': 'Introdueix el teu país',
   'joinUs.optional': 'Opcional',
+  'joinUs.acceptTerms': 'Accepto els',
+  'joinUs.termsLink': 'Termes i Condicions',
+  'joinUs.and': 'i la',
+  'joinUs.privacyLink': 'Política de Privacitat',
   'joinUs.submit': 'Uneix-te a Elektr-Âme',
   'joinUs.submitting': 'Enviant...',
   'joinUs.success': 'Gràcies! La teva sol·licitud ha estat enviada exitosament.',
   'joinUs.error': 'Ha ocorregut un error. Si us plau, torna-ho a intentar.',
   'joinUs.tempPasswordTitle': 'La Teva Contrasenya Temporal:',
   'joinUs.tempPasswordNote': 'Si us plau, desa aquesta contrasenya! Utilitza-la per iniciar sessió al Portal de Membres. Pots canviar-la després d\'iniciar sessió.',
+  'payment.acceptTerms': 'Accepto els',
+  'payment.termsLink': 'Termes i Condicions',
+  'payment.and': 'i la',
+  'payment.privacyLink': 'Política de Privacitat',
   
   // Member Login
   'memberLogin.title': 'Accés Membres',
@@ -278,6 +287,7 @@ export default {
   'admin.status.manage': 'Gestionar',
   
   // Admin - Membership Types
+  'admin.membership.inProgress': 'En Progrés',
   'admin.membership.freeTrial': 'Prova Gratuïta',
   'admin.membership.monthly': 'Mensual',
   'admin.membership.yearly': 'Anual',
@@ -312,6 +322,9 @@ export default {
   'admin.dialog.endDate': 'Data de Fi',
   'admin.dialog.lastPayment': 'Data Últim Pagament',
   'admin.dialog.amount': 'Import del Pagament',
+  'admin.dialog.paymentMethod': 'Mètode de pagament',
+  'admin.dialog.selectPaymentMethod': 'Selecciona com van pagar',
+  'admin.dialog.paymentMethodHelp': 'Registra com van pagar (per a pagaments anteriors a Stripe)',
   'admin.dialog.notes': 'Notes Internes',
   'admin.dialog.notesPlaceholder': 'Afegeix notes internes sobre aquest membre...',
   'admin.dialog.cancel': 'Cancel·lar',
@@ -490,7 +503,24 @@ export default {
   'portal.overview.downloadCard': 'Descarregar Targeta de Membresa',
   'portal.overview.pending.title': 'Membresa Pendent d\'Aprovació',
   'portal.overview.pending.message': 'La teva sol·licitud de membresa està actualment en revisió. Rebràs un correu electrònic un cop sigui aprovada.',
-  
+  'portal.terms.title': 'Termes i Condicions',
+  'portal.terms.requiredToSign': 'Heu d\'acceptar els termes i condicions per ser membre oficial.',
+  'portal.terms.acceptLabel': 'Accepto els',
+  'portal.terms.termsLink': 'Termes i Condicions',
+  'portal.terms.and': 'i la',
+  'portal.terms.privacyLink': 'Política de Privacitat',
+  'portal.terms.acceptButton': 'Acceptar Termes',
+  'portal.terms.submitting': 'Desant...',
+  'portal.terms.mustAccept': 'Si us plau, marqueu la casella per acceptar els termes i condicions.',
+  'portal.terms.acceptFailed': 'Error en desar. Si us plau, torneu-ho a intentar.',
+  'portal.terms.acceptedTitle': 'Termes Acceptats',
+  'portal.terms.acceptedMessage': 'Gràcies. Heu acceptat els termes i condicions.',
+  'portal.terms.acceptedOn': 'Heu acceptat els termes el',
+  'portal.terms.viewTerms': 'Veure termes i condicions',
+  'portal.terms.payFirst': 'Completeu el pagament per acceptar els termes',
+  'portal.terms.payFirstDetail': 'Els termes s\'accepten en completar el pagament de la membresia (Stripe, efectiu, transferència bancària, Paycomet o altre).',
+  'portal.terms.goToPayments': 'Anar a Pagaments',
+
   // Insígnies d\'Estat
   'portal.status.approved': 'Aprovat',
   'portal.status.pending': 'Pendent',
@@ -498,9 +528,8 @@ export default {
   'portal.status.active': 'Actiu',
   
   // Tipus de Membresa
-  'portal.membership.free': 'Gratuïta',
-  'portal.membership.basic': 'Bàsica',
-  'portal.membership.sponsor': 'Patrocinador',
+  'portal.membership.inProgress': 'En Progrés',
+  'portal.membership.yearly': 'Anual',
   'portal.membership.lifetime': 'Vitalícia',
   'portal.membership.freeMember': 'Membre Gratuït',
   'portal.membership.basicMember': 'Membre Bàsic (€20/any)',
@@ -751,7 +780,7 @@ export default {
   'legal.applicableLaw': 'Llei Aplicable',
   'legal.applicableLawText': 'Aquest avís legal es regeix per la legislació espanyola.',
 
-  // Termes i Condicions
+  // Terms - content in content/terms/terms-ca.ts
   'terms.title': 'Termes i Condicions',
   'terms.description': 'Termes i condicions, política de compra i devolucions d\'Elektr-Âme',
   'terms.acceptance': 'Acceptació dels Termes',
@@ -791,6 +820,8 @@ export default {
   'terms.modificationsText': 'Ens reservem el dret de modificar aquests termes i condicions en qualsevol moment. Els canvis seran efectius immediatament després de la seva publicació en aquest lloc web.',
   'terms.contact': 'Contacte',
   'terms.contactText': 'Per a preguntes sobre aquests termes i condicions, contacteu-nos a contact@elektr-ame.com',
+
+  // Terms - content in content/terms/terms-ca.ts
 
   // Política de Privacitat
   'privacy.title': 'Política de Privacitat',
@@ -839,14 +870,14 @@ export default {
   'products.basicFeature2': 'Targeta de membresia digital',
   'products.basicFeature3': 'Butlletí i actualitzacions',
   'products.basicFeature4': 'Accés al portal de membres',
+  'products.basicFeature5': 'Certificat de deducció fiscal (per a residents fiscals espanyols)',
   'products.supportTitle': 'Membresia de Suport',
   'products.supportPrice': 'Des de €21',
   'products.supportPeriod': '/any',
-  'products.supportDescription': 'Suporteu la nostra comunitat amb qualsevol quantitat superior a €20 i rebeu beneficis de deducció fiscal',
+  'products.supportDescription': 'Suporteu la nostra comunitat amb qualsevol quantitat superior a €20',
   'products.supportFeatures': 'Totes les característiques bàsiques, més:',
-  'products.supportFeature1': 'Certificat de deducció fiscal (per a residents fiscals espanyols)',
-  'products.supportFeature2': 'Reconeixement com a col·laborador',
-  'products.supportFeature3': 'Accés prioritari a esdeveniments especials',
+  'products.supportFeature1': 'Reconeixement com a col·laborador',
+  'products.supportFeature2': 'Accés prioritari a esdeveniments especials',
   'products.buyNow': 'Uniu-vos Ara',
   'products.learnMore': 'Més Informació'
 };
