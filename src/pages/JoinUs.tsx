@@ -25,6 +25,7 @@ const joinUsSchema = z.object({
   city: z.string().min(2, "City must be at least 2 characters"),
   country: z.string().min(2, "Country must be at least 2 characters"),
   acceptTerms: z.literal(true, { errorMap: () => ({ message: "You must accept the terms and conditions" }) }),
+  newsletterSubscribe: z.boolean().optional(),
   isDj: z.boolean().optional(),
   isProducer: z.boolean().optional(),
   isVj: z.boolean().optional(),
@@ -51,6 +52,9 @@ const JoinUs = () => {
     reset,
   } = useForm<JoinUsFormData>({
     resolver: zodResolver(joinUsSchema),
+    defaultValues: {
+      newsletterSubscribe: true,
+    },
   });
 
   const onSubmit = async (data: JoinUsFormData) => {
@@ -367,6 +371,20 @@ const JoinUs = () => {
                       <p className="text-red-400 text-sm">{errors.country.message}</p>
                     )}
                   </div>
+                </div>
+
+                {/* Newsletter opt-in */}
+                <div className="space-y-3 pt-2">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      {...register('newsletterSubscribe')}
+                      className="mt-1 rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                    />
+                    <span className="text-white/90 text-sm">
+                      {t('joinUs.newsletterSubscribe')}
+                    </span>
+                  </label>
                 </div>
 
                 {/* Terms acceptance */}

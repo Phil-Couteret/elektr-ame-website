@@ -33,6 +33,14 @@ try {
         }
     }
 
+    // Check if newsletter_subscribe column exists
+    $hasNewsletterCol = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasNewsletterCol = true;
+    }
+    $newsletterSubscribe = isset($input['newsletter_subscribe']) ? ($input['newsletter_subscribe'] ? 1 : 0) : 1;
+
     // Check if email already exists
     $stmt = $pdo->prepare("SELECT id FROM members WHERE email = :email");
     $stmt->execute([':email' => $input['email']]);
@@ -43,6 +51,8 @@ try {
     }
 
     // Insert new member
+    $newsletterCol = $hasNewsletterCol ? 'newsletter_subscribe,' : '';
+    $newsletterVal = $hasNewsletterCol ? ':newsletter_subscribe,' : '';
     $sql = "INSERT INTO members (
         first_name, 
         last_name, 
@@ -59,6 +69,7 @@ try {
         is_vj,
         is_visual_artist,
         is_fan,
+        $newsletterCol
         status,
         membership_type,
         membership_start_date,
@@ -85,6 +96,7 @@ try {
         :is_vj,
         :is_visual_artist,
         :is_fan,
+        $newsletterVal
         :status,
         :membership_type,
         :membership_start_date,
@@ -114,6 +126,9 @@ try {
     $stmt->bindParam(':is_vj', $input['is_vj'], PDO::PARAM_BOOL);
     $stmt->bindParam(':is_visual_artist', $input['is_visual_artist'], PDO::PARAM_BOOL);
     $stmt->bindParam(':is_fan', $input['is_fan'], PDO::PARAM_BOOL);
+    if ($hasNewsletterCol) {
+        $stmt->bindValue(':newsletter_subscribe', $newsletterSubscribe, PDO::PARAM_INT);
+    }
     $stmt->bindParam(':status', $input['status']);
     $stmt->bindParam(':membership_type', $input['membership_type']);
     $stmt->bindParam(':membership_start_date', $input['membership_start_date']);
@@ -124,11 +139,30 @@ try {
     $stmt->bindParam(':notes', $input['notes']);
 
     $stmt->execute();
+    $newMemberId = $pdo->lastInsertId();
+
+    // If newsletter opt-in, add to newsletter_subscribers
+    if ($hasNewsletterCol && $newsletterSubscribe) {
+        try {
+            $nsCheck = $pdo->prepare("SELECT id, unsubscribed_at FROM newsletter_subscribers WHERE email = ?");
+            $nsCheck->execute([$input['email']]);
+            $existing = $nsCheck->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                if ($existing['unsubscribed_at'] !== null) {
+                    $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NULL, subscribed_at = NOW() WHERE email = ?")->execute([$input['email']]);
+                }
+            } else {
+                $pdo->prepare("INSERT INTO newsletter_subscribers (email) VALUES (?)")->execute([$input['email']]);
+            }
+        } catch (PDOException $e) {
+            error_log("Newsletter subscribe on member create failed: " . $e->getMessage());
+        }
+    }
 
     echo json_encode([
         'success' => true, 
         'message' => 'Member created successfully',
-        'member_id' => $pdo->lastInsertId()
+        'member_id' => $newMemberId
     ]);
 
 } catch (PDOException $e) {

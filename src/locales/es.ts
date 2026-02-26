@@ -130,6 +130,7 @@ export default {
   'joinUs.country': 'País',
   'joinUs.countryPlaceholder': 'Ingresa tu país',
   'joinUs.optional': 'Opcional',
+  'joinUs.newsletterSubscribe': 'Quiero recibir el boletín (eventos, actualizaciones y noticias de la comunidad)',
   'joinUs.acceptTerms': 'Acepto los',
   'joinUs.termsLink': 'Términos y Condiciones',
   'joinUs.and': 'y la',
@@ -269,8 +270,12 @@ export default {
   'admin.members.passwordCopied': 'Contraseña copiada al portapapeles',
   
   // Admin - Members Table
+  'admin.members.newsletter': 'Boletín',
+  'admin.members.newsletterYes': 'Suscrito',
+  'admin.members.newsletterNo': 'No suscrito',
   'admin.members.table.name': 'Nombre',
   'admin.members.table.email': 'Correo',
+  'admin.members.table.newsletter': 'Boletín',
   'admin.members.table.status': 'Estado',
   'admin.members.table.membership': 'Membresía',
   'admin.members.table.expires': 'Vence',
@@ -586,6 +591,12 @@ export default {
   'portal.profile.pendingEmailChange.title': 'Cambio de correo pendiente',
   'portal.profile.pendingEmailChange.message': 'Confirma {email} antes de {date} para completar la actualización de tu correo de acceso.',
   'portal.profile.pendingEmailChange.messageNoDate': 'Confirma {email} para completar la actualización de tu correo de acceso.',
+  'portal.profile.newsletter': 'Boletín',
+  'portal.profile.newsletterSubscribed': 'Suscrito a eventos y actualizaciones',
+  'portal.profile.newsletterNotSubscribed': 'No suscrito',
+  'portal.profile.newsletterOptIn': 'Quiero recibir el boletín (eventos, actualizaciones y noticias de la comunidad)',
+  'portal.profile.newsletterOn': 'Sí',
+  'portal.profile.newsletterOff': 'No',
 
   // Cambiar Contraseña
   'portal.changePassword.title': 'Cambiar Contraseña',

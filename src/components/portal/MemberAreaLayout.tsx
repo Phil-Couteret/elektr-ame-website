@@ -9,7 +9,7 @@ import MemberPortal from "@/pages/MemberPortal";
 import Messaging from "@/components/portal/Messaging";
 
 const MemberAreaLayout = () => {
-  const [activeTab, setActiveTab] = useState("directory");
+  const [activeTab, setActiveTab] = useState("portal");
   const [messageRecipientId, setMessageRecipientId] = useState<number | null>(null);
   const [messageRecipientName, setMessageRecipientName] = useState<string>("");
   const navigate = useNavigate();
@@ -73,29 +73,25 @@ const MemberAreaLayout = () => {
         {/* Main Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-black/40 border-white/10 mb-6">
-            <TabsTrigger value="directory" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Directory
+            <TabsTrigger value="portal" className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              Profile
             </TabsTrigger>
             <TabsTrigger value="messaging" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Messaging
             </TabsTrigger>
-            <TabsTrigger value="portal" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              My Portal
+            <TabsTrigger value="directory" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Directory
             </TabsTrigger>
           </TabsList>
 
-          {/* Directory Tab */}
-          <TabsContent value="directory" className="mt-0">
-            <MemberDirectory 
-              onSendMessage={(memberId, memberName) => {
-                setMessageRecipientId(memberId);
-                setMessageRecipientName(memberName);
-                setActiveTab("messaging");
-              }}
-            />
+          {/* Member Portal Tab (Profile) */}
+          <TabsContent value="portal" className="mt-0">
+            <div className="-mx-4 -my-8">
+              <MemberPortal />
+            </div>
           </TabsContent>
 
           {/* Messaging Tab */}
@@ -106,11 +102,15 @@ const MemberAreaLayout = () => {
             />
           </TabsContent>
 
-          {/* Member Portal Tab */}
-          <TabsContent value="portal" className="mt-0">
-            <div className="-mx-4 -my-8">
-              <MemberPortal />
-            </div>
+          {/* Directory Tab */}
+          <TabsContent value="directory" className="mt-0">
+            <MemberDirectory 
+              onSendMessage={(memberId, memberName) => {
+                setMessageRecipientId(memberId);
+                setMessageRecipientName(memberName);
+                setActiveTab("messaging");
+              }}
+            />
           </TabsContent>
         </Tabs>
       </div>

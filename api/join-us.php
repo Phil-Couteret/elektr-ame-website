@@ -91,7 +91,18 @@ try {
     
     // Terms accepted_at is set only when member pays (Stripe or manual: cash, wire, paycomet, other)
     
+    // Check if newsletter_subscribe column exists (backward compatibility)
+    $hasNewsletterCol = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasNewsletterCol = true;
+    }
+    
+    $newsletterSubscribe = !isset($input['newsletterSubscribe']) || $input['newsletterSubscribe'] ? 1 : 0;
+    
     // Prepare SQL statement
+    $newsletterCol = $hasNewsletterCol ? 'newsletter_subscribe,' : '';
+    $newsletterVal = $hasNewsletterCol ? ':newsletterSubscribe,' : '';
     $sql = "INSERT INTO members (
         first_name, 
         last_name, 
@@ -112,6 +123,7 @@ try {
         is_vj,
         is_visual_artist,
         is_fan,
+        $newsletterCol
         created_at
     ) VALUES (
         :firstName, 
@@ -133,6 +145,7 @@ try {
         :isVj,
         :isVisualArtist,
         :isFan,
+        $newsletterVal
         NOW()
     )";
     
@@ -166,6 +179,9 @@ try {
     $stmt->bindParam(':isVisualArtist', $isVisualArtist, PDO::PARAM_INT);
     $isFan = isset($input['isFan']) && $input['isFan'] ? 1 : 0;
     $stmt->bindParam(':isFan', $isFan, PDO::PARAM_INT);
+    if ($hasNewsletterCol) {
+        $stmt->bindParam(':newsletterSubscribe', $newsletterSubscribe, PDO::PARAM_INT);
+    }
     
     // Execute the statement
     $stmt->execute();
@@ -226,6 +242,26 @@ try {
             } else {
                 error_log("Registration: No invitation updated for email: $inviteeEmail");
             }
+        }
+    }
+    
+    // If newsletter opt-in, add to newsletter_subscribers
+    if ($newsletterSubscribe) {
+        try {
+            $nsCheck = $pdo->prepare("SELECT id, unsubscribed_at FROM newsletter_subscribers WHERE email = ?");
+            $nsCheck->execute([$input['email']]);
+            $existing = $nsCheck->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                if ($existing['unsubscribed_at'] !== null) {
+                    $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NULL, subscribed_at = NOW() WHERE email = ?")->execute([$input['email']]);
+                }
+            } else {
+                $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+                $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+                $pdo->prepare("INSERT INTO newsletter_subscribers (email, ip_address, user_agent) VALUES (?, ?, ?)")->execute([$input['email'], $ip, $userAgent]);
+            }
+        } catch (PDOException $e) {
+            error_log("Newsletter subscribe on registration failed: " . $e->getMessage());
         }
     }
     

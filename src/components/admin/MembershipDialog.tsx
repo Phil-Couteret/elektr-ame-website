@@ -23,6 +23,7 @@ interface Member {
   is_vj?: boolean;
   is_visual_artist?: boolean;
   is_fan?: boolean;
+  newsletter_subscribe?: boolean;
   membership_type?: string;
   membership_start_date?: string;
   membership_end_date?: string;
@@ -76,6 +77,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
     is_vj: false,
     is_visual_artist: false,
     is_fan: false,
+    newsletter_subscribe: true,
     membership_type: '',
     membership_start_date: '',
     membership_end_date: '',
@@ -99,6 +101,7 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
         is_vj: Boolean(member.is_vj),
         is_visual_artist: Boolean(member.is_visual_artist),
         is_fan: Boolean(member.is_fan),
+        newsletter_subscribe: Boolean(member.newsletter_subscribe ?? true),
         membership_type: member.membership_type || 'in_progress',
         membership_start_date: member.membership_start_date || '',
         membership_end_date: member.membership_end_date || '',
@@ -393,6 +396,18 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                   <span className="text-sm text-white">{t('admin.addMember.fan')}</span>
                 </label>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.newsletter_subscribe}
+                  onChange={(e) => setFormData({ ...formData, newsletter_subscribe: e.target.checked })}
+                  className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                />
+                <span className="text-sm text-white">{t('admin.members.newsletter')}</span>
+              </label>
             </div>
           </div>
 

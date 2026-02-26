@@ -30,8 +30,16 @@ try {
         $hasPaymentMethod = true;
     }
 
+    // Check if newsletter_subscribe column exists
+    $hasNewsletterSubscribe = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasNewsletterSubscribe = true;
+    }
+
     // Get all members ordered by creation date (newest first)
     $paymentMethodCol = $hasPaymentMethod ? ', payment_method' : '';
+    $newsletterCol = $hasNewsletterSubscribe ? ', newsletter_subscribe' : '';
     $stmt = $pdo->query("
         SELECT 
             id,
@@ -52,7 +60,8 @@ try {
             payment_status,
             last_payment_date,
             payment_amount
-            $paymentMethodCol,
+            $paymentMethodCol
+            $newsletterCol,
             is_dj,
             is_producer,
             is_vj,
@@ -74,6 +83,7 @@ try {
         $member['is_vj'] = (bool)($member['is_vj'] ?? 0);
         $member['is_visual_artist'] = (bool)($member['is_visual_artist'] ?? 0);
         $member['is_fan'] = (bool)($member['is_fan'] ?? 0);
+        $member['newsletter_subscribe'] = (bool)($member['newsletter_subscribe'] ?? 0);
     }
     unset($member); // Break reference
     

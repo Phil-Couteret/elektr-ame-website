@@ -106,7 +106,18 @@ try {
     // Convert social_links array to JSON string for storage
     $socialLinksJson = $socialLinks ? json_encode($socialLinks) : null;
 
+    // Newsletter preference (opt-in/opt-out)
+    $newsletterSubscribe = isset($input['newsletter_subscribe']) ? ($input['newsletter_subscribe'] ? 1 : 0) : null;
+
+    // Check if newsletter_subscribe column exists
+    $hasNewsletterCol = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasNewsletterCol = true;
+    }
+
     // Update profile fields (excluding email for now)
+    $newsletterSet = $hasNewsletterCol && $newsletterSubscribe !== null ? ', newsletter_subscribe = ?' : '';
     $stmt = $pdo->prepare("
         UPDATE members 
         SET 
@@ -120,10 +131,11 @@ try {
             country = ?,
             bio = ?,
             social_links = ?
+            $newsletterSet
         WHERE id = ?
     ");
 
-    $stmt->execute([
+    $params = [
         $firstName,
         $secondName,
         $artistName ?: null,
@@ -134,8 +146,40 @@ try {
         $country ?: null,
         $bio ?: null,
         $socialLinksJson,
-        $member_id
-    ]);
+    ];
+    if ($hasNewsletterCol && $newsletterSubscribe !== null) {
+        $params[] = $newsletterSubscribe;
+    }
+    $params[] = $member_id;
+    $stmt->execute($params);
+
+    // Sync newsletter_subscribers when newsletter preference changes
+    if ($hasNewsletterCol && $newsletterSubscribe !== null) {
+        try {
+            $memberStmt = $pdo->prepare("SELECT email FROM members WHERE id = ?");
+            $memberStmt->execute([$member_id]);
+            $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
+            $email = $member ? trim($member['email']) : null;
+            if ($email) {
+                if ($newsletterSubscribe) {
+                    $nsCheck = $pdo->prepare("SELECT id, unsubscribed_at FROM newsletter_subscribers WHERE email = ?");
+                    $nsCheck->execute([$email]);
+                    $existing = $nsCheck->fetch(PDO::FETCH_ASSOC);
+                    if ($existing) {
+                        if ($existing['unsubscribed_at'] !== null) {
+                            $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NULL, subscribed_at = NOW() WHERE email = ?")->execute([$email]);
+                        }
+                    } else {
+                        $pdo->prepare("INSERT INTO newsletter_subscribers (email) VALUES (?)")->execute([$email]);
+                    }
+                } else {
+                    $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NOW() WHERE email = ?")->execute([$email]);
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Newsletter sync on profile update failed: " . $e->getMessage());
+        }
+    }
 
     $pendingEmailChange = null;
 

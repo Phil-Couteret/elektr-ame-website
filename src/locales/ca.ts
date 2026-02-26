@@ -130,6 +130,7 @@ export default {
   'joinUs.country': 'País',
   'joinUs.countryPlaceholder': 'Introdueix el teu país',
   'joinUs.optional': 'Opcional',
+  'joinUs.newsletterSubscribe': 'Vull rebre el butlletí (esdeveniments, actualitzacions i notícies de la comunitat)',
   'joinUs.acceptTerms': 'Accepto els',
   'joinUs.termsLink': 'Termes i Condicions',
   'joinUs.and': 'i la',
@@ -269,8 +270,12 @@ export default {
   'admin.members.passwordCopied': 'Contrasenya copiada al porta-retalls',
   
   // Admin - Members Table
+  'admin.members.newsletter': 'Butlletí',
+  'admin.members.newsletterYes': 'Subscrit',
+  'admin.members.newsletterNo': 'No subscrit',
   'admin.members.table.name': 'Nom',
   'admin.members.table.email': 'Correu',
+  'admin.members.table.newsletter': 'Butlletí',
   'admin.members.table.status': 'Estat',
   'admin.members.table.membership': 'Membresia',
   'admin.members.table.expires': 'Caduca',
@@ -586,6 +591,12 @@ export default {
   'portal.profile.pendingEmailChange.title': 'Canvi de correu pendent',
   'portal.profile.pendingEmailChange.message': 'Confirma {email} abans de {date} per completar l\'actualització del correu d\'accés.',
   'portal.profile.pendingEmailChange.messageNoDate': 'Confirma {email} per completar l\'actualització del correu d\'accés.',
+  'portal.profile.newsletter': 'Butlletí',
+  'portal.profile.newsletterSubscribed': 'Subscrit a esdeveniments i actualitzacions',
+  'portal.profile.newsletterNotSubscribed': 'No subscrit',
+  'portal.profile.newsletterOptIn': 'Vull rebre el butlletí (esdeveniments, actualitzacions i notícies de la comunitat)',
+  'portal.profile.newsletterOn': 'Sí',
+  'portal.profile.newsletterOff': 'No',
 
   // Canviar Contrasenya
   'portal.changePassword.title': 'Canviar Contrasenya',

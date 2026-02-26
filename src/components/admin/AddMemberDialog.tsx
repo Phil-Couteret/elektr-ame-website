@@ -35,6 +35,7 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
     is_vj: false,
     is_visual_artist: false,
     is_fan: false,
+    newsletter_subscribe: true,
     status: 'approved',
     membership_type: 'in_progress',
     membership_start_date: '',
@@ -85,6 +86,7 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
           is_vj: false,
           is_visual_artist: false,
           is_fan: false,
+          newsletter_subscribe: true,
           status: 'approved',
           membership_type: 'in_progress',
           membership_start_date: '',
@@ -216,6 +218,18 @@ const AddMemberDialog = ({ open, onOpenChange, onSuccess }: AddMemberDialogProps
                   <span className="text-sm text-white">{t('admin.addMember.fan')}</span>
                 </label>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="flex items-center space-x-2 cursor-pointer bg-black/20 p-2 rounded border border-white/10 hover:border-electric-blue/50 transition-colors">
+                <input
+                  type="checkbox"
+                  checked={formData.newsletter_subscribe}
+                  onChange={(e) => setFormData({ ...formData, newsletter_subscribe: e.target.checked })}
+                  className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                />
+                <span className="text-sm text-white">{t('admin.members.newsletter')}</span>
+              </label>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

@@ -101,6 +101,14 @@ try {
         $params[':is_fan'] = $input['is_fan'] ? 1 : 0;
     }
     
+    if (isset($input['newsletter_subscribe'])) {
+        $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+        if ($colCheck && $colCheck->rowCount() > 0) {
+            $updates[] = "newsletter_subscribe = :newsletter_subscribe";
+            $params[':newsletter_subscribe'] = $input['newsletter_subscribe'] ? 1 : 0;
+        }
+    }
+    
     if (isset($input['membership_type'])) {
         $validTypes = ['in_progress', 'yearly', 'lifetime'];
         if (!in_array($input['membership_type'], $validTypes)) {
@@ -179,6 +187,37 @@ try {
         throw new Exception('Member not found or no changes made');
     }
     
+    // Sync newsletter_subscribers when newsletter_subscribe changes
+    if (isset($input['newsletter_subscribe'])) {
+        try {
+            $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+            if ($colCheck && $colCheck->rowCount() > 0) {
+                $memberStmt = $pdo->prepare("SELECT email FROM members WHERE id = ?");
+                $memberStmt->execute([$memberId]);
+                $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
+                $email = $member ? trim($member['email']) : null;
+                if ($email) {
+                    if ($input['newsletter_subscribe']) {
+                        $nsCheck = $pdo->prepare("SELECT id, unsubscribed_at FROM newsletter_subscribers WHERE email = ?");
+                        $nsCheck->execute([$email]);
+                        $existing = $nsCheck->fetch(PDO::FETCH_ASSOC);
+                        if ($existing) {
+                            if ($existing['unsubscribed_at'] !== null) {
+                                $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NULL, subscribed_at = NOW() WHERE email = ?")->execute([$email]);
+                            }
+                        } else {
+                            $pdo->prepare("INSERT INTO newsletter_subscribers (email) VALUES (?)")->execute([$email]);
+                        }
+                    } else {
+                        $pdo->prepare("UPDATE newsletter_subscribers SET unsubscribed_at = NOW() WHERE email = ?")->execute([$email]);
+                    }
+                }
+            }
+        } catch (PDOException $e) {
+            error_log("Newsletter sync on member update failed: " . $e->getMessage());
+        }
+    }
+    
     // Update invitation status if payment was made
     if ($before && isset($input['payment_status']) && $input['payment_status'] === 'paid' && $before['payment_status'] !== 'paid') {
         // Fetch member email and inviter_id for matching invitations
@@ -234,16 +273,8 @@ try {
         
         error_log("Invitation payment update: member_id=$memberId, email=$memberEmail, inviter_id=$inviterId, by_member_id=$rowsByMemberId, by_email=$rowsByEmail, by_inviter=$rowsByInviter");
         
-        // Debug: Check if any invitations exist for this member
         if ($rowsByMemberId === 0 && $rowsByEmail === 0 && $rowsByInviter === 0) {
-            $debugStmt = $pdo->prepare("
-                SELECT id, inviter_id, invitee_email, invitee_member_id, status 
-                FROM member_invitations 
-                WHERE invitee_member_id = ? OR LOWER(TRIM(invitee_email)) = ?
-            ");
-            $debugStmt->execute([$memberId, $memberEmail ?? '']);
-            $debugInvitations = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
-            error_log("Invitation payment debug: Found " . count($debugInvitations) . " invitation(s): " . json_encode($debugInvitations));
+            error_log("Invitation payment: No invitations found for member_id=$memberId, email=$memberEmail");
         }
 
         // Insert manual payment into payment_transactions (for history and modify/delete)

@@ -133,6 +133,7 @@ export default {
   'joinUs.country': 'Country',
   'joinUs.countryPlaceholder': 'Enter your country',
   'joinUs.optional': 'Optional',
+  'joinUs.newsletterSubscribe': 'I want to receive the newsletter (events, updates, and community news)',
   'joinUs.acceptTerms': 'I accept the',
   'joinUs.termsLink': 'Terms and Conditions',
   'joinUs.and': 'and',
@@ -274,8 +275,12 @@ export default {
   'admin.members.passwordCopied': 'Password copied to clipboard',
   
   // Admin - Members Table
+  'admin.members.newsletter': 'Newsletter',
+  'admin.members.newsletterYes': 'Subscribed',
+  'admin.members.newsletterNo': 'Not subscribed',
   'admin.members.table.name': 'Name',
   'admin.members.table.email': 'Email',
+  'admin.members.table.newsletter': 'Newsletter',
   'admin.members.table.status': 'Status',
   'admin.members.table.membership': 'Membership',
   'admin.members.table.expires': 'Expires',
@@ -593,6 +598,12 @@ export default {
   'portal.profile.pendingEmailChange.title': 'Email change pending',
   'portal.profile.pendingEmailChange.message': 'Please confirm {email} before {date} to finish updating your login email.',
   'portal.profile.pendingEmailChange.messageNoDate': 'Please confirm {email} to finish updating your login email.',
+  'portal.profile.newsletter': 'Newsletter',
+  'portal.profile.newsletterSubscribed': 'Subscribed to events and updates',
+  'portal.profile.newsletterNotSubscribed': 'Not subscribed',
+  'portal.profile.newsletterOptIn': 'I want to receive the newsletter (events, updates, and community news)',
+  'portal.profile.newsletterOn': 'On',
+  'portal.profile.newsletterOff': 'Off',
   
   // Change Password
   'portal.changePassword.title': 'Change Password',

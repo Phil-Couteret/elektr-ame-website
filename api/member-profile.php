@@ -31,6 +31,14 @@ try {
 
     $member_id = $_SESSION['member_id'];
 
+    // Check if newsletter_subscribe column exists
+    $hasNewsletterCol = false;
+    $colCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'newsletter_subscribe'");
+    if ($colCheck && $colCheck->rowCount() > 0) {
+        $hasNewsletterCol = true;
+    }
+    $newsletterCol = $hasNewsletterCol ? ', newsletter_subscribe' : '';
+
     // Fetch member data
     $stmt = $pdo->prepare("
         SELECT 
@@ -60,7 +68,8 @@ try {
             is_producer,
             is_vj,
             is_visual_artist,
-            is_fan,
+            is_fan
+            $newsletterCol,
             notes,
             created_at
         FROM members 
@@ -80,11 +89,12 @@ try {
     }
 
     // Convert boolean fields
-    $member['is_dj'] = (bool)$member['is_dj'];
+    $member['is_dj'] = (bool)($member['is_dj'] ?? 0);
     $member['is_producer'] = (bool)$member['is_producer'];
     $member['is_vj'] = (bool)$member['is_vj'];
     $member['is_visual_artist'] = (bool)$member['is_visual_artist'];
-    $member['is_fan'] = (bool)$member['is_fan'];
+    $member['is_fan'] = (bool)($member['is_fan'] ?? 0);
+    $member['newsletter_subscribe'] = (bool)($member['newsletter_subscribe'] ?? 0);
 
     // Fetch pending email change if any
     $pendingStmt = $pdo->prepare("

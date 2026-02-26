@@ -40,6 +40,7 @@ import PaymentCheckout from "@/components/payment/PaymentCheckout";
 import MembershipRenewal from "@/components/payment/MembershipRenewal";
 import PaymentAllocation from "@/components/payment/PaymentAllocation";
 import TermsAcceptance from "@/components/portal/TermsAcceptance";
+import { Switch } from "@/components/ui/switch";
 
 interface PendingEmailChange {
   new_email: string;
@@ -80,6 +81,7 @@ interface MemberData {
   is_vj: boolean;
   is_visual_artist: boolean;
   is_fan: boolean;
+  newsletter_subscribe?: boolean;
   created_at: string;
   terms_accepted_at?: string | null;
   terms_version?: string | null;
@@ -106,6 +108,7 @@ const MemberPortal = () => {
     postal_code: '',
     country: '',
     bio: '',
+    newsletter_subscribe: true,
     social_links: {
       instagram: '',
       soundcloud: '',
@@ -132,6 +135,7 @@ const MemberPortal = () => {
   const [invitationsLoading, setInvitationsLoading] = useState(true);
   const [invitedMembers, setInvitedMembers] = useState<any[]>([]);
   const [invitedMembersLoading, setInvitedMembersLoading] = useState(true);
+  const [updatingNewsletter, setUpdatingNewsletter] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -253,6 +257,7 @@ const MemberPortal = () => {
         postal_code: memberData.postal_code || '',
         country: memberData.country || '',
         bio: memberData.bio || '',
+        newsletter_subscribe: memberData.newsletter_subscribe ?? true,
         social_links: memberData.social_links || {
           instagram: '',
           soundcloud: '',
@@ -264,6 +269,50 @@ const MemberPortal = () => {
         }
       });
       setIsEditing(true);
+    }
+  };
+
+  const handleNewsletterToggle = async (checked: boolean) => {
+    if (!memberData) return;
+    setUpdatingNewsletter(true);
+    try {
+      const response = await fetch('/api/member-profile-update.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          first_name: memberData.first_name,
+          second_name: memberData.second_name ?? '',
+          email: memberData.email,
+          artist_name: memberData.artist_name || '',
+          phone: memberData.phone || '',
+          address: memberData.address || '',
+          city: memberData.city || '',
+          postal_code: memberData.postal_code || '',
+          country: memberData.country || '',
+          bio: memberData.bio || '',
+          social_links: memberData.social_links || {},
+          newsletter_subscribe: checked,
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMemberData({ ...memberData, newsletter_subscribe: checked });
+        toast({
+          title: t('portal.profile.updateSuccess'),
+          description: checked ? t('portal.profile.newsletterSubscribed') : t('portal.profile.newsletterNotSubscribed'),
+        });
+      } else {
+        throw new Error(data.error || 'Update failed');
+      }
+    } catch (error) {
+      toast({
+        title: t('portal.profile.updateError'),
+        description: error instanceof Error ? error.message : t('portal.profile.updateErrorMessage'),
+        variant: 'destructive',
+      });
+    } finally {
+      setUpdatingNewsletter(false);
     }
   };
 
@@ -280,6 +329,7 @@ const MemberPortal = () => {
       postal_code: '',
       country: '',
       bio: '',
+      newsletter_subscribe: true,
       social_links: {
         instagram: '',
         soundcloud: '',
@@ -1043,6 +1093,32 @@ const MemberPortal = () => {
                       </div>
                     )}
 
+                    {/* Newsletter preference - inline toggle */}
+                    <div className="flex items-center justify-between gap-3 pb-4 border-b border-white/10">
+                      <div className="flex items-center gap-3 flex-1">
+                        <Mail className="h-5 w-5 text-white/50" />
+                        <div>
+                          <p className="text-white/70 text-sm">{t('portal.profile.newsletter')}</p>
+                          <p className="text-white text-sm">
+                            {memberData.newsletter_subscribe
+                              ? t('portal.profile.newsletterSubscribed')
+                              : t('portal.profile.newsletterNotSubscribed')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-white/60 text-sm">
+                          {memberData.newsletter_subscribe ? t('portal.profile.newsletterOn') : t('portal.profile.newsletterOff')}
+                        </span>
+                        <Switch
+                          checked={!!memberData.newsletter_subscribe}
+                          onCheckedChange={handleNewsletterToggle}
+                          disabled={updatingNewsletter}
+                          className="data-[state=checked]:bg-electric-blue"
+                        />
+                      </div>
+                    </div>
+
                     {/* Profile Picture */}
                     <div className="pb-4 border-b border-white/10">
                       <p className="text-white/70 text-sm mb-3">Profile Picture</p>
@@ -1220,6 +1296,19 @@ const MemberPortal = () => {
                           className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                         />
                       </div>
+                    </div>
+
+                    {/* Newsletter preference */}
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={editFormData.newsletter_subscribe ?? true}
+                          onChange={(e) => setEditFormData({...editFormData, newsletter_subscribe: e.target.checked})}
+                          className="rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                        />
+                        <span className="text-white text-sm">{t('portal.profile.newsletterOptIn')}</span>
+                      </label>
                     </div>
 
                     {/* Profile Picture Upload */}

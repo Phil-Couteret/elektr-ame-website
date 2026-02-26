@@ -31,6 +31,7 @@ interface Member {
   is_vj: boolean;
   is_visual_artist: boolean;
   is_fan: boolean;
+  newsletter_subscribe?: boolean;
   status: 'pending' | 'approved' | 'rejected';
   membership_type?: 'in_progress' | 'yearly' | 'lifetime';
   membership_start_date?: string;
@@ -819,6 +820,7 @@ const MembersManager = () => {
                     <TableHead className="text-white/80">{t('admin.members.table.email')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.status')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.membership')}</TableHead>
+                    <TableHead className="text-white/80">{t('admin.members.table.newsletter')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.expires')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.payment')}</TableHead>
                     <TableHead className="text-white/80">{t('admin.members.table.amount')}</TableHead>
@@ -837,7 +839,7 @@ const MembersManager = () => {
                             {member.artist_name && <div className="text-sm text-electric-blue">"{member.artist_name}"</div>}
                             <div className="text-xs text-white/40">{member.city}</div>
                           </TableCell>
-                          <TableCell colSpan={8}>
+                          <TableCell colSpan={9}>
                             <div className="flex gap-1 flex-wrap">
                               {member.is_dj && <span className="text-xs bg-purple-600/30 text-purple-300 px-1.5 py-0.5 rounded">DJ</span>}
                               {member.is_producer && <span className="text-xs bg-blue-600/30 text-blue-300 px-1.5 py-0.5 rounded">Producer</span>}
@@ -874,6 +876,13 @@ const MembersManager = () => {
                         <TableCell className="text-white/80 text-sm">{member.email}</TableCell>
                         <TableCell>{getStatusBadge(member.status)}</TableCell>
                         <TableCell>{getMembershipTypeBadge(member.membership_type)}</TableCell>
+                        <TableCell>
+                          {member.newsletter_subscribe ? (
+                            <CheckCircle className="h-4 w-4 text-green-400" title={t('admin.members.newsletterYes')} />
+                          ) : (
+                            <XCircle className="h-4 w-4 text-white/40" title={t('admin.members.newsletterNo')} />
+                          )}
+                        </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
                             <span className="text-white/80 text-sm">{formatSimpleDate(member.membership_end_date)}</span>
