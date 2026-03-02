@@ -6,6 +6,7 @@ export default {
   'nav.about': 'Sobre nosotros',
   'nav.artists': 'Artistas',
   'nav.membership': 'Membresía',
+  'nav.sponsoring': 'Patrocinio',
   'nav.joinUs': 'Únete',
   'nav.memberLogin': 'Acceso Miembros',
   'nav.contact': 'Contacto',

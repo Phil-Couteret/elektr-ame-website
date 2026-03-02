@@ -13,17 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 session_start();
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+requireAdminSection('invitations');
 
 try {
-    // Check if user is admin
-    if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
-        http_response_code(401);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Unauthorized. Admin access required.'
-        ]);
-        exit;
-    }
 
     // Get query parameters for filtering
     $statusFilter = $_GET['status'] ?? 'all';

@@ -17,27 +17,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit();
-}
-
-// Include database configuration
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+// Users section: superadmin only
+requireAdminSection(null);
+if (($_SESSION['admin_role'] ?? '') !== 'superadmin') {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Only superadmin can access user management']);
+    exit;
+}
 
 try {
     // Superadmin account is never shown in the list
     $stmt = $pdo->prepare("
-        SELECT id, email, name, role, is_active, created_at, last_login
+        SELECT id, email, name, role, permissions, is_active, created_at, last_login
         FROM admin_users
         WHERE role != 'superadmin'
         ORDER BY role DESC, email ASC
     ");
     $stmt->execute();
-    $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $users = array_map(function ($row) {
+        $perms = $row['permissions'] ?? null;
+        $row['permissions'] = $perms ? (json_decode($perms, true) ?: []) : [];
+        return $row;
+    }, $rows);
+
     echo json_encode([
         'success' => true,
         'users' => $users

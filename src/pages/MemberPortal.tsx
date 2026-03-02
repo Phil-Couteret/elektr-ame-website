@@ -16,6 +16,7 @@ import {
   Mail, 
   Phone, 
   MapPin,
+  Building2,
   Edit,
   QrCode,
   CheckCircle,
@@ -82,6 +83,9 @@ interface MemberData {
   is_visual_artist: boolean;
   is_fan: boolean;
   newsletter_subscribe?: boolean;
+  company_name?: string | null;
+  company_cif?: string | null;
+  company_address?: string | null;
   created_at: string;
   terms_accepted_at?: string | null;
   terms_version?: string | null;
@@ -107,6 +111,9 @@ const MemberPortal = () => {
     city: '',
     postal_code: '',
     country: '',
+    company_name: '',
+    company_cif: '',
+    company_address: '',
     bio: '',
     newsletter_subscribe: true,
     social_links: {
@@ -256,6 +263,9 @@ const MemberPortal = () => {
         city: memberData.city || '',
         postal_code: memberData.postal_code || '',
         country: memberData.country || '',
+        company_name: memberData.company_name || '',
+        company_cif: memberData.company_cif || '',
+        company_address: memberData.company_address || '',
         bio: memberData.bio || '',
         newsletter_subscribe: memberData.newsletter_subscribe ?? true,
         social_links: memberData.social_links || {
@@ -328,6 +338,9 @@ const MemberPortal = () => {
       city: '',
       postal_code: '',
       country: '',
+      company_name: '',
+      company_cif: '',
+      company_address: '',
       bio: '',
       newsletter_subscribe: true,
       social_links: {
@@ -401,7 +414,10 @@ const MemberPortal = () => {
         credentials: 'include',
         body: JSON.stringify({
           ...editFormData,
-          social_links: editFormData.social_links
+          social_links: editFormData.social_links,
+          company_name: editFormData.company_name || null,
+          company_cif: editFormData.company_cif || null,
+          company_address: editFormData.company_address || null,
         }),
       });
 
@@ -1093,6 +1109,21 @@ const MemberPortal = () => {
                       </div>
                     )}
 
+                    {(memberData.company_name || memberData.company_cif) && (
+                      <div className="flex items-start gap-3 pb-4 border-b border-white/10">
+                        <Building2 className="h-5 w-5 text-white/50 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-white/70 text-sm">Company (for tax receipt)</p>
+                          <p className="text-white">
+                            {memberData.company_name}
+                            {memberData.company_cif && <><br />CIF: {memberData.company_cif}</>}
+                            {memberData.company_address && <><br />{memberData.company_address}</>}
+                          </p>
+                          <p className="text-white/50 text-xs mt-1">You can choose to issue the tax receipt to this company when paying.</p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Newsletter preference - inline toggle */}
                     <div className="flex items-center justify-between gap-3 pb-4 border-b border-white/10">
                       <div className="flex items-center gap-3 flex-1">
@@ -1294,6 +1325,43 @@ const MemberPortal = () => {
                           value={editFormData.country}
                           onChange={(e) => setEditFormData({...editFormData, country: e.target.value})}
                           className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="border-t border-white/10 pt-4 mt-4">
+                      <p className="text-white/70 text-sm mb-3">Company (optional – for tax receipt on behalf of company)</p>
+                      <p className="text-white/50 text-xs mb-3">If your employer pays your membership, add company details here. When paying, you can choose to issue the tax receipt to the company instead of yourself.</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="company_name" className="text-white">Company name</Label>
+                          <Input
+                            id="company_name"
+                            value={editFormData.company_name}
+                            onChange={(e) => setEditFormData({...editFormData, company_name: e.target.value})}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="Acme S.L."
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="company_cif" className="text-white">CIF / NIF</Label>
+                          <Input
+                            id="company_cif"
+                            value={editFormData.company_cif}
+                            onChange={(e) => setEditFormData({...editFormData, company_cif: e.target.value})}
+                            className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                            placeholder="B12345678"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2 mt-4">
+                        <Label htmlFor="company_address" className="text-white">Company address</Label>
+                        <Input
+                          id="company_address"
+                          value={editFormData.company_address}
+                          onChange={(e) => setEditFormData({...editFormData, company_address: e.target.value})}
+                          className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                          placeholder="Carrer Example 123, Barcelona"
                         />
                       </div>
                     </div>
@@ -1616,6 +1684,15 @@ const MemberPortal = () => {
                     memberId={memberData.id}
                     currentMembershipType={memberData.membership_type}
                     currentPaymentStatus={memberData.payment_status}
+                    companyDetails={
+                      memberData.company_name && memberData.company_cif
+                        ? {
+                            company_name: memberData.company_name,
+                            company_cif: memberData.company_cif,
+                            company_address: memberData.company_address || undefined,
+                          }
+                        : null
+                    }
                     onPaymentSuccess={() => {
                       fetchMemberData();
                       toast({

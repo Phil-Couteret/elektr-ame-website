@@ -16,14 +16,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Check if user is authenticated
-if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit();
-}
-
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+requireAdminSection('artists');
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);

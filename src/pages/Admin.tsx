@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send, UserCheck, CreditCard } from "lucide-react";
@@ -18,9 +18,27 @@ import LanguageSelector from "@/components/LanguageSelector";
 import { SEO } from "@/components/SEO";
 
 const Admin = () => {
-  const { logout, user, isSuperAdmin } = useAuth();
+  const { logout, user, isSuperAdmin, canAccessSection } = useAuth();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("events");
+
+  const visibleTabs = [
+    canAccessSection('events') && 'events',
+    canAccessSection('artists') && 'artists',
+    canAccessSection('gallery') && 'gallery',
+    canAccessSection('members') && 'members',
+    canAccessSection('newsletter') && 'newsletter',
+    canAccessSection('email_automation') && 'email-automation',
+    canAccessSection('invitations') && 'invitations',
+    canAccessSection('payment') && 'payment-config',
+    isSuperAdmin && 'users',
+  ].filter(Boolean) as string[];
+
+  useEffect(() => {
+    if (!visibleTabs.includes(activeTab) && visibleTabs[0]) {
+      setActiveTab(visibleTabs[0]);
+    }
+  }, [activeTab, visibleTabs]);
 
   const handleLogout = () => {
     logout();
@@ -76,107 +94,108 @@ const Admin = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-9 bg-black/40 border-white/10">
-            <TabsTrigger 
-              value="events" 
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              {t('admin.tabs.events')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="artists"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              {t('admin.tabs.artists')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="gallery"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <Image className="h-4 w-4 mr-2" />
-              {t('admin.tabs.gallery')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="members"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              {t('admin.tabs.members')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="newsletter"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              {t('admin.tabs.newsletter')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="email-automation"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <Send className="h-4 w-4 mr-2" />
-              {t('admin.tabs.emailAutomation')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="invitations"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <UserCheck className="h-4 w-4 mr-2" />
-              {t('admin.tabs.invitations')}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="payment-config"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <CreditCard className="h-4 w-4 mr-2" />
-              Payment
-            </TabsTrigger>
-            <TabsTrigger 
-              value="users"
-              className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white"
-            >
-              <UserCog className="h-4 w-4 mr-2" />
-              {t('admin.tabs.users')}
-            </TabsTrigger>
+          <TabsList className="flex flex-wrap gap-1 bg-black/40 border-white/10 p-2">
+            {canAccessSection('events') && (
+              <TabsTrigger value="events" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Calendar className="h-4 w-4 mr-2" />
+                {t('admin.tabs.events')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('artists') && (
+              <TabsTrigger value="artists" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Users className="h-4 w-4 mr-2" />
+                {t('admin.tabs.artists')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('gallery') && (
+              <TabsTrigger value="gallery" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Image className="h-4 w-4 mr-2" />
+                {t('admin.tabs.gallery')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('members') && (
+              <TabsTrigger value="members" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <UserPlus className="h-4 w-4 mr-2" />
+                {t('admin.tabs.members')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('newsletter') && (
+              <TabsTrigger value="newsletter" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Mail className="h-4 w-4 mr-2" />
+                {t('admin.tabs.newsletter')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('email_automation') && (
+              <TabsTrigger value="email-automation" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Send className="h-4 w-4 mr-2" />
+                {t('admin.tabs.emailAutomation')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('invitations') && (
+              <TabsTrigger value="invitations" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <UserCheck className="h-4 w-4 mr-2" />
+                {t('admin.tabs.invitations')}
+              </TabsTrigger>
+            )}
+            {canAccessSection('payment') && (
+              <TabsTrigger value="payment-config" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Payment
+              </TabsTrigger>
+            )}
+            {isSuperAdmin && (
+              <TabsTrigger value="users" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <UserCog className="h-4 w-4 mr-2" />
+                {t('admin.tabs.users')}
+              </TabsTrigger>
+            )}
           </TabsList>
           
-          <TabsContent value="events" className="mt-6">
-            <EventsManager />
-          </TabsContent>
-          
-          <TabsContent value="artists" className="mt-6">
-            <ArtistsManager />
-          </TabsContent>
-
-          <TabsContent value="gallery" className="mt-6">
-            <GalleryManager />
-          </TabsContent>
-
-          <TabsContent value="members" className="mt-6">
-            <MembersManager />
-          </TabsContent>
-
-          <TabsContent value="newsletter" className="mt-6">
-            <NewsletterManager />
-          </TabsContent>
-
-          <TabsContent value="email-automation" className="mt-6">
-            <EmailAutomationManager />
-          </TabsContent>
-
-          <TabsContent value="invitations" className="mt-6">
-            <InvitationsManager />
-          </TabsContent>
-
-          <TabsContent value="payment-config" className="mt-6">
-            <PaymentConfigManager />
-          </TabsContent>
-
-          <TabsContent value="users" className="mt-6">
-            <UsersManager />
-          </TabsContent>
+          {canAccessSection('events') && (
+            <TabsContent value="events" className="mt-6">
+              <EventsManager />
+            </TabsContent>
+          )}
+          {canAccessSection('artists') && (
+            <TabsContent value="artists" className="mt-6">
+              <ArtistsManager />
+            </TabsContent>
+          )}
+          {canAccessSection('gallery') && (
+            <TabsContent value="gallery" className="mt-6">
+              <GalleryManager />
+            </TabsContent>
+          )}
+          {canAccessSection('members') && (
+            <TabsContent value="members" className="mt-6">
+              <MembersManager />
+            </TabsContent>
+          )}
+          {canAccessSection('newsletter') && (
+            <TabsContent value="newsletter" className="mt-6">
+              <NewsletterManager />
+            </TabsContent>
+          )}
+          {canAccessSection('email_automation') && (
+            <TabsContent value="email-automation" className="mt-6">
+              <EmailAutomationManager />
+            </TabsContent>
+          )}
+          {canAccessSection('invitations') && (
+            <TabsContent value="invitations" className="mt-6">
+              <InvitationsManager />
+            </TabsContent>
+          )}
+          {canAccessSection('payment') && (
+            <TabsContent value="payment-config" className="mt-6">
+              <PaymentConfigManager />
+            </TabsContent>
+          )}
+          {isSuperAdmin && (
+            <TabsContent value="users" className="mt-6">
+              <UsersManager />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>

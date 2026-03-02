@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,24 +11,48 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { calculateTaxDeduction, TaxDeductionResult } from "@/utils/taxCalculations";
 
+interface CompanyDetails {
+  company_name: string;
+  company_cif: string;
+  company_address?: string;
+}
+
 interface PaymentCheckoutProps {
   memberId: number;
   currentMembershipType?: string;
   currentPaymentStatus?: string;
+  companyDetails?: CompanyDetails | null;
   onPaymentSuccess?: () => void;
 }
 
 type PaymentStep = 'selection' | 'amount' | 'confirmation';
 
-const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus, onPaymentSuccess }: PaymentCheckoutProps) => {
+const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus, companyDetails, onPaymentSuccess }: PaymentCheckoutProps) => {
   const [selectedType, setSelectedType] = useState<'basic' | 'custom'>('basic');
   const [customAmount, setCustomAmount] = useState<string>('');
   const [currentStep, setCurrentStep] = useState<PaymentStep>('selection');
   const [isProcessing, setIsProcessing] = useState(false);
   const [taxCalculation, setTaxCalculation] = useState<TaxDeductionResult | null>(null);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [payOnBehalfOfCompany, setPayOnBehalfOfCompany] = useState(false);
+  const [gateways, setGateways] = useState<string[]>(['stripe']);
+  const [selectedGateway, setSelectedGateway] = useState<string>('stripe');
+  const hasCompanyDetails = companyDetails && companyDetails.company_name && companyDetails.company_cif;
   const { toast } = useToast();
   const { t } = useLanguage();
+
+  // Fetch active payment gateways on mount
+  useEffect(() => {
+    fetch('/api/payment/active-gateways.php', { credentials: 'include' })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && Array.isArray(d.gateways) && d.gateways.length > 0) {
+          setGateways(d.gateways);
+          setSelectedGateway(d.gateways.includes('stripe') ? 'stripe' : d.gateways[0]);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const BASIC_MEMBERSHIP_PRICE = 20.00; // €20/year
   const MINIMUM_CUSTOM_AMOUNT = 20.00; // Minimum €20
@@ -117,9 +141,14 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
         },
         credentials: 'include',
         body: JSON.stringify({
+          gateway: selectedGateway,
           membership_type: membershipType,
           amount: amount,
           terms_accepted: acceptTerms,
+          tax_fiscal_recipient: hasCompanyDetails && payOnBehalfOfCompany ? 'company' : 'personal',
+          company_name: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_name : null,
+          company_cif: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_cif : null,
+          company_address: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_address : null,
         }),
       });
 
@@ -133,7 +162,6 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
       }
 
       if (data.success && data.checkout_url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.checkout_url;
       } else {
         throw new Error(data.error || 'Failed to create checkout session');
@@ -160,7 +188,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
           Membership Payment
         </CardTitle>
         <CardDescription className="text-white/70">
-          Complete your membership payment securely via Stripe
+          Complete your membership payment securely
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -380,6 +408,50 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                 </Alert>
               )}
 
+              {/* Pay on behalf of company (when member has company details) */}
+              {hasCompanyDetails && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={payOnBehalfOfCompany}
+                      onChange={(e) => setPayOnBehalfOfCompany(e.target.checked)}
+                      className="mt-1 rounded border-white/20 text-electric-blue focus:ring-electric-blue"
+                    />
+                    <div>
+                      <span className="text-white/90 text-sm font-medium">
+                        Issue tax receipt to company
+                      </span>
+                      <p className="text-white/60 text-xs mt-0.5">
+                        {companyDetails.company_name} (CIF: {companyDetails.company_cif}). The tax receipt will be sent to your email for the company. For Impuesto de Sociedades.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              )}
+
+              {/* Gateway selector (when multiple available) */}
+              {gateways.length > 1 && (
+                <div className="mt-4 pt-4 border-t border-white/10">
+                  <Label className="text-white mb-2 block">Payment method</Label>
+                  <RadioGroup
+                    value={selectedGateway}
+                    onValueChange={setSelectedGateway}
+                    className="flex gap-4"
+                  >
+                    {gateways.map((g) => (
+                      <label
+                        key={g}
+                        className={`flex items-center gap-2 cursor-pointer ${selectedGateway === g ? 'text-electric-blue' : 'text-white/70'}`}
+                      >
+                        <RadioGroupItem value={g} className="text-electric-blue" />
+                        <span className="capitalize">{g === 'paycomet' ? 'Card (Paycomet)' : g}</span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                </div>
+              )}
+
               {/* Terms acceptance */}
               <div className="mt-4 pt-4 border-t border-white/10">
                 <label className="flex items-start gap-3 cursor-pointer">
@@ -426,7 +498,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                 ) : (
                   <>
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Pay with Stripe
+                    Pay with {selectedGateway === 'paycomet' ? 'Card' : 'Stripe'}
                   </>
                 )}
               </Button>
@@ -436,7 +508,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
 
         {/* Security Notice */}
         <p className="text-white/50 text-xs text-center">
-          🔒 Your payment is processed securely by Stripe. We never store your card details.
+          🔒 Your payment is processed securely. We never store your card details.
         </p>
       </CardContent>
     </Card>

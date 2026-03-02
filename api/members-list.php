@@ -12,15 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// Check if user is authenticated
-if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit();
-}
-
-// Include database configuration
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+requireAdminSection('members');
 
 try {
     // Check if payment_method column exists (for backward compatibility)

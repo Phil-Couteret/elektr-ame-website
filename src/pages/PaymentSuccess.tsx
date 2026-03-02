@@ -19,29 +19,32 @@ const PaymentSuccess = () => {
   const [error, setError] = useState<string | null>(null);
 
   const sessionId = searchParams.get('session_id');
+  const orderId = searchParams.get('order_id');
+  const gateway = searchParams.get('gateway') || (orderId ? 'paycomet' : 'stripe');
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    if (sessionId) {
+
+    if (sessionId || orderId) {
       confirmPayment();
     } else {
       setError('No payment session found');
       setIsConfirming(false);
     }
-  }, [sessionId]);
+  }, [sessionId, orderId]);
 
   const confirmPayment = async () => {
     try {
+      const body: Record<string, string> = gateway === 'paycomet'
+        ? { order_id: orderId!, gateway: 'paycomet' }
+        : { session_id: sessionId! };
       const response = await fetch('/api/payment/confirm-payment.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify({
-          session_id: sessionId,
-        }),
+        body: JSON.stringify(body),
       });
 
       const responseText = await response.text();

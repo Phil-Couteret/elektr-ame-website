@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 ob_clean();
 
 require_once __DIR__ . '/../classes/StripePayment.php';
+require_once __DIR__ . '/../classes/PaycometPayment.php';
 require_once __DIR__ . '/../classes/EmailAutomation.php';
 
 // Check if user is logged in
@@ -42,18 +43,77 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 try {
     $data = json_decode(file_get_contents('php://input'), true);
-    
+
     if (!$data) {
         throw new Exception('Invalid JSON data');
     }
-    
+
     $sessionId = $data['session_id'] ?? null;
-    
-    if (!$sessionId) {
-        throw new Exception('Session ID is required');
+    $orderId = $data['order_id'] ?? null;
+    $gateway = $data['gateway'] ?? null;
+
+    // Paycomet flow: order_id or gateway=paycomet with session_id (Paycomet uses order_id in URL)
+    if ($gateway === 'paycomet' || $orderId) {
+        $orderId = $orderId ?: $sessionId;
+        if (!$orderId) {
+            throw new Exception('Order ID is required for Paycomet');
+        }
+        $paycomet = new PaycometPayment($pdo);
+        $result = $paycomet->confirmOrderOnReturn($orderId);
+        if (!$result) {
+            throw new Exception('Payment not found or not yet confirmed. The callback may still be processing.');
+        }
+        $memberId = (int) $result['member_id'];
+        $amount = (float) $result['amount'];
+        $membershipType = ($result['membership_type'] ?? 'basic') === 'lifetime' ? 'lifetime' : 'yearly';
+        $membershipStartDate = $result['membership_start_date'] ?? date('Y-m-d');
+        $membershipEndDate = $result['membership_end_date'] ?? null;
+
+        // Member may already be updated by callback; ensure consistency
+        $updateStmt = $pdo->prepare("
+            UPDATE members SET
+                membership_type = ?, membership_start_date = ?, membership_end_date = ?,
+                payment_status = 'paid', payment_amount = ?, last_payment_date = CURDATE(), updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        ");
+        $updateStmt->execute([$membershipType, $membershipStartDate, $membershipEndDate, $amount, $memberId]);
+
+        $memberStmt = $pdo->prepare("SELECT * FROM members WHERE id = ?");
+        $memberStmt->execute([$memberId]);
+        $member = $memberStmt->fetch(PDO::FETCH_ASSOC);
+        if ($member) {
+            $emailAutomation = new EmailAutomation($pdo);
+            $isFirstPayment = empty($member['last_payment_date']);
+            if ($isFirstPayment) {
+                $emailAutomation->queueEmail($member['email'], $member['first_name'] . ' ' . $member['last_name'], 'member_welcome', ['first_name' => $member['first_name'], 'membership_type' => ucfirst($membershipType)], $memberId, 'high');
+            }
+            $emailAutomation->queueEmail($member['email'], $member['first_name'] . ' ' . $member['last_name'], 'payment_confirmation', ['first_name' => $member['first_name'], 'amount' => number_format($amount, 2), 'membership_type' => ucfirst($membershipType), 'date' => date('Y-m-d')], $memberId, 'high');
+            $memberCountry = $member['country'] ?? '';
+            $isSpain = $emailAutomation->isSpainResident($memberCountry);
+            if ($amount >= 20 && $isSpain) {
+                $memberForTax = array_merge($member, ['payment_amount' => $amount, 'membership_type' => $membershipType]);
+                $variables = $emailAutomation->preparePaymentTaxVariables($memberForTax);
+                $emailAutomation->sendTaxReceiptPdf($memberId, $variables);
+            }
+            $emailAutomation->processQueue(10);
+        }
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Payment confirmed successfully',
+            'membership_type' => $membershipType,
+            'amount' => $amount,
+            'membership_start_date' => $membershipStartDate,
+            'membership_end_date' => $membershipEndDate,
+        ]);
+        exit;
     }
-    
-    // Initialize Stripe
+
+    // Stripe flow: session_id
+    if (!$sessionId) {
+        throw new Exception('Session ID or Order ID is required');
+    }
+
     $stripe = new StripePayment($pdo);
     
     // Get checkout session from Stripe
@@ -169,12 +229,20 @@ try {
             'high'
         );
         
-        // Tax receipt PDF for Spain residents only (IRPF applies in Spain)
+        // Tax receipt PDF for Spain residents only (IRPF or Impuesto de Sociedades for company)
         $memberCountry = $member['country'] ?? '';
         $isSpain = $emailAutomation->isSpainResident($memberCountry);
         if ($amount >= 20 && $isSpain) {
             $memberForTax = array_merge($member, ['payment_amount' => $amount, 'membership_type' => $membershipType]);
-            $variables = $emailAutomation->preparePaymentTaxVariables($memberForTax);
+            $companyOverride = null;
+            if (($metadata['tax_fiscal_recipient'] ?? '') === 'company' && !empty($metadata['company_name']) && !empty($metadata['company_cif'])) {
+                $companyOverride = [
+                    'company_name' => $metadata['company_name'],
+                    'company_cif' => $metadata['company_cif'],
+                    'company_address' => $metadata['company_address'] ?? null,
+                ];
+            }
+            $variables = $emailAutomation->preparePaymentTaxVariables($memberForTax, $companyOverride);
             $sent = $emailAutomation->sendTaxReceiptPdf($memberId, $variables);
             if (!$sent) {
                 error_log("Tax receipt send failed for member_id=$memberId, email={$member['email']}");

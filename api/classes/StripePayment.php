@@ -259,8 +259,9 @@ class StripePayment {
     
     /**
      * Create a Checkout Session (Stripe's hosted checkout page)
+     * @param array|null $companyForTax Optional: ['company_name','company_cif','company_address'] for tax receipt to company
      */
-    public function createCheckoutSessionHosted($memberId, $membershipType, $amount, $currency = 'EUR') {
+    public function createCheckoutSessionHosted($memberId, $membershipType, $amount, $currency = 'EUR', $companyForTax = null) {
         try {
             $startDate = date('Y-m-d');
             $endDate = ($membershipType === 'lifetime') ? null : date('Y-m-d', strtotime('+1 year'));
@@ -269,8 +270,20 @@ class StripePayment {
             $successUrl = $baseUrl . '/payment-success?session_id={CHECKOUT_SESSION_ID}';
             $cancelUrl = $baseUrl . '/payment-cancelled';
             
+            $metadata = [
+                'member_id' => (string)$memberId,
+                'membership_type' => $membershipType,
+                'membership_start_date' => $startDate,
+                'membership_end_date' => $endDate ?? '',
+            ];
+            if ($companyForTax && !empty($companyForTax['company_name']) && !empty($companyForTax['company_cif'])) {
+                $metadata['tax_fiscal_recipient'] = 'company';
+                $metadata['company_name'] = $companyForTax['company_name'];
+                $metadata['company_cif'] = $companyForTax['company_cif'];
+                $metadata['company_address'] = $companyForTax['company_address'] ?? '';
+            }
+            
             // Build session data - omit payment_method_types for dynamic methods
-            // (Stripe chooses best options per user: cards, wallets, etc.)
             $sessionData = [
                 'line_items' => [[
                     'price_data' => [
@@ -286,12 +299,7 @@ class StripePayment {
                 'mode' => 'payment',
                 'success_url' => $successUrl,
                 'cancel_url' => $cancelUrl,
-                'metadata' => [
-                    'member_id' => (string)$memberId,
-                    'membership_type' => $membershipType,
-                    'membership_start_date' => $startDate,
-                    'membership_end_date' => $endDate ?? '',
-                ],
+                'metadata' => $metadata,
             ];
             
             $customerEmail = $this->getMemberEmail($memberId);
@@ -329,6 +337,52 @@ class StripePayment {
         }
     }
     
+    /**
+     * Create checkout session for sponsor donation (company, no member)
+     */
+    public function createSponsorCheckoutSession($sponsorId, $companyName, $companyCif, $companyAddress, $contactEmail, $amount, $currency = 'EUR') {
+        $baseUrl = $this->getBaseUrl();
+        $successUrl = $baseUrl . '/sponsor-success?session_id={CHECKOUT_SESSION_ID}';
+        $cancelUrl = $baseUrl . '/sponsor';
+
+        $sessionData = [
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => strtolower($currency),
+                    'unit_amount' => (int)($amount * 100),
+                    'product_data' => [
+                        'name' => 'Sponsor Donation - Elektr-Âme',
+                        'description' => 'Company sponsorship / donation to Elektr-Âme association',
+                    ],
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => $successUrl,
+            'cancel_url' => $cancelUrl,
+            'customer_email' => $contactEmail,
+            'metadata' => [
+                'sponsor_donation_id' => (string)$sponsorId,
+                'company_name' => $companyName,
+                'company_cif' => $companyCif,
+                'company_address' => $companyAddress ?? '',
+            ],
+        ];
+
+        $response = $this->makeRequest('checkout/sessions', 'POST', $sessionData);
+
+        // Update sponsor_donations with transaction_id
+        $updateStmt = $this->db->prepare("UPDATE sponsor_donations SET transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+        $updateStmt->execute([$response['id'], $sponsorId]);
+
+        return [
+            'session_id' => $response['id'],
+            'url' => $response['url'],
+            'amount' => $amount,
+            'currency' => $currency,
+        ];
+    }
+
     /**
      * Retrieve a Checkout Session
      */

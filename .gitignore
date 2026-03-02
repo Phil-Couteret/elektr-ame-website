@@ -75,6 +75,8 @@ public/gallery-images/*
 !public/gallery-images/.gitkeep
 public/event-media/*
 !public/event-media/.gitkeep
+public/sponsor-logos/*
+!public/sponsor-logos/.gitkeep
 
 # Shell scripts (local only)
 *.sh

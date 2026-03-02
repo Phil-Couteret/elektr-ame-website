@@ -91,6 +91,12 @@ const Header = () => {
             >
               {t('nav.about')}
             </button>
+            <Link 
+              to="/sponsor" 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
+              {t('nav.sponsoring')}
+            </Link>
             <LanguageSelector />
             <Link to="/join-us">
               <Button className="bg-blue-dark hover:bg-blue-darker text-white">
@@ -171,6 +177,13 @@ const Header = () => {
             >
               {t('nav.about')}
             </button>
+            <Link
+              to="/sponsor"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
+            >
+              {t('nav.sponsoring')}
+            </Link>
             <div className="px-3 py-2">
               <LanguageSelector />
             </div>

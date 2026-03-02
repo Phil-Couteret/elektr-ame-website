@@ -17,13 +17,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -34,20 +27,43 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { UserPlus, Shield, User as UserIcon, CheckCircle, XCircle, Trash2, Pencil } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContextNew";
+import { ADMIN_SECTIONS } from "@/contexts/AuthContextNew";
+import { Checkbox } from "@/components/ui/checkbox";
+
+const SECTION_LABELS: Record<string, string> = {
+  events: 'Events',
+  artists: 'Artists',
+  gallery: 'Gallery',
+  members: 'Members',
+  newsletter: 'Newsletter',
+  email_automation: 'Email Automation',
+  invitations: 'Invitations',
+  payment: 'Payment',
+};
 
 interface AdminUser {
   id: number;
   email: string;
   name: string;
   role: 'admin' | 'superadmin';
+  permissions?: string[];
   is_active: boolean;
   created_at: string;
   last_login: string | null;
 }
 
 const UsersManager = () => {
+  const { isSuperAdmin } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -55,16 +71,17 @@ const UsersManager = () => {
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", email: "", password: "" });
+  const [editForm, setEditForm] = useState({ name: "", email: "", password: "", permissions: [] as string[] });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  // Form state for new user
+  // Form state for new user (superadmin can choose role; admins always create admin)
   const [newUser, setNewUser] = useState({
     email: "",
     name: "",
     password: "",
     role: "admin" as 'admin' | 'superadmin',
+    permissions: [] as string[],
   });
 
   useEffect(() => {
@@ -113,7 +130,13 @@ const UsersManager = () => {
           'Content-Type': 'application/json',
         },
         credentials: 'include',
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({
+          email: newUser.email,
+          name: newUser.name,
+          password: newUser.password,
+          role: isSuperAdmin ? newUser.role : 'admin',
+          permissions: newUser.role === 'admin' ? newUser.permissions : [],
+        }),
       });
 
       const data = await response.json();
@@ -124,7 +147,7 @@ const UsersManager = () => {
           description: "Admin user created successfully",
         });
         setIsCreateDialogOpen(false);
-        setNewUser({ email: "", name: "", password: "", role: "admin" });
+        setNewUser({ email: "", name: "", password: "", role: "admin" as const, permissions: [] });
         fetchUsers();
       } else {
         toast({
@@ -171,7 +194,7 @@ const UsersManager = () => {
 
   const handleOpenEdit = (user: AdminUser) => {
     setEditingUser(user);
-    setEditForm({ name: user.name, email: user.email, password: "" });
+    setEditForm({ name: user.name, email: user.email, password: "", permissions: user.permissions ?? [] });
   };
 
   const handleSaveEdit = async () => {
@@ -182,12 +205,13 @@ const UsersManager = () => {
     }
     setIsSaving(true);
     try {
-      const body: { id: number; name: string; email: string; password?: string } = {
+      const body: { id: number; name: string; email: string; password?: string; permissions?: string[] } = {
         id: editingUser.id,
         name: editForm.name.trim(),
         email: editForm.email.trim(),
       };
       if (editForm.password) body.password = editForm.password;
+      if (editingUser.role === 'admin') body.permissions = editForm.permissions;
       const response = await fetch('/api/admin-users-update.php', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -392,21 +416,52 @@ const UsersManager = () => {
                 className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="role" className="text-white">Role</Label>
-              <Select
-                value={newUser.role}
-                onValueChange={(value: 'admin' | 'superadmin') => setNewUser({ ...newUser, role: value })}
-              >
-                <SelectTrigger className="bg-white/10 border-white/20 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin">Admin</SelectItem>
-                  <SelectItem value="superadmin">Superadmin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {isSuperAdmin && (
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-white">Role</Label>
+                <Select
+                  value={newUser.role}
+                  onValueChange={(value: 'admin' | 'superadmin') => setNewUser({ ...newUser, role: value })}
+                >
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="superadmin">Superadmin</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-white/60 text-xs">Only superadmins can create another superadmin.</p>
+              </div>
+            )}
+            {newUser.role === 'admin' && (
+              <div className="space-y-2">
+                <Label className="text-white">Section access</Label>
+                <p className="text-white/60 text-xs">Choose which admin sections this user can access.</p>
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  {ADMIN_SECTIONS.map((section) => (
+                    <div key={section} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`create-${section}`}
+                        checked={newUser.permissions.includes(section)}
+                        onCheckedChange={(checked) => {
+                          setNewUser({
+                            ...newUser,
+                            permissions: checked
+                              ? [...newUser.permissions, section]
+                              : newUser.permissions.filter((p) => p !== section),
+                          });
+                        }}
+                        className="border-white/40 data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                      />
+                      <Label htmlFor={`create-${section}`} className="text-white text-sm font-normal cursor-pointer">
+                        {SECTION_LABELS[section] ?? section}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
@@ -466,6 +521,33 @@ const UsersManager = () => {
                 placeholder="Leave blank to keep current"
               />
             </div>
+            {editingUser?.role === 'admin' && (
+              <div className="space-y-2">
+                <Label className="text-white">Section access</Label>
+                <div className="grid grid-cols-2 gap-2 pt-2">
+                  {ADMIN_SECTIONS.map((section) => (
+                    <div key={section} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`edit-${section}`}
+                        checked={editForm.permissions.includes(section)}
+                        onCheckedChange={(checked) => {
+                          setEditForm((f) => ({
+                            ...f,
+                            permissions: checked
+                              ? [...f.permissions, section]
+                              : f.permissions.filter((p) => p !== section),
+                          }));
+                        }}
+                        className="border-white/40 data-[state=checked]:bg-electric-blue data-[state=checked]:border-electric-blue"
+                      />
+                      <Label htmlFor={`edit-${section}`} className="text-white text-sm font-normal cursor-pointer">
+                        {SECTION_LABELS[section] ?? section}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditingUser(null)} className="border-white/20 text-white hover:bg-white/10">

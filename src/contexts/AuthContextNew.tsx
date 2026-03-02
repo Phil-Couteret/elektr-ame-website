@@ -1,11 +1,16 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+// Admin section keys for granular permissions
+export const ADMIN_SECTIONS = ['events', 'artists', 'gallery', 'members', 'newsletter', 'email_automation', 'invitations', 'payment'] as const;
+export type AdminSection = (typeof ADMIN_SECTIONS)[number];
+
 // Define user type  
 // Backend authentication with secure PHP sessions
 type User = {
   email: string;
   name: string;
   role: 'admin' | 'superadmin';
+  permissions?: string[];
 } | null;
 
 // Define auth context type
@@ -16,6 +21,8 @@ type AuthContextType = {
   user: User;
   isLoading: boolean;
   isSuperAdmin: boolean;
+  adminPermissions: string[];
+  canAccessSection: (section: string) => boolean;
 };
 
 // Create context with default values
@@ -26,6 +33,8 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: true,
   isSuperAdmin: false,
+  adminPermissions: [],
+  canAccessSection: () => false,
 });
 
 // Auth provider component
@@ -111,8 +120,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const adminPermissions = user?.permissions ?? [];
+  const canAccessSection = (section: string) =>
+    isSuperAdmin || adminPermissions.includes(section);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, isLoading, isSuperAdmin }}>
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      login,
+      logout,
+      user,
+      isLoading,
+      isSuperAdmin,
+      adminPermissions,
+      canAccessSection,
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -55,6 +55,9 @@ try {
     $city = isset($input['city']) ? trim($input['city']) : null;
     $postalCode = isset($input['postal_code']) ? trim($input['postal_code']) : null;
     $country = isset($input['country']) ? trim($input['country']) : null;
+    $companyName = isset($input['company_name']) ? trim($input['company_name']) : null;
+    $companyCif = isset($input['company_cif']) ? trim($input['company_cif']) : null;
+    $companyAddress = isset($input['company_address']) ? trim($input['company_address']) : null;
 
     if ($phone && !preg_match('/^\+?[0-9\s\-().]{7,20}$/', $phone)) {
         throw new Exception('Invalid phone format');
@@ -116,8 +119,24 @@ try {
         $hasNewsletterCol = true;
     }
 
+    // Check if company columns exist
+    $hasCompanyCol = false;
+    $companyColCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'company_name'");
+    if ($companyColCheck && $companyColCheck->rowCount() > 0) {
+        $hasCompanyCol = true;
+    }
+
     // Update profile fields (excluding email for now)
-    $newsletterSet = $hasNewsletterCol && $newsletterSubscribe !== null ? ', newsletter_subscribe = ?' : '';
+    $extraSets = [];
+    if ($hasNewsletterCol && $newsletterSubscribe !== null) {
+        $extraSets[] = 'newsletter_subscribe = ?';
+    }
+    if ($hasCompanyCol) {
+        $extraSets[] = 'company_name = ?';
+        $extraSets[] = 'company_cif = ?';
+        $extraSets[] = 'company_address = ?';
+    }
+    $extraSetClause = !empty($extraSets) ? ', ' . implode(', ', $extraSets) : '';
     $stmt = $pdo->prepare("
         UPDATE members 
         SET 
@@ -131,7 +150,7 @@ try {
             country = ?,
             bio = ?,
             social_links = ?
-            $newsletterSet
+            $extraSetClause
         WHERE id = ?
     ");
 
@@ -149,6 +168,11 @@ try {
     ];
     if ($hasNewsletterCol && $newsletterSubscribe !== null) {
         $params[] = $newsletterSubscribe;
+    }
+    if ($hasCompanyCol) {
+        $params[] = $companyName ?: null;
+        $params[] = $companyCif ?: null;
+        $params[] = $companyAddress ?: null;
     }
     $params[] = $member_id;
     $stmt->execute($params);

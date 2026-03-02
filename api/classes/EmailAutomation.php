@@ -242,9 +242,19 @@ class EmailAutomation {
 
     /**
      * Build template variables for tax receipt (used by confirm-payment and sendPaymentRecordedEmails)
+     * @param array $member Member data
+     * @param array|null $companyOverride When tax receipt is for company: ['company_name','company_cif','company_address']
      */
-    public function preparePaymentTaxVariables($member) {
-        return $this->prepareTemplateVariables($member, 'payment_recorded');
+    public function preparePaymentTaxVariables($member, $companyOverride = null) {
+        $variables = $this->prepareTemplateVariables($member, 'payment_recorded');
+        if ($companyOverride && !empty($companyOverride['company_name']) && !empty($companyOverride['company_cif'])) {
+            $variables['full_name'] = $companyOverride['company_name'];
+            $variables['email'] = $member['email']; // Still send to member email
+            $variables['company_cif'] = $companyOverride['company_cif'];
+            $variables['company_address'] = $companyOverride['company_address'] ?? '';
+            $variables['tax_type'] = 'company'; // For Impuesto de Sociedades
+        }
+        return $variables;
     }
 
     /**
@@ -495,6 +505,30 @@ class EmailAutomation {
             return false;
         } catch (Exception $e) {
             error_log("Tax receipt PDF error: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Send tax receipt for sponsor donation (company, no member)
+     * Sends to contact_email with company as donor (Impuesto de Sociedades)
+     */
+    public function sendSponsorTaxReceiptPdf($sponsorId, $variables, $contactEmail) {
+        if (floatval($variables['amount'] ?? 0) < 20) return false;
+        try {
+            $variables['payment_method'] = 'stripe';
+            $variables['tax_type'] = 'company';
+            require_once __DIR__ . '/TaxReceiptPdf.php';
+            $pdf = new TaxReceiptPdf($variables);
+            $pdfContent = $pdf->generate();
+            $receiptId = $variables['receipt_id'] ?? 'EA-S' . date('Y') . '-' . str_pad($sponsorId, 6, '0', STR_PAD_LEFT);
+            $downloadUrl = $this->storeTaxReceiptForDownload(0, $pdfContent, $receiptId); // member_id=0 for sponsor
+            $subject = 'Your tax deduction certificate - Elektr-Âme (Impuesto de Sociedades)';
+            $body = "Dear sponsor,\n\nYour official tax deduction certificate for your company's donation to Elektr-Âme is ready.\n\nDownload your PDF here (link valid 30 days):\n$downloadUrl\n\nYou can use this PDF when filing your Impuesto de Sociedades declaration.\n\nBest regards,\nThe Elektr-Âme Team";
+            $result = $this->sendEmail($contactEmail, $variables['full_name'] ?? 'Sponsor', $subject, $body);
+            return $result;
+        } catch (Exception $e) {
+            error_log("Sponsor tax receipt PDF error: " . $e->getMessage());
             return false;
         }
     }

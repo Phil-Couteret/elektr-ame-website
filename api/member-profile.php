@@ -39,6 +39,14 @@ try {
     }
     $newsletterCol = $hasNewsletterCol ? ', newsletter_subscribe' : '';
 
+    // Check if company columns exist (for pay on behalf of company)
+    $hasCompanyCol = false;
+    $companyColCheck = $pdo->query("SHOW COLUMNS FROM members LIKE 'company_name'");
+    if ($companyColCheck && $companyColCheck->rowCount() > 0) {
+        $hasCompanyCol = true;
+    }
+    $companyCol = $hasCompanyCol ? ', company_name, company_cif, company_address' : '';
+
     // Fetch member data
     $stmt = $pdo->prepare("
         SELECT 
@@ -54,7 +62,8 @@ try {
             street as address,
             city,
             zip_code as postal_code,
-            country,
+            country
+            $companyCol,
             status,
             membership_type,
             membership_start_date,

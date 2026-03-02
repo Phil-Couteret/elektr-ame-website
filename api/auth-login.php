@@ -66,9 +66,8 @@ try {
         throw new Exception('Only @elektr-ame.com email addresses are allowed');
     }
     
-    // Get user from database
-    // Note: Table uses 'name' column, not 'full_name'
-    $stmt = $pdo->prepare("SELECT id, email, password_hash, name, role, is_active FROM admin_users WHERE email = :email");
+    // Get user from database (include permissions for granular section access)
+    $stmt = $pdo->prepare("SELECT id, email, password_hash, name, role, permissions, is_active FROM admin_users WHERE email = :email");
     $stmt->execute([':email' => $email]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     
@@ -92,25 +91,30 @@ try {
     $updateStmt = $pdo->prepare("UPDATE admin_users SET last_login = NOW() WHERE id = :id");
     $updateStmt->execute([':id' => $user['id']]);
     
-    // Create session
+    // Create session (permissions: superadmin bypasses; admin uses JSON array)
+    $perms = ($user['role'] === 'superadmin') ? [] : (json_decode($user['permissions'] ?? '[]', true) ?: []);
     $_SESSION['admin_logged_in'] = true;
     $_SESSION['admin_id'] = $user['id'];
     $_SESSION['admin_email'] = $user['email'];
     $_SESSION['admin_name'] = $user['name'];
     $_SESSION['admin_role'] = $user['role'];
+    $_SESSION['admin_permissions'] = $perms;
     $_SESSION['login_time'] = time();
     
     // Regenerate session ID for security
     session_regenerate_id(true);
     
-    // Return success response
+    // Return success response (permissions for superadmin = all sections for UI)
+    $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+    $userPerms = ($user['role'] === 'superadmin') ? $allSections : $perms;
     echo json_encode([
         'success' => true,
         'message' => 'Login successful',
         'user' => [
             'email' => $user['email'],
             'name' => $user['name'],
-            'role' => $user['role']
+            'role' => $user['role'],
+            'permissions' => $userPerms
         ]
     ]);
     

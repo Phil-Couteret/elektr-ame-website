@@ -23,15 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     exit();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit();
-}
-
-// Include database configuration
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+requireAdminSection(null);
+if (($_SESSION['admin_role'] ?? '') !== 'superadmin') {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Only superadmin can manage admin users']);
+    exit;
+}
 
 try {
     $input = json_decode(file_get_contents('php://input'), true);

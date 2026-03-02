@@ -32,6 +32,8 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import MembershipProducts from "./pages/MembershipProducts";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
+import Sponsor from "./pages/Sponsor";
+import SponsorSuccess from "./pages/SponsorSuccess";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +57,8 @@ const App = () => (
               <Route path="/membership" element={<MembershipProducts />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/payment-cancelled" element={<PaymentFailure />} />
+              <Route path="/sponsor" element={<Sponsor />} />
+              <Route path="/sponsor-success" element={<SponsorSuccess />} />
               <Route path="/join-us" element={<JoinUs />} />
               <Route path="/member-login" element={<MemberLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />

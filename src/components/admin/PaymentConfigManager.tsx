@@ -400,7 +400,7 @@ const PaymentConfigManager = () => {
                 disabled={!!editingConfig}
               />
               <p className="text-white/60 text-xs mt-1">
-                Payment gateway name (e.g., stripe, paypal)
+                Payment gateway: stripe, paycomet, paypal
               </p>
             </div>
 
@@ -426,10 +426,12 @@ const PaymentConfigManager = () => {
                 value={formData.api_key_public}
                 onChange={(e) => setFormData({ ...formData, api_key_public: e.target.value })}
                 className="bg-black/40 border-white/10 text-white"
-                placeholder="pk_test_..."
+                placeholder={formData.gateway === 'paycomet' ? 'JET ID (optional)' : 'pk_test_...'}
               />
               <p className="text-white/60 text-xs mt-1">
-                Stripe publishable key (starts with pk_test_ or pk_live_)
+                {formData.gateway === 'paycomet'
+                  ? 'Paycomet JET ID for tokenization (optional). Leave empty if not using JET.'
+                  : 'Stripe publishable key (starts with pk_test_ or pk_live_)'}
               </p>
             </div>
 
@@ -441,10 +443,12 @@ const PaymentConfigManager = () => {
                 value={formData.api_key_secret}
                 onChange={(e) => setFormData({ ...formData, api_key_secret: e.target.value })}
                 className="bg-black/40 border-white/10 text-white"
-                placeholder="sk_test_..."
+                placeholder={formData.gateway === 'paycomet' ? 'API password' : 'sk_test_...'}
               />
               <p className="text-white/60 text-xs mt-1">
-                Stripe secret key (starts with sk_test_ or sk_live_). Keep this secure!
+                {formData.gateway === 'paycomet'
+                  ? 'Paycomet API password. Keep this secure!'
+                  : 'Stripe secret key (starts with sk_test_ or sk_live_). Keep this secure!'}
               </p>
             </div>
 
@@ -456,10 +460,12 @@ const PaymentConfigManager = () => {
                 value={formData.webhook_secret}
                 onChange={(e) => setFormData({ ...formData, webhook_secret: e.target.value })}
                 className="bg-black/40 border-white/10 text-white"
-                placeholder="whsec_..."
+                placeholder={formData.gateway === 'paycomet' ? 'IPN secret (if used)' : 'whsec_...'}
               />
               <p className="text-white/60 text-xs mt-1">
-                Stripe webhook signing secret (starts with whsec_). Used to verify webhook events.
+                {formData.gateway === 'paycomet'
+                  ? 'Paycomet IPN callback signing secret (if provided by Paycomet).'
+                  : 'Stripe webhook signing secret (starts with whsec_). Used to verify webhook events.'}
               </p>
             </div>
 
@@ -470,10 +476,12 @@ const PaymentConfigManager = () => {
                 value={formData.config_json}
                 onChange={(e) => setFormData({ ...formData, config_json: e.target.value })}
                 className="w-full min-h-[100px] bg-black/40 border border-white/10 rounded-md p-3 text-white text-sm font-mono"
-                placeholder='{"currency": "EUR", "country": "ES"}'
+                placeholder={formData.gateway === 'paycomet' ? '{"merchant_code":"...","terminal_id":"..."}' : '{"currency": "EUR", "country": "ES"}'}
               />
               <p className="text-white/60 text-xs mt-1">
-                Optional: Additional gateway-specific configuration in JSON format
+                {formData.gateway === 'paycomet'
+                  ? 'Required for Paycomet: merchant_code, terminal_id. Optional: api_url for sandbox.'
+                  : 'Optional: Additional gateway-specific configuration in JSON format'}
               </p>
             </div>
           </div>

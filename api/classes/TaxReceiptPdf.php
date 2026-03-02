@@ -28,10 +28,11 @@ class TaxReceiptPdf extends FPDF {
         $this->SetAutoPageBreak(true, 15);
 
         // Header (Spanish - document for Hacienda/Spain only)
+        $isCompany = ($this->variables['tax_type'] ?? '') === 'company';
         $this->SetFont('Helvetica', 'B', 14);
         $this->Cell(0, 8, $this->t('CERTIFICADO DE DONACIÓN / CUOTA DE SOCIO'), 0, 1, 'C');
         $this->SetFont('Helvetica', 'B', 11);
-        $this->Cell(0, 6, $this->t('Recibo oficial para deducción fiscal (IRPF)'), 0, 1, 'C');
+        $this->Cell(0, 6, $this->t($isCompany ? 'Recibo oficial para deducción fiscal (Impuesto de Sociedades)' : 'Recibo oficial para deducción fiscal (IRPF)'), 0, 1, 'C');
         $this->SetFont('Helvetica', '', 10);
         $this->Ln(5);
 
@@ -45,12 +46,20 @@ class TaxReceiptPdf extends FPDF {
         $this->Cell(0, 5, $this->t('Estado legal: Asociación sin ánimo de lucro'), 0, 1);
         $this->Ln(5);
 
-        // Donor
+        // Donor (personal or company)
+        $isCompany = ($this->variables['tax_type'] ?? '') === 'company';
         $this->SetFont('Helvetica', 'B', 10);
-        $this->Cell(0, 6, $this->t('Datos del donante'), 0, 1);
+        $this->Cell(0, 6, $this->t($isCompany ? 'Datos del donante (empresa)' : 'Datos del donante'), 0, 1);
         $this->SetFont('Helvetica', '', 9);
         $this->Cell(0, 5, $this->t('Nombre: ') . $this->t($this->variables['full_name'] ?? ''), 0, 1);
-        $this->Cell(0, 5, $this->t('Correo: ') . $this->t($this->variables['email'] ?? ''), 0, 1);
+        if ($isCompany && !empty($this->variables['company_cif'])) {
+            $this->Cell(0, 5, $this->t('CIF/NIF: ') . $this->t($this->variables['company_cif']), 0, 1);
+            if (!empty($this->variables['company_address'])) {
+                $this->Cell(0, 5, $this->t('Dirección: ') . $this->t($this->variables['company_address']), 0, 1);
+            }
+        } else {
+            $this->Cell(0, 5, $this->t('Correo: ') . $this->t($this->variables['email'] ?? ''), 0, 1);
+        }
         $this->Cell(0, 5, $this->t('Número de recibo: ') . $this->receiptId, 0, 1);
         $dateStr = $this->variables['date'] ?? date('Y-m-d');
         $ts = is_numeric(strtotime($dateStr)) ? strtotime($dateStr) : time();
@@ -95,7 +104,11 @@ class TaxReceiptPdf extends FPDF {
 
         // Legal
         $this->SetFont('Helvetica', '', 8);
-        $this->MultiCell(0, 4, $this->t('Este certificado es válido para la declaración del Impuesto sobre la Renta de las Personas Físicas (IRPF). Según la normativa fiscal española: las donaciones hasta 250 EUR tienen una deducción del 80%; los importes superiores a 250 EUR tienen una deducción del 40% (45% para donantes recurrentes de 3 o más años consecutivos).'), 0, 'L');
+        if ($isCompany) {
+            $this->MultiCell(0, 4, $this->t('Este certificado es válido para la declaración del Impuesto sobre Sociedades. Según la normativa fiscal española: las donaciones a entidades de utilidad pública tienen deducción fiscal en el Impuesto sobre Sociedades.'), 0, 'L');
+        } else {
+            $this->MultiCell(0, 4, $this->t('Este certificado es válido para la declaración del Impuesto sobre la Renta de las Personas Físicas (IRPF). Según la normativa fiscal española: las donaciones hasta 250 EUR tienen una deducción del 80%; los importes superiores a 250 EUR tienen una deducción del 40% (45% para donantes recurrentes de 3 o más años consecutivos).'), 0, 'L');
+        }
         $this->Ln(5);
         $this->Cell(0, 5, $this->t('Para consultas: ') . 'contact@elektr-ame.com', 0, 1);
         $this->Cell(0, 5, $this->t('Asociación Elektr-Ame - NIF: G24808495'), 0, 1);

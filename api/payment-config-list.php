@@ -19,15 +19,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 ob_clean();
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
 
-// Check if user is logged in and is admin
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Unauthorized'
-    ]);
-    exit;
+// Payment section: superadmin or admin with 'payment' permission
+requireAdminSection(null); // require login
+if (($_SESSION['admin_role'] ?? '') !== 'superadmin') {
+    $perms = $_SESSION['admin_permissions'] ?? [];
+    if (!in_array('payment', $perms)) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'Access denied to payment configuration']);
+        exit;
+    }
 }
 
 try {

@@ -49,13 +49,36 @@ try {
             exit();
         }
         
-        // Return authenticated user info
+        // Return authenticated user info (permissions for section access)
+        $role = $_SESSION['admin_role'] ?? 'admin';
+        $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+        $perms = ($role === 'superadmin') ? $allSections : ($_SESSION['admin_permissions'] ?? []);
+        // Backward compat: if admin has no perms in session, fetch from DB and refresh session
+        if ($role === 'admin' && empty($perms)) {
+            try {
+                require_once __DIR__ . '/config.php';
+                $id = (int)($_SESSION['admin_id'] ?? 0);
+                if ($id) {
+                    $colCheck = $pdo->query("SHOW COLUMNS FROM admin_users LIKE 'permissions'");
+                    if ($colCheck && $colCheck->rowCount() > 0) {
+                        $s = $pdo->prepare("SELECT permissions FROM admin_users WHERE id = ?");
+                        $s->execute([$id]);
+                        $row = $s->fetch(PDO::FETCH_ASSOC);
+                        $perms = $row ? (json_decode($row['permissions'] ?? '[]', true) ?: []) : $allSections;
+                        $_SESSION['admin_permissions'] = $perms;
+                    } else {
+                        $perms = $allSections; // Migration not run yet - grant all
+                    }
+                }
+            } catch (Exception $e) { /* ignore */ }
+        }
         echo json_encode([
             'authenticated' => true,
             'user' => [
                 'email' => $_SESSION['admin_email'] ?? null,
                 'name' => $_SESSION['admin_name'] ?? null,
-                'role' => $_SESSION['admin_role'] ?? 'admin'
+                'role' => $role,
+                'permissions' => $perms
             ]
         ]);
     } else {

@@ -23,15 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
     exit();
 }
 
-// Check if user is logged in
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit();
-}
-
-// Include database configuration
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/require-admin-section.php';
+requireAdminSection(null);
+if (($_SESSION['admin_role'] ?? '') !== 'superadmin') {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Only superadmin can manage admin users']);
+    exit;
+}
 
 try {
     
@@ -108,6 +107,16 @@ try {
     if (isset($input['role']) && in_array($input['role'], ['admin', 'superadmin'])) {
         $updates[] = "role = :role";
         $params[':role'] = $input['role'];
+    }
+
+    if (isset($input['permissions']) && is_array($input['permissions']) && $target['role'] === 'admin') {
+        $colCheck = $pdo->query("SHOW COLUMNS FROM admin_users LIKE 'permissions'");
+        if ($colCheck && $colCheck->rowCount() > 0) {
+            $validSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+            $perms = array_values(array_unique(array_intersect($input['permissions'], $validSections)));
+            $updates[] = "permissions = :permissions";
+            $params[':permissions'] = json_encode($perms);
+        }
     }
     
     if (isset($input['password']) && !empty($input['password'])) {
