@@ -9,7 +9,7 @@ WHAT IS CORRECT ON THE SERVER
 COPY THIS FILE ON THE SERVER AS config.php
   api/config.SERVER.upload-as-config.php
   → FTP to www/api/config.php
-  → Edit $password to match OVH (you can copy from your local api/config.php line 16 if still valid, or reset in panel).
+  → Set $password to the database password from the OVH panel (same as phpMyAdmin).
 
 YOUR LOCAL api/config.php
   Stays on your machine for tunnel/dev only. It is NOT deployed by deploy.sh.
