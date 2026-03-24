@@ -26,6 +26,11 @@ try {
         ORDER BY gateway ASC
     ");
     $rows = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    // Redsys is active in DB but checkout (create-checkout + redirect) is not in this release after rollback.
+    // Avoid offering a gateway that would fall through to Stripe and confuse users.
+    $rows = array_values(array_filter($rows ?: [], static function ($g) {
+        return $g !== 'redsys';
+    }));
     echo json_encode([
         'success' => true,
         'gateways' => $rows ?: ['stripe'],

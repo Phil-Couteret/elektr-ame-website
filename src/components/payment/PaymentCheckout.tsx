@@ -445,7 +445,9 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                         className={`flex items-center gap-2 cursor-pointer ${selectedGateway === g ? 'text-electric-blue' : 'text-white/70'}`}
                       >
                         <RadioGroupItem value={g} className="text-electric-blue" />
-                        <span className="capitalize">{g === 'paycomet' ? 'Card (Paycomet)' : g}</span>
+                        <span className="capitalize">
+                          {g === 'paycomet' ? 'Card (Paycomet)' : g === 'redsys' ? 'Redsys' : g === 'stripe' ? 'Stripe' : g}
+                        </span>
                       </label>
                     ))}
                   </RadioGroup>
@@ -498,7 +500,12 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                 ) : (
                   <>
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Pay with {selectedGateway === 'paycomet' ? 'Card' : 'Stripe'}
+                    Pay with{' '}
+                    {selectedGateway === 'paycomet'
+                      ? 'Card'
+                      : selectedGateway === 'redsys'
+                        ? 'Redsys'
+                        : 'Stripe'}
                   </>
                 )}
               </Button>
