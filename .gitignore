@@ -78,8 +78,10 @@ public/event-media/*
 public/sponsor-logos/*
 !public/sponsor-logos/.gitkeep
 
-# Shell scripts (local only)
+# Shell scripts (local only) — deploy.sh is tracked so npm run deploy works for everyone
 *.sh
 !database/*.sh
+!deploy.sh
 config.php
 deployment/assets/
+deployment/api/config.php

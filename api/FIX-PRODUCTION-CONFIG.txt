@@ -1,0 +1,9 @@
+If you see "Database connection failed" on www.elektr-ame.com:
+
+1. FTP or file manager → open ONLY: www/api/config.php (on the server).
+2. Set $host, $dbname, $username, $password to match OVH → Databases (same as phpMyAdmin).
+3. Save. No redeploy required.
+
+deploy.sh and "npm run deploy" never upload config.php — you must edit config.php on the server once.
+
+Template to copy from: api/config-ovh-production.php (placeholders only in Git).
