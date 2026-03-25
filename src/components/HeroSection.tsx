@@ -1,6 +1,4 @@
-
 import { Button } from "@/components/ui/button";
-import { Volume } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroSection = () => {
@@ -18,10 +16,17 @@ const HeroSection = () => {
       {/* Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
-          <div className="inline-block mb-8 p-2 rounded-full bg-black/20 backdrop-blur border border-blue-light/20">
-            <Volume className="h-10 w-10 text-blue-medium" />
+          <div className="mb-8 flex justify-center">
+            <img
+              src="/logo-elektr-ame.png"
+              alt=""
+              width={420}
+              height={120}
+              className="max-w-[min(85vw,420px)] h-auto w-auto"
+              decoding="async"
+            />
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
+          <h1 className="sr-only text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
             <span className="text-blue-light">Elektr</span>-Âme
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto mb-12">
