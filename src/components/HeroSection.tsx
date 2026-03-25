@@ -17,13 +17,19 @@ const HeroSection = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center">
           <div className="mb-8 flex justify-center">
+            {/* Prefer hero wordmark (transparent + grey stroke); was lost when file was untracked. Add public/logo-elektr-ame-hero.png and commit. */}
             <img
-              src="/logo-elektr-ame.png"
+              src="/logo-elektr-ame-hero.png"
               alt=""
-              width={420}
-              height={120}
-              className="max-w-[min(85vw,420px)] h-auto w-auto"
+              width={520}
+              height={160}
+              className="max-w-[min(90vw,520px)] h-auto w-auto drop-shadow-sm"
               decoding="async"
+              onError={(e) => {
+                const el = e.currentTarget;
+                el.onerror = null;
+                el.src = "/logo-elektr-ame.png";
+              }}
             />
           </div>
           <h1 className="sr-only text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
