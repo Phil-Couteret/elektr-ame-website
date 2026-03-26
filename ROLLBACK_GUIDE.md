@@ -63,13 +63,13 @@ After rollback, verify:
 - **v1.0.0** - Initial stable version
 - **v1.0.1** - Fix lightbox blank screen issue (ID-based lookup)
 - **v1.0.2** - Fix lightbox infinite loop and close button visibility
-- **v1.2.0** - Redsys redirect payment flow (production-ready); member PHP session surfaced in UI (`member-auth-check`, portal link); hero “Upcoming events” scroll; invitation tab label i18n; Header member session fix
+- **v1.2.0** *(older tag — Dec 2025 snapshot)* - About section and messaging features
+- **v1.2.1** - Redsys redirect payment flow (production-ready); member PHP session in UI (`member-auth-check`, portal link); hero “Upcoming events” scroll; invitation tab label i18n; Header member session fix
 
-**Rollback to v1.2.0:**
+**Rollback to this Redsys-ready release:**
 ```bash
 git fetch --tags
-git checkout v1.2.0
-# or: git reset --hard v1.2.0   # only if you intend to move main backward (coordinate with team)
+git checkout v1.2.1
 ```
 Then `npm ci`, `npm run build`, deploy per your process.
 
