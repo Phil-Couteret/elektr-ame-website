@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { useMemberSession } from "@/contexts/MemberSessionContext";
 
 const MemberLogin = () => {
   const [email, setEmail] = useState("");
@@ -20,6 +21,21 @@ const MemberLogin = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { memberSession, isLoading: memberSessionLoading, refresh } = useMemberSession();
+
+  useEffect(() => {
+    if (!memberSessionLoading && memberSession) {
+      navigate("/member-portal", { replace: true });
+    }
+  }, [memberSessionLoading, memberSession, navigate]);
+
+  if (memberSessionLoading || memberSession) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-deep-purple via-deep-purple/95 to-black flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-electric-blue" />
+      </div>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +60,7 @@ const MemberLogin = () => {
           description: t('memberLogin.welcomeBack'),
         });
 
-        // Redirect to member portal
+        await refresh();
         navigate("/member-portal");
       } else {
         setError(data.message || t('memberLogin.loginFailed'));

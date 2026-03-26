@@ -20,7 +20,10 @@ const PaymentSuccess = () => {
 
   const sessionId = searchParams.get('session_id');
   const orderId = searchParams.get('order_id');
-  const gateway = searchParams.get('gateway') || (orderId ? 'paycomet' : 'stripe');
+  const gatewayParam = searchParams.get('gateway');
+  const gateway =
+    gatewayParam ??
+    (sessionId ? 'stripe' : orderId ? 'paycomet' : 'stripe');
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -35,9 +38,12 @@ const PaymentSuccess = () => {
 
   const confirmPayment = async () => {
     try {
-      const body: Record<string, string> = gateway === 'paycomet'
-        ? { order_id: orderId!, gateway: 'paycomet' }
-        : { session_id: sessionId! };
+      const body: Record<string, string> =
+        gateway === 'redsys' && orderId
+          ? { order_id: orderId, gateway: 'redsys' }
+          : gateway === 'paycomet'
+            ? { order_id: orderId!, gateway: 'paycomet' }
+            : { session_id: sessionId! };
       const response = await fetch('/api/payment/confirm-payment.php', {
         method: 'POST',
         headers: {

@@ -9,6 +9,7 @@ export default {
   'nav.sponsoring': 'Patrocinio',
   'nav.joinUs': 'Únete',
   'nav.memberLogin': 'Acceso Miembros',
+  'nav.memberPortal': 'Portal de miembros',
   'nav.contact': 'Contacto',
   
   // Hero
@@ -497,7 +498,7 @@ export default {
   'portal.tabs.card': 'Tarjeta Digital',
   'portal.tabs.profile': 'Perfil',
   'portal.tabs.payments': 'Pagos',
-  'portal.tabs.sponsorship': 'Patrocinio',
+  'portal.tabs.sponsorship': 'Invitación',
   
   // Pestaña Resumen
   'portal.overview.membershipInfo': 'Información de Membresía',

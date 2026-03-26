@@ -9,6 +9,7 @@ export default {
   'nav.sponsoring': 'Sponsoring',
   'nav.joinUs': 'Join Us',
   'nav.memberLogin': 'Member Login',
+  'nav.memberPortal': 'Member portal',
   'nav.contact': 'Contact',
   
   // Hero
@@ -502,7 +503,7 @@ export default {
   'portal.tabs.card': 'Digital Card',
   'portal.tabs.profile': 'Profile',
   'portal.tabs.payments': 'Payments',
-  'portal.tabs.sponsorship': 'Sponsorship',
+  'portal.tabs.sponsorship': 'Invitation',
   
   // Overview Tab
   'portal.overview.membershipInfo': 'Membership Information',

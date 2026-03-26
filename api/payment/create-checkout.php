@@ -119,6 +119,28 @@ try {
         ];
     }
 
+    if ($gateway === 'redsys') {
+        require_once __DIR__ . '/../classes/RedsysPayment.php';
+        $redsys = new RedsysPayment($pdo);
+        $checkout = $redsys->createMembershipCheckout($memberId, $membershipType, $amount, 'EUR', $companyForTax);
+        echo json_encode([
+            'success' => true,
+            'gateway' => 'redsys',
+            'order_id' => $checkout['order_id'],
+            'checkout_url' => $checkout['action'],
+            'redsys_form' => [
+                'action' => $checkout['action'],
+                'Ds_SignatureVersion' => $checkout['Ds_SignatureVersion'],
+                'Ds_MerchantParameters' => $checkout['Ds_MerchantParameters'],
+                'Ds_Signature' => $checkout['Ds_Signature'],
+            ],
+            'amount' => $amount,
+            'currency' => 'EUR',
+            'membership_type' => $membershipType,
+        ]);
+        exit;
+    }
+
     // Default: Stripe
     $stripe = new StripePayment($pdo);
     $checkout = $stripe->createCheckoutSessionHosted(

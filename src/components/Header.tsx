@@ -1,14 +1,16 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Home, LogIn } from "lucide-react";
+import { Menu, X, Home, LogIn, User, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useMemberSession } from "@/contexts/MemberSessionContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import LanguageSelector from "./LanguageSelector";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useLanguage();
+  const { memberSession, isLoading: memberSessionLoading } = useMemberSession();
   const location = useLocation();
   const navigate = useNavigate();
   const isArtistPage = location.pathname.startsWith('/artist/');
@@ -103,12 +105,25 @@ const Header = () => {
                 {t('nav.joinUs')}
               </Button>
             </Link>
-            <Link to="/member-login">
-              <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple flex items-center gap-2">
-                <LogIn className="h-4 w-4" />
-                {t('nav.memberLogin')}
+            {memberSessionLoading ? (
+              <Button variant="outline" disabled className="border-electric-blue/50 text-electric-blue/80 flex items-center gap-2 min-w-[9rem] justify-center">
+                <Loader2 className="h-4 w-4 animate-spin" />
               </Button>
-            </Link>
+            ) : memberSession ? (
+              <Link to="/member-portal">
+                <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  {t('nav.memberPortal')}
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/member-login">
+                <Button variant="outline" className="border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple flex items-center gap-2">
+                  <LogIn className="h-4 w-4" />
+                  {t('nav.memberLogin')}
+                </Button>
+              </Link>
+            )}
             <Link to="/" onClick={handleHomeClick}>
               <Button className="bg-electric-blue hover:bg-electric-blue/80 text-deep-purple flex items-center gap-2">
                 <Home className="h-4 w-4" />
@@ -195,12 +210,25 @@ const Header = () => {
               </Link>
             </div>
             <div className="px-3 py-2">
-              <Link to="/member-login" className="block w-full" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple">
-                  <LogIn className="h-4 w-4 mr-2" />
-                  {t('nav.memberLogin')}
+              {memberSessionLoading ? (
+                <Button variant="outline" disabled className="w-full border-electric-blue/50 text-electric-blue/80">
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin inline" />
                 </Button>
-              </Link>
+              ) : memberSession ? (
+                <Link to="/member-portal" className="block w-full" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple">
+                    <User className="h-4 w-4 mr-2" />
+                    {t('nav.memberPortal')}
+                  </Button>
+                </Link>
+              ) : (
+                <Link to="/member-login" className="block w-full" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full border-electric-blue text-electric-blue hover:bg-electric-blue hover:text-deep-purple">
+                    <LogIn className="h-4 w-4 mr-2" />
+                    {t('nav.memberLogin')}
+                  </Button>
+                </Link>
+              )}
             </div>
             <div className="px-3 py-2">
               <Link 

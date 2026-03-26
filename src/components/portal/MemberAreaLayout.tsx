@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Users, MessageSquare, User, LogOut, Home } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useMemberSession } from "@/contexts/MemberSessionContext";
 import MemberDirectory from "@/components/portal/MemberDirectory";
 import MemberPortal from "@/pages/MemberPortal";
 import Messaging from "@/components/portal/Messaging";
@@ -14,6 +15,11 @@ const MemberAreaLayout = () => {
   const [messageRecipientName, setMessageRecipientName] = useState<string>("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { refresh: refreshMemberSession } = useMemberSession();
+
+  useEffect(() => {
+    refreshMemberSession();
+  }, [refreshMemberSession]);
 
   const handleLogout = async () => {
     try {
@@ -25,6 +31,7 @@ const MemberAreaLayout = () => {
       const data = await response.json();
 
       if (data.success) {
+        await refreshMemberSession();
         toast({
           title: 'Logged out',
           description: 'You have been successfully logged out.',

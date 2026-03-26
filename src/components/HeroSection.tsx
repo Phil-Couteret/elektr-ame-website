@@ -3,7 +3,18 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 const HeroSection = () => {
   const { t } = useLanguage();
-  
+
+  const scrollToEvents = () => {
+    window.dispatchEvent(new CustomEvent("closeFullGallery"));
+    const element = document.querySelector("#events");
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -38,7 +49,11 @@ const HeroSection = () => {
             {t('hero.description')}
           </p>
           <div className="flex justify-center">
-            <Button className="bg-blue-dark hover:bg-blue-darker text-white text-lg px-8 py-6">
+            <Button
+              type="button"
+              onClick={scrollToEvents}
+              className="bg-blue-dark hover:bg-blue-darker text-white text-lg px-8 py-6"
+            >
               {t('hero.events')}
             </Button>
           </div>

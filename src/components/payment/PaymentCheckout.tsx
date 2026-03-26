@@ -161,6 +161,32 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
         throw new Error('Invalid response from server');
       }
 
+      if (data.success && data.redsys_form) {
+        const rf = data.redsys_form as {
+          action: string;
+          Ds_SignatureVersion: string;
+          Ds_MerchantParameters: string;
+          Ds_Signature: string;
+        };
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = rf.action;
+        const fields: [string, string][] = [
+          ['Ds_SignatureVersion', rf.Ds_SignatureVersion],
+          ['Ds_MerchantParameters', rf.Ds_MerchantParameters],
+          ['Ds_Signature', rf.Ds_Signature],
+        ];
+        for (const [name, value] of fields) {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = value;
+          form.appendChild(input);
+        }
+        document.body.appendChild(form);
+        form.submit();
+        return;
+      }
       if (data.success && data.checkout_url) {
         window.location.href = data.checkout_url;
       } else {

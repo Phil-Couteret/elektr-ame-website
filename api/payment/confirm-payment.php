@@ -19,6 +19,7 @@ ob_clean();
 
 require_once __DIR__ . '/../classes/StripePayment.php';
 require_once __DIR__ . '/../classes/PaycometPayment.php';
+require_once __DIR__ . '/../classes/RedsysPayment.php';
 require_once __DIR__ . '/../classes/EmailAutomation.php';
 
 // Check if user is logged in
@@ -52,8 +53,34 @@ try {
     $orderId = $data['order_id'] ?? null;
     $gateway = $data['gateway'] ?? null;
 
-    // Paycomet flow: order_id or gateway=paycomet with session_id (Paycomet uses order_id in URL)
-    if ($gateway === 'paycomet' || $orderId) {
+    // RedSys return: gateway=redsys + order_id (member + emails handled in redsys-notification.php)
+    if ($gateway === 'redsys' && $orderId) {
+        $redsys = new RedsysPayment($pdo);
+        $result = $redsys->getCompletedTransactionByOrder($orderId);
+        if (!$result) {
+            throw new Exception('Payment not found or not yet confirmed. If you just completed the payment, wait a few seconds and refresh this page.');
+        }
+        if ((int) $result['member_id'] !== (int) $_SESSION['member_id']) {
+            throw new Exception('This payment does not belong to your account.');
+        }
+        $amount = (float) $result['amount'];
+        $membershipType = ($result['membership_type'] ?? 'basic') === 'lifetime' ? 'lifetime' : 'yearly';
+        $membershipStartDate = $result['membership_start_date'] ?? date('Y-m-d');
+        $membershipEndDate = $result['membership_end_date'] ?? null;
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Payment confirmed successfully',
+            'membership_type' => $membershipType,
+            'amount' => $amount,
+            'membership_start_date' => $membershipStartDate,
+            'membership_end_date' => $membershipEndDate,
+        ]);
+        exit;
+    }
+
+    // Paycomet flow: order_id or gateway=paycomet (not RedSys)
+    if ($gateway === 'paycomet' || ($orderId && $gateway !== 'redsys')) {
         $orderId = $orderId ?: $sessionId;
         if (!$orderId) {
             throw new Exception('Order ID is required for Paycomet');
