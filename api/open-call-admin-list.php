@@ -73,7 +73,7 @@ try {
         'id', 'email', 'whatsapp', 'first_name', 'last_name', 'dj_name', 'musical_style',
         'mix_link', 'mix_file_path', 'mix_file_original_name', 'photo_path', 'promo_consent',
         'selected', 'selection_date', 'rebooking_possible', 'future_session', 'archived',
-        'promoted_artist_id',
+        'promoted_artist_id', 'promoted_member_id',
         'created_at', 'updated_at', 'ip_address',
     ];
     $selectCols = array_values(array_filter($wanted, static function ($c) use ($cols) {
@@ -142,6 +142,11 @@ try {
             $row['promoted_artist_id'] = (int)$row['promoted_artist_id'];
         } else {
             $row['promoted_artist_id'] = null;
+        }
+        if (array_key_exists('promoted_member_id', $row) && $row['promoted_member_id'] !== null && $row['promoted_member_id'] !== '') {
+            $row['promoted_member_id'] = (int)$row['promoted_member_id'];
+        } else {
+            $row['promoted_member_id'] = null;
         }
         $row['selection_date'] = !empty($row['selection_date']) ? $row['selection_date'] : null;
         $row['rebooking_dates'] = $rebookingBySub[$id] ?? [];

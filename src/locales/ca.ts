@@ -102,6 +102,16 @@ export default {
   'admin.openCall.promoteAlready': 'Aquesta candidatura ja està vinculada a un artista.',
   'admin.openCall.promoteError': 'No s’ha pogut crear el perfil d’artista.',
   'admin.openCall.promoteViewArtist': 'Obrir pàgina de l’artista',
+  'admin.openCall.promoteToMember': 'Afegir candidat a socis',
+  'admin.openCall.promoteMemberHint':
+    'Concedeix la quota anual de cortesia només amb aquest botó — independent de “Seleccionat”. No està vinculat a esdeveniments. Si el correu ja existeix, s’actualitzen les dates. Cal accés a Socis.',
+  'admin.openCall.promoteMemberDone': 'Fitxa de soci creada.',
+  'admin.openCall.promoteMemberAlready': 'Aquesta candidatura ja està vinculada a un soci.',
+  'admin.openCall.promoteMemberError': 'No s’ha pogut crear o actualitzar el soci.',
+  'admin.openCall.promoteViewMember': 'Vinculat al soci #{id} — usa la pestanya Socis per editar.',
+  'admin.openCall.memberSyncDoneDetail': 'Soci #{id} — obre la pestanya Socis per revisar o editar.',
+  'admin.openCall.selectedMemberHint':
+    '“Seleccionat” és només seguiment intern (no està vinculat a esdeveniments ni a la quota). Pots marcar algú sense donar quota; usa “Afegir candidat a socis” només quan vulguis concedir la subscripció anual.',
   
   // Hero
   'hero.title': 'Elektr-Âme',

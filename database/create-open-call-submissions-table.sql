@@ -19,13 +19,15 @@ CREATE TABLE IF NOT EXISTS open_call_submissions (
     future_session TINYINT NOT NULL DEFAULT 0,
     archived TINYINT NOT NULL DEFAULT 0,
     promoted_artist_id INT NULL DEFAULT NULL,
+    promoted_member_id INT NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     ip_address VARCHAR(45) NULL,
     INDEX idx_created_at (created_at),
     INDEX idx_email (email),
     INDEX idx_archived (archived),
-    INDEX idx_promoted_artist (promoted_artist_id)
+    INDEX idx_promoted_artist (promoted_artist_id),
+    INDEX idx_promoted_member (promoted_member_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS open_call_rebooking_dates (

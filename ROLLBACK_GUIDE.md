@@ -66,6 +66,14 @@ After rollback, verify:
 - **v1.2.0** *(older tag — Dec 2025 snapshot)* - About section and messaging features
 - **v1.2.1** - Redsys redirect payment flow (production-ready); member PHP session in UI (`member-auth-check`, portal link); hero “Upcoming events” scroll; invitation tab label i18n; Header member session fix
 - **v1.3.2** - Open Call (public form + admin), promote submission to artist; admin section permissions; Header: home sections from any route; Open Call page scroll-to-top; `open-call-admin-list` compatible with older DB schemas; Open Call SQL migrations (archive, promoted artist). *(Note: an older unrelated **v1.3.0** tag exists for Paycomet/legal pages — use **v1.3.2** for this release.)*
+- **v1.3.3** - Open Call: promote to members (complimentary yearly membership via explicit button only); `promoted_member_id` migration; selection decoupled from membership; copy updates (EN/ES/CA).
+
+**Rollback to v1.3.3:**
+```bash
+git fetch --tags
+git checkout v1.3.3
+```
+Then `npm ci`, `npm run build`, deploy per your process.
 
 **Rollback to v1.3.2:**
 ```bash

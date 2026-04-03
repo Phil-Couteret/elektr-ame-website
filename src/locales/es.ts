@@ -102,6 +102,16 @@ export default {
   'admin.openCall.promoteAlready': 'Esta candidatura ya está vinculada a un artista.',
   'admin.openCall.promoteError': 'No se pudo crear el perfil de artista.',
   'admin.openCall.promoteViewArtist': 'Abrir página del artista',
+  'admin.openCall.promoteToMember': 'Añadir candidato a socios',
+  'admin.openCall.promoteMemberHint':
+    'Otorga la membresía anual de cortesía solo con este botón — independiente de “Seleccionado”. No está vinculado a eventos. Si el email ya existe, se actualizan las fechas. Requiere acceso a Socios.',
+  'admin.openCall.promoteMemberDone': 'Ficha de socio creada.',
+  'admin.openCall.promoteMemberAlready': 'Esta candidatura ya está vinculada a un socio.',
+  'admin.openCall.promoteMemberError': 'No se pudo crear o actualizar el socio.',
+  'admin.openCall.promoteViewMember': 'Vinculado al socio #{id} — usa la pestaña Socios para editar.',
+  'admin.openCall.memberSyncDoneDetail': 'Socio #{id} — abre la pestaña Socios para revisar o editar.',
+  'admin.openCall.selectedMemberHint':
+    '“Seleccionado” es solo seguimiento interno (no está vinculado a eventos ni a la membresía). Puedes marcar a alguien sin dar membresía; usa “Añadir candidato a socios” solo cuando quieras conceder la cuota anual.',
   
   // Hero
   'hero.title': 'Elektr-Âme',

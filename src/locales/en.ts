@@ -102,6 +102,16 @@ export default {
   'admin.openCall.promoteAlready': 'This submission is already linked to an artist.',
   'admin.openCall.promoteError': 'Could not create artist profile.',
   'admin.openCall.promoteViewArtist': 'Open artist page',
+  'admin.openCall.promoteToMember': 'Add applicant to members',
+  'admin.openCall.promoteMemberHint':
+    'Grants a complimentary one-year yearly membership only when you use this button — independent of “Selected”. Not linked to events. If the email already exists, membership dates are updated. Requires Members access.',
+  'admin.openCall.promoteMemberDone': 'Member record created.',
+  'admin.openCall.promoteMemberAlready': 'This submission is already linked to a member.',
+  'admin.openCall.promoteMemberError': 'Could not create or update member.',
+  'admin.openCall.promoteViewMember': 'Linked to member #{id} — use the Members tab to edit.',
+  'admin.openCall.memberSyncDoneDetail': 'Member #{id} — open the Members tab to review or edit.',
+  'admin.openCall.selectedMemberHint':
+    '“Selected” is internal tracking only (not tied to events or membership). You can mark someone selected without granting membership; use “Add applicant to members” only when you choose to award the yearly subscription.',
   
   // Hero
   'hero.title': 'Elektr-Âme',

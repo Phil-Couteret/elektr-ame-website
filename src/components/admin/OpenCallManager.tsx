@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Plus, Trash2, Link2, FileAudio, UserPlus } from "lucide-react";
+import { Loader2, Plus, Trash2, Link2, FileAudio, UserPlus, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContextNew";
@@ -47,6 +47,7 @@ interface OpenCallSubmission {
   ip_address: string | null;
   rebooking_dates: RebookingRow[];
   promoted_artist_id?: number | null;
+  promoted_member_id?: number | null;
 }
 
 function publicAssetUrl(path: string): string {
@@ -70,10 +71,12 @@ function OpenCallSubmissionEditor({
   s,
   onSaved,
   canPromoteToArtist,
+  canPromoteToMember,
 }: {
   s: OpenCallSubmission;
   onSaved: () => void;
   canPromoteToArtist: boolean;
+  canPromoteToMember: boolean;
 }) {
   const { t } = useLanguage();
   const { toast } = useToast();
@@ -86,7 +89,8 @@ function OpenCallSubmissionEditor({
   const [saving, setSaving] = useState(false);
   const [deleteMixOpen, setDeleteMixOpen] = useState(false);
   const [deletingMix, setDeletingMix] = useState(false);
-  const [promoting, setPromoting] = useState(false);
+  const [promotingArtist, setPromotingArtist] = useState(false);
+  const [promotingMember, setPromotingMember] = useState(false);
 
   useEffect(() => {
     setArchived(!!s.archived);
@@ -108,6 +112,8 @@ function OpenCallSubmissionEditor({
     s.rebooking_possible,
     s.rebooking_dates,
     s.mix_file_path,
+    s.promoted_artist_id,
+    s.promoted_member_id,
   ]);
 
   const mixFileUrl = s.mix_file_path ? publicAssetUrl(s.mix_file_path) : null;
@@ -187,7 +193,7 @@ function OpenCallSubmissionEditor({
   };
 
   const promoteToArtist = async () => {
-    setPromoting(true);
+    setPromotingArtist(true);
     try {
       const res = await fetch("/api/open-call-promote-to-artist.php", {
         method: "POST",
@@ -213,7 +219,40 @@ function OpenCallSubmissionEditor({
         variant: "destructive",
       });
     } finally {
-      setPromoting(false);
+      setPromotingArtist(false);
+    }
+  };
+
+  const promoteToMember = async () => {
+    setPromotingMember(true);
+    try {
+      const res = await fetch("/api/open-call-promote-to-member.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id: s.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "promote failed");
+      }
+      if (data.alreadyLinked && data.memberId) {
+        toast({ title: t("admin.openCall.promoteMemberAlready") });
+      } else {
+        toast({
+          title: t("admin.openCall.promoteMemberDone"),
+          description: t("admin.openCall.memberSyncDoneDetail", { id: String(data.memberId ?? "") }),
+        });
+      }
+      onSaved();
+    } catch (e) {
+      toast({
+        title: t("admin.openCall.promoteMemberError"),
+        description: e instanceof Error ? e.message : undefined,
+        variant: "destructive",
+      });
+    } finally {
+      setPromotingMember(false);
     }
   };
 
@@ -304,37 +343,69 @@ function OpenCallSubmissionEditor({
       <div className="space-y-4 rounded-lg border border-white/20 bg-black/35 p-4 mt-4">
         <p className="text-white font-semibold text-base">{t("admin.openCall.adminSection")}</p>
 
-        {canPromoteToArtist && (
-          <div className="space-y-2 pb-2 border-b border-white/10">
-            {s.promoted_artist_id ? (
-              <p className="text-sm text-white/85">
-                <a
-                  href={`/artist/${s.promoted_artist_id}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-electric-blue underline font-medium"
-                >
-                  {t("admin.openCall.promoteViewArtist")}
-                </a>
-              </p>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10"
-                onClick={() => void promoteToArtist()}
-                disabled={promoting}
-              >
-                {promoting ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        {(canPromoteToArtist || canPromoteToMember) && (
+          <div className="space-y-4 pb-2 border-b border-white/10">
+            {canPromoteToArtist && (
+              <div className="space-y-2">
+                {s.promoted_artist_id ? (
+                  <p className="text-sm text-white/85">
+                    <a
+                      href={`/artist/${s.promoted_artist_id}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-electric-blue underline font-medium"
+                    >
+                      {t("admin.openCall.promoteViewArtist")}
+                    </a>
+                  </p>
                 ) : (
-                  <UserPlus className="h-4 w-4 mr-2" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-electric-blue/50 text-electric-blue hover:bg-electric-blue/10"
+                    onClick={() => void promoteToArtist()}
+                    disabled={promotingArtist || promotingMember}
+                  >
+                    {promotingArtist ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <UserPlus className="h-4 w-4 mr-2" />
+                    )}
+                    {t("admin.openCall.promoteToArtist")}
+                  </Button>
                 )}
-                {t("admin.openCall.promoteToArtist")}
-              </Button>
+                <p className="text-xs text-white/50">{t("admin.openCall.promoteHint")}</p>
+              </div>
             )}
-            <p className="text-xs text-white/50">{t("admin.openCall.promoteHint")}</p>
+            {canPromoteToMember && (
+              <div className="space-y-2">
+                {s.promoted_member_id ? (
+                  <p className="text-sm text-white/85">
+                    <span className="text-electric-blue font-medium">
+                      {t("admin.openCall.promoteViewMember", { id: String(s.promoted_member_id) })}
+                    </span>
+                  </p>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="border-green-500/50 text-green-200 hover:bg-green-950/30"
+                    onClick={() => void promoteToMember()}
+                    disabled={promotingArtist || promotingMember}
+                  >
+                    {promotingMember ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Users className="h-4 w-4 mr-2" />
+                    )}
+                    {t("admin.openCall.promoteToMember")}
+                  </Button>
+                )}
+                <p className="text-xs text-white/50">{t("admin.openCall.promoteMemberHint")}</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -422,6 +493,7 @@ function OpenCallSubmissionEditor({
             {t("admin.openCall.selected")}
           </Label>
         </div>
+        <p className="text-xs text-white/45 -mt-1 pl-7">{t("admin.openCall.selectedMemberHint")}</p>
         {selected && (
           <div className="space-y-1">
             <Label htmlFor={`oc-sel-date-${s.id}`} className="text-white/90">
@@ -503,6 +575,7 @@ const OpenCallManager = () => {
   const { toast } = useToast();
   const { canAccessSection } = useAuth();
   const canPromoteToArtist = canAccessSection("artists");
+  const canPromoteToMember = canAccessSection("members");
   const [rows, setRows] = useState<OpenCallSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [listScope, setListScope] = useState<ListScope>("active");
@@ -639,7 +712,12 @@ const OpenCallManager = () => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <OpenCallSubmissionEditor s={s} onSaved={load} canPromoteToArtist={canPromoteToArtist} />
+                  <OpenCallSubmissionEditor
+                    s={s}
+                    onSaved={load}
+                    canPromoteToArtist={canPromoteToArtist}
+                    canPromoteToMember={canPromoteToMember}
+                  />
                 </AccordionContent>
               </AccordionItem>
             ))}
