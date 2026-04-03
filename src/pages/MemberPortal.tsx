@@ -42,6 +42,7 @@ import MembershipRenewal from "@/components/payment/MembershipRenewal";
 import PaymentAllocation from "@/components/payment/PaymentAllocation";
 import TermsAcceptance from "@/components/portal/TermsAcceptance";
 import { Switch } from "@/components/ui/switch";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 
 interface PendingEmailChange {
   new_email: string;
@@ -1113,13 +1114,19 @@ const MemberPortal = () => {
                       <div className="flex items-start gap-3 pb-4 border-b border-white/10">
                         <Building2 className="h-5 w-5 text-white/50 mt-0.5" />
                         <div className="flex-1">
-                          <p className="text-white/70 text-sm">Company (for tax receipt)</p>
+                          <p className="text-white/70 text-sm">
+                            {FEATURE_TAX_DEDUCTION_UI ? "Company (for tax receipt)" : "Company"}
+                          </p>
                           <p className="text-white">
                             {memberData.company_name}
                             {memberData.company_cif && <><br />CIF: {memberData.company_cif}</>}
                             {memberData.company_address && <><br />{memberData.company_address}</>}
                           </p>
-                          <p className="text-white/50 text-xs mt-1">You can choose to issue the tax receipt to this company when paying.</p>
+                          {FEATURE_TAX_DEDUCTION_UI && (
+                            <p className="text-white/50 text-xs mt-1">
+                              You can choose to issue the tax receipt to this company when paying.
+                            </p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -1330,8 +1337,16 @@ const MemberPortal = () => {
                     </div>
 
                     <div className="border-t border-white/10 pt-4 mt-4">
-                      <p className="text-white/70 text-sm mb-3">Company (optional – for tax receipt on behalf of company)</p>
-                      <p className="text-white/50 text-xs mb-3">If your employer pays your membership, add company details here. When paying, you can choose to issue the tax receipt to the company instead of yourself.</p>
+                      <p className="text-white/70 text-sm mb-3">
+                        {FEATURE_TAX_DEDUCTION_UI
+                          ? "Company (optional – for tax receipt on behalf of company)"
+                          : "Company (optional)"}
+                      </p>
+                      <p className="text-white/50 text-xs mb-3">
+                        {FEATURE_TAX_DEDUCTION_UI
+                          ? "If your employer pays your membership, add company details here. When paying, you can choose to issue the tax receipt to the company instead of yourself."
+                          : "If you want company details on file for correspondence or invoicing, add them here."}
+                      </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="company_name" className="text-white">Company name</Label>

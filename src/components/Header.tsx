@@ -13,30 +13,15 @@ const Header = () => {
   const { memberSession, isLoading: memberSessionLoading } = useMemberSession();
   const location = useLocation();
   const navigate = useNavigate();
-  const isArtistPage = location.pathname.startsWith('/artist/');
 
   const handleHomeClick = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSectionClick = (section: string) => {
-    // Dispatch custom event to close full gallery if open
     window.dispatchEvent(new CustomEvent('closeFullGallery'));
-    
-    if (isArtistPage) {
-      // If on artist page, navigate to home first, then scroll
-      navigate('/');
-      setTimeout(() => {
-        const element = document.querySelector(section);
-        if (element) {
-          const headerOffset = 80;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-        }
-      }, 100);
-    } else {
-      // On home page, just scroll
+
+    const scrollToSection = () => {
       const element = document.querySelector(section);
       if (element) {
         const headerOffset = 80;
@@ -44,6 +29,15 @@ const Header = () => {
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
       }
+    };
+
+    // Section anchors exist only on the home page. From any other route (Open Call, artist
+    // detail, etc.), go home first then scroll — same idea as the former artist-page branch.
+    if (location.pathname === '/') {
+      scrollToSection();
+    } else {
+      navigate('/');
+      setTimeout(scrollToSection, 100);
     }
   };
 
@@ -75,6 +69,12 @@ const Header = () => {
             >
               {t('nav.artists')}
             </button>
+            <Link 
+              to="/open-call-dj" 
+              className="text-white/80 hover:text-blue-light transition-colors"
+            >
+              {t('nav.openCall')}
+            </Link>
             <button 
               onClick={() => handleSectionClick('#events')} 
               className="text-white/80 hover:text-blue-light transition-colors"
@@ -165,6 +165,13 @@ const Header = () => {
             >
               {t('nav.artists')}
             </button>
+            <Link
+              to="/open-call-dj"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-3 py-2 text-base font-medium text-white hover:bg-gray-800/50 rounded-md"
+            >
+              {t('nav.openCall')}
+            </Link>
             <button
               onClick={() => {
                 setIsMenuOpen(false);

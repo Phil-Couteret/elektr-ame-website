@@ -4,6 +4,7 @@ import { CheckCircle, Home } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useNavigate } from "react-router-dom";
 
 const SponsorSuccess = () => {
@@ -25,7 +26,9 @@ const SponsorSuccess = () => {
               <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
               <h1 className="text-2xl font-bold text-white mb-2">Thank You!</h1>
               <p className="text-white/80 mb-6">
-                Your company's donation has been received. A tax deduction certificate will be sent to the contact email you provided, for use with your Impuesto de Sociedades declaration.
+                {FEATURE_TAX_DEDUCTION_UI
+                  ? "Your company's donation has been received. A tax deduction certificate will be sent to the contact email you provided, for use with your Impuesto de Sociedades declaration."
+                  : "Your company's donation has been received. A confirmation will be sent to the contact email you provided."}
               </p>
               <Button
                 onClick={() => navigate("/")}

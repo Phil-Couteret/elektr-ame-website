@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { CreditCard, Loader2, AlertCircle, CheckCircle, Euro, Calendar, Info, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { calculateTaxDeduction, TaxDeductionResult } from "@/utils/taxCalculations";
 
 interface CompanyDetails {
@@ -62,7 +63,9 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
       case 'basic':
         return 'Basic membership - Full access to Elektr-Âme community for 1 year';
       case 'custom':
-        return 'Custom amount - Pay any amount you wish (minimum €20). Amounts above €20 qualify for tax deduction benefits.';
+        return FEATURE_TAX_DEDUCTION_UI
+          ? 'Custom amount - Pay any amount you wish (minimum €20). Amounts above €20 qualify for tax deduction benefits.'
+          : 'Custom amount - Pay any amount you wish (minimum €20).';
       default:
         return '';
     }
@@ -113,8 +116,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
 
     const amount = calculateAmount();
     
-    // Calculate tax deduction (only for amounts > €20)
-    if (amount > MINIMUM_CUSTOM_AMOUNT) {
+    if (FEATURE_TAX_DEDUCTION_UI && amount > MINIMUM_CUSTOM_AMOUNT) {
       const taxCalc = calculateTaxDeduction(amount, false); // TODO: Check if recurring donor
       setTaxCalculation(taxCalc);
     } else {
@@ -145,10 +147,16 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
           membership_type: membershipType,
           amount: amount,
           terms_accepted: acceptTerms,
-          tax_fiscal_recipient: hasCompanyDetails && payOnBehalfOfCompany ? 'company' : 'personal',
-          company_name: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_name : null,
-          company_cif: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_cif : null,
-          company_address: hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_address : null,
+          tax_fiscal_recipient:
+            FEATURE_TAX_DEDUCTION_UI && hasCompanyDetails && payOnBehalfOfCompany ? 'company' : 'personal',
+          company_name:
+            FEATURE_TAX_DEDUCTION_UI && hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_name : null,
+          company_cif:
+            FEATURE_TAX_DEDUCTION_UI && hasCompanyDetails && payOnBehalfOfCompany ? companyDetails.company_cif : null,
+          company_address:
+            FEATURE_TAX_DEDUCTION_UI && hasCompanyDetails && payOnBehalfOfCompany
+              ? companyDetails.company_address
+              : null,
         }),
       });
 
@@ -204,7 +212,8 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
   };
 
   const currentAmount = calculateAmount();
-  const showTaxDeduction = taxCalculation && currentAmount > MINIMUM_CUSTOM_AMOUNT;
+  const showTaxDeduction =
+    FEATURE_TAX_DEDUCTION_UI && taxCalculation && currentAmount > MINIMUM_CUSTOM_AMOUNT;
 
   return (
     <Card className="bg-black/40 border-white/10">
@@ -292,7 +301,9 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                   placeholder={`${MINIMUM_CUSTOM_AMOUNT.toFixed(2)}`}
                 />
                 <p className="text-white/60 text-sm mt-2">
-                  Minimum €{MINIMUM_CUSTOM_AMOUNT.toFixed(2)}. Amounts above €{MINIMUM_CUSTOM_AMOUNT.toFixed(2)} qualify for tax deduction benefits.
+                  Minimum €{MINIMUM_CUSTOM_AMOUNT.toFixed(2)}.
+                  {FEATURE_TAX_DEDUCTION_UI &&
+                    ` Amounts above €${MINIMUM_CUSTOM_AMOUNT.toFixed(2)} qualify for tax deduction benefits.`}
                 </p>
               </div>
             )}
@@ -425,7 +436,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
                 </div>
               )}
 
-              {!showTaxDeduction && currentAmount > MINIMUM_CUSTOM_AMOUNT && (
+              {FEATURE_TAX_DEDUCTION_UI && !showTaxDeduction && currentAmount > MINIMUM_CUSTOM_AMOUNT && (
                 <Alert className="bg-blue-500/20 border-blue-500/50 mt-4">
                   <Info className="h-4 w-4 text-blue-400" />
                   <AlertDescription className="text-blue-300 text-sm">
@@ -435,7 +446,7 @@ const PaymentCheckout = ({ memberId, currentMembershipType, currentPaymentStatus
               )}
 
               {/* Pay on behalf of company (when member has company details) */}
-              {hasCompanyDetails && (
+              {FEATURE_TAX_DEDUCTION_UI && hasCompanyDetails && (
                 <div className="mt-4 pt-4 border-t border-white/10">
                   <label className="flex items-start gap-3 cursor-pointer">
                     <input

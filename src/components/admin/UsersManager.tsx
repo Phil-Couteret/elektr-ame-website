@@ -49,6 +49,7 @@ const SECTION_LABELS: Record<string, string> = {
   email_automation: 'Email Automation',
   invitations: 'Invitations',
   payment: 'Payment',
+  open_call: 'Open Call (DJ)',
 };
 
 interface AdminUser {

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Calendar, AlertCircle, CreditCard, Loader2 } from "lucide-react";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import PaymentCheckout from "./PaymentCheckout";
@@ -118,7 +119,10 @@ const MembershipRenewal = ({
               <p>Complete your membership payment (€20/year) to unlock all member benefits.</p>
             )}
             {currentMembershipType === 'yearly' && (
-              <p>Renew your yearly membership. Choose €20 for basic or any amount above €20 for tax benefits.</p>
+              <p>
+                Renew your yearly membership. Choose €20 for basic
+                {FEATURE_TAX_DEDUCTION_UI ? ' or any amount above €20 for tax benefits' : ' or a higher amount to support the association'}.
+              </p>
             )}
           </div>
         </div>

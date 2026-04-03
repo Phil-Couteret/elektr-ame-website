@@ -112,7 +112,7 @@ try {
     if (isset($input['permissions']) && is_array($input['permissions']) && $target['role'] === 'admin') {
         $colCheck = $pdo->query("SHOW COLUMNS FROM admin_users LIKE 'permissions'");
         if ($colCheck && $colCheck->rowCount() > 0) {
-            $validSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+            $validSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment','open_call'];
             $perms = array_values(array_unique(array_intersect($input['permissions'], $validSections)));
             $updates[] = "permissions = :permissions";
             $params[':permissions'] = json_encode($perms);

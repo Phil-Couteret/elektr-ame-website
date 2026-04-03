@@ -60,6 +60,9 @@ Thumbs.db
 # Cursor / IDE
 cursor_current_working_directory.md
 
+# Local scratch / one-off files
+calcul budget boisson.html
+
 # Local test files
 test-*.html
 test-*.php

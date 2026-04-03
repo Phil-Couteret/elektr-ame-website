@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { CreditCard, Loader2, AlertCircle, CheckCircle, Euro, Calculator, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { calculateTaxDeduction } from "@/utils/taxCalculations";
 
 interface AllocationOption {
@@ -189,10 +190,6 @@ const PaymentAllocation = () => {
     ? data.options.find(opt => `${opt.type}-${opt.years}` === selectedOption)
     : null;
 
-  const taxCalculation = selectedOptionData && selectedOptionData.type === 'sponsor_donation'
-    ? calculateTaxDeduction(selectedOptionData.amount, false)
-    : null;
-
   return (
     <Card className="bg-black/40 border-white/10">
       <CardHeader>
@@ -258,7 +255,7 @@ const PaymentAllocation = () => {
                     </p>
                   )}
                   
-                  {option.type === 'sponsor_donation' && taxCalc && (
+                  {FEATURE_TAX_DEDUCTION_UI && option.type === 'sponsor_donation' && taxCalc && (
                     <div className="mt-3 bg-blue-500/20 rounded p-3 border border-blue-500/30">
                       <div className="flex items-start gap-2">
                         <Calculator className="h-4 w-4 text-blue-400 mt-0.5" />

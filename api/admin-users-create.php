@@ -47,7 +47,7 @@ try {
     $passwordInput = $input['password'];
     $permissions = $input['permissions'] ?? [];
     if (!is_array($permissions)) $permissions = [];
-    $validSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+    $validSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment','open_call'];
     $permissions = array_values(array_unique(array_intersect($permissions, $validSections)));
     $permissionsJson = json_encode($permissions);
 

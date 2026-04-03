@@ -51,7 +51,7 @@ try {
         
         // Return authenticated user info (permissions for section access)
         $role = $_SESSION['admin_role'] ?? 'admin';
-        $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+        $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment','open_call'];
         $perms = ($role === 'superadmin') ? $allSections : ($_SESSION['admin_permissions'] ?? []);
         // Backward compat: if admin has no perms in session, fetch from DB and refresh session
         if ($role === 'admin' && empty($perms)) {

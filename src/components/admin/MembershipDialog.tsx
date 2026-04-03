@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
@@ -335,7 +336,11 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
                 className="bg-black/40 border-white/10 text-white"
                 placeholder="Spain, France, etc."
               />
-              <p className="text-white/50 text-xs">Required for tax receipt (Spain residents only)</p>
+              <p className="text-white/50 text-xs">
+                {FEATURE_TAX_DEDUCTION_UI
+                  ? "Required for tax receipt (Spain residents only)"
+                  : "Helps us apply the correct regional settings"}
+              </p>
             </div>
             <div className="space-y-2">
               <Label>{t('admin.addMember.artistName')}</Label>
@@ -540,7 +545,9 @@ const MembershipDialog = ({ member, open, onOpenChange, onSuccess }: MembershipD
           <div className="space-y-3 border-t border-white/10 pt-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold text-white/80">Payment history</h3>
-              {formData.country && /spain|españa|es|catalonia/i.test(formData.country) && (
+              {FEATURE_TAX_DEDUCTION_UI &&
+                formData.country &&
+                /spain|españa|es|catalonia/i.test(formData.country) && (
                 <Button type="button" variant="outline" size="sm" onClick={handleSendTaxReceiptTest} disabled={isSendingTaxTest} className="border-electric-blue text-electric-blue text-xs">
                   {isSendingTaxTest ? <><Loader2 className="h-3 w-3 mr-1 animate-spin" />Sending</> : 'Send tax receipt test'}
                 </Button>

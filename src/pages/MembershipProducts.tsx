@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -86,10 +87,12 @@ const MembershipProducts = () => {
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature4')}</span>
                     </li>
+                    {FEATURE_TAX_DEDUCTION_UI && (
                     <li className="flex items-start gap-2 text-white/80">
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature5')}</span>
                     </li>
+                    )}
                   </ul>
                 </div>
                 <Button
@@ -139,10 +142,12 @@ const MembershipProducts = () => {
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature4')}</span>
                     </li>
+                    {FEATURE_TAX_DEDUCTION_UI && (
                     <li className="flex items-start gap-2 text-white/80">
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.basicFeature5')}</span>
                     </li>
+                    )}
                     <li className="flex items-start gap-2 text-white/80 mt-3 pt-3 border-t border-white/10">
                       <Check className="h-5 w-5 text-electric-blue flex-shrink-0 mt-0.5" />
                       <span>{t('products.supportFeature1')}</span>

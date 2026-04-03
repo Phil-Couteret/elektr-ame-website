@@ -105,7 +105,7 @@ try {
     session_regenerate_id(true);
     
     // Return success response (permissions for superadmin = all sections for UI)
-    $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment'];
+    $allSections = ['events','artists','gallery','members','newsletter','email_automation','invitations','payment','open_call'];
     $userPerms = ($user['role'] === 'superadmin') ? $allSections : $perms;
     echo json_encode([
         'success' => true,

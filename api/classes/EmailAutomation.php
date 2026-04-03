@@ -469,6 +469,10 @@ class EmailAutomation {
      * Returns true if sent, false if skipped (non-Spain) or failed
      */
     public function sendTaxReceiptPdf($memberId, $variables) {
+        require_once __DIR__ . '/../tax-features.php';
+        if (!tax_receipt_actions_enabled()) {
+            return false;
+        }
         $member = $this->getMemberData($memberId);
         if (!$member) return false;
         if (!$this->isSpainResident($member['country'] ?? '')) return false;
@@ -514,6 +518,10 @@ class EmailAutomation {
      * Sends to contact_email with company as donor (Impuesto de Sociedades)
      */
     public function sendSponsorTaxReceiptPdf($sponsorId, $variables, $contactEmail) {
+        require_once __DIR__ . '/../tax-features.php';
+        if (!tax_receipt_actions_enabled()) {
+            return false;
+        }
         if (floatval($variables['amount'] ?? 0) < 20) return false;
         try {
             $variables['payment_method'] = 'stripe';

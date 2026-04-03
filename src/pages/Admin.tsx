@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send, UserCheck, CreditCard } from "lucide-react";
+import { LogOut, Calendar, Users, Home, Image, UserCog, UserPlus, Mail, Send, UserCheck, CreditCard, Mic } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContextNew";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Link } from "react-router-dom";
@@ -14,6 +14,7 @@ import NewsletterManager from "@/components/admin/NewsletterManager";
 import EmailAutomationManager from "@/components/admin/EmailAutomationManager";
 import InvitationsManager from "@/components/admin/InvitationsManager";
 import PaymentConfigManager from "@/components/admin/PaymentConfigManager";
+import OpenCallManager from "@/components/admin/OpenCallManager";
 import LanguageSelector from "@/components/LanguageSelector";
 import { SEO } from "@/components/SEO";
 
@@ -25,6 +26,7 @@ const Admin = () => {
   const visibleTabs = [
     canAccessSection('events') && 'events',
     canAccessSection('artists') && 'artists',
+    canAccessSection('open_call') && 'open-call',
     canAccessSection('gallery') && 'gallery',
     canAccessSection('members') && 'members',
     canAccessSection('newsletter') && 'newsletter',
@@ -107,6 +109,12 @@ const Admin = () => {
                 {t('admin.tabs.artists')}
               </TabsTrigger>
             )}
+            {canAccessSection('open_call') && (
+              <TabsTrigger value="open-call" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
+                <Mic className="h-4 w-4 mr-2" />
+                {t('admin.tabs.openCall')}
+              </TabsTrigger>
+            )}
             {canAccessSection('gallery') && (
               <TabsTrigger value="gallery" className="data-[state=active]:bg-electric-blue data-[state=active]:text-deep-purple text-white">
                 <Image className="h-4 w-4 mr-2" />
@@ -159,6 +167,11 @@ const Admin = () => {
           {canAccessSection('artists') && (
             <TabsContent value="artists" className="mt-6">
               <ArtistsManager />
+            </TabsContent>
+          )}
+          {canAccessSection('open_call') && (
+            <TabsContent value="open-call" className="mt-6">
+              <OpenCallManager />
             </TabsContent>
           )}
           {canAccessSection('gallery') && (

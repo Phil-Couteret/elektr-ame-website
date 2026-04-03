@@ -35,6 +35,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import Sponsor from "./pages/Sponsor";
 import SponsorSuccess from "./pages/SponsorSuccess";
+import OpenCallDj from "./pages/OpenCallDj";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/payment-cancelled" element={<PaymentFailure />} />
               <Route path="/sponsor" element={<Sponsor />} />
               <Route path="/sponsor-success" element={<SponsorSuccess />} />
+              <Route path="/open-call-dj" element={<OpenCallDj />} />
               <Route path="/join-us" element={<JoinUs />} />
               <Route path="/member-login" element={<MemberLogin />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />

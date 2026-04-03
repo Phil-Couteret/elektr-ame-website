@@ -10,6 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useToast } from "@/hooks/use-toast";
 
 const PRESET_AMOUNTS = [50, 100, 250, 500];
@@ -85,9 +86,17 @@ const Sponsor = () => {
     <>
       <SEO
         title="Support Us | Company Sponsorship | Elektr-Âme"
-        description="Support Elektr-Âme as a company. Make a tax-deductible donation and receive an official certificate for Impuesto de Sociedades."
+        description={
+          FEATURE_TAX_DEDUCTION_UI
+            ? "Support Elektr-Âme as a company. Make a tax-deductible donation and receive an official certificate for Impuesto de Sociedades."
+            : "Support Elektr-Âme as a company with a donation to our association."
+        }
         url="https://www.elektr-ame.com/sponsor"
-        keywords="sponsor, donation, company, Elektr-Âme, tax deduction, Impuesto de Sociedades"
+        keywords={
+          FEATURE_TAX_DEDUCTION_UI
+            ? "sponsor, donation, company, Elektr-Âme, tax deduction, Impuesto de Sociedades"
+            : "sponsor, donation, company, Elektr-Âme"
+        }
       />
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-deep-purple via-black to-deep-purple pt-20 pb-12">
@@ -109,7 +118,9 @@ const Sponsor = () => {
                 Support Elektr-Âme
               </CardTitle>
               <CardDescription className="text-white/80">
-                Companies can support our association with a tax-deductible donation. You will receive an official certificate for your Impuesto de Sociedades declaration.
+                {FEATURE_TAX_DEDUCTION_UI
+                  ? "Companies can support our association with a tax-deductible donation. You will receive an official certificate for your Impuesto de Sociedades declaration."
+                  : "Companies can support our association with a donation. Thank you for helping grow the community."}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -157,7 +168,9 @@ const Sponsor = () => {
                     placeholder="contact@company.com"
                     required
                   />
-                  <p className="text-white/50 text-xs">Tax receipt will be sent to this email</p>
+                  {FEATURE_TAX_DEDUCTION_UI && (
+                    <p className="text-white/50 text-xs">Tax receipt will be sent to this email</p>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label className="text-white">Amount (€) *</Label>

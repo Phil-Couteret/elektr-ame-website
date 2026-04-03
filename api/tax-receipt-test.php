@@ -16,6 +16,12 @@ if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
 }
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/tax-features.php';
+if (!tax_receipt_actions_enabled()) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Tax receipt actions are disabled']);
+    exit;
+}
 require_once __DIR__ . '/classes/EmailAutomation.php';
 
 $memberId = isset($_POST['member_id']) ? (int)$_POST['member_id'] : (int)($_GET['member_id'] ?? 0);

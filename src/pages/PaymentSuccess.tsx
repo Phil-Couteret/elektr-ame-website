@@ -6,6 +6,7 @@ import { CheckCircle, CreditCard, Home, Download, Loader2 } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -181,7 +182,7 @@ const PaymentSuccess = () => {
                 <div className="bg-blue-500/20 border border-blue-500/50 rounded-lg p-4">
                   <p className="text-blue-300 text-sm">
                     ✅ A confirmation email has been sent to your email address.
-                    {paymentData?.amount >= 20 && (
+                    {FEATURE_TAX_DEDUCTION_UI && paymentData?.amount >= 20 && (
                       <span className="block mt-2">
                         📄 Spain residents: your tax receipt PDF has been sent to your email.
                       </span>

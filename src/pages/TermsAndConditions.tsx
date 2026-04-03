@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { FEATURE_TAX_DEDUCTION_UI } from "@/config/features";
 import { getTerms } from "content/terms";
 
 const TermsAndConditions = () => {
@@ -90,7 +91,7 @@ const TermsAndConditions = () => {
                     <li>{terms.shippingPolicyItem1}</li>
                     <li>{terms.shippingPolicyItem2}</li>
                     <li>{terms.shippingPolicyItem3}</li>
-                    <li>{terms.shippingPolicyItem4}</li>
+                    {FEATURE_TAX_DEDUCTION_UI && <li>{terms.shippingPolicyItem4}</li>}
                   </ul>
                 </div>
               </div>

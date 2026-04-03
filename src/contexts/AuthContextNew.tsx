@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Admin section keys for granular permissions
-export const ADMIN_SECTIONS = ['events', 'artists', 'gallery', 'members', 'newsletter', 'email_automation', 'invitations', 'payment'] as const;
+export const ADMIN_SECTIONS = ['events', 'artists', 'gallery', 'members', 'newsletter', 'email_automation', 'invitations', 'payment', 'open_call'] as const;
 export type AdminSection = (typeof ADMIN_SECTIONS)[number];
 
 // Define user type  
